@@ -1,0 +1,26 @@
+<!-- @dsCard group="Components" viewport="700x340" name="Navigation" subtitle="Nav bar, tabs, side rail and the app shell" -->
+<!doctype html><html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css"><style>html,body{margin:0;background:var(--background)}#root{padding:0px;font-family:var(--font-sans)}.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.col{display:flex;flex-direction:column;gap:10px}.lbl{font-family:var(--font-mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-foreground)}</style></head>
+<body><div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel">
+const B = window.B3PayDesignSystem_8a84cb;
+const {NavBar,Tabs,SideNav,Shell,BrandMark,Button,IconOf}=B;
+const icon = IconOf;
+function Demo(){const[t,setT]=React.useState("all");const[s,setS]=React.useState("core");
+return(<div>
+<NavBar sticky={false} brand={<BrandMark size={22}/>} active="Products" links={[{label:"Products"},{label:"Developers"},{label:"Blog"},{label:"About"}]} actions={<><Button size="sm" variant="ghost">GitHub</Button><Button size="sm" variant="filled" color="primary">Open B3Forge</Button></>}/>
+<div style={{padding:20,display:"flex",flexDirection:"column",gap:16}}>
+<div className="row" style={{gap:20}}>
+<Tabs value={t} onChange={setT} tabs={[{value:"all",label:"All"},{value:"mine",label:"Mine"},{value:"fav",label:"Favorites"}]}/>
+<Tabs variant="underline" value={t} onChange={setT} tabs={[{value:"all",label:"Community",count:128},{value:"mine",label:"My workflows",count:6},{value:"fav",label:"Favorites",count:3}]}/>
+</div>
+<div style={{height:150,border:"1px solid var(--border)",borderRadius:10,overflow:"hidden"}}>
+<Shell bar={<><BrandMark size={18}/><Button size="xs" variant="filled" color="primary">Deploy</Button></>}
+ aside={<SideNav active={s} onSelect={setS} sections={[{label:"Packages",items:[{value:"core",label:"@ic-reactor/core",icon:icon("Package")},{value:"react",label:"@ic-reactor/react",icon:icon("Package")},{value:"cli",label:"@ic-reactor/cli",icon:icon("Terminal"),badge:"new"}]}]}/>}>
+ <div style={{padding:16,fontSize:12,color:"var(--muted-foreground)",fontFamily:"var(--font-mono)"}}>main content</div>
+</Shell></div></div></div>);}
+ReactDOM.createRoot(document.getElementById("root")).render(<Demo/>);
+</script></body></html>

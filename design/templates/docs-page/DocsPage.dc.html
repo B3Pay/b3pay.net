@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Docs page" description="B3Pay developer docs — sidebar, article, code samples, on-this-page rail" -->
+<helmet><script src="./ds-base.js"></script><style>body{margin:0;background:#111113;color:#F2F2F2;font-family:"Inter",ui-sans-serif,system-ui,sans-serif}a{color:#FF8D28;text-decoration:none}a:hover{color:#FFA056}</style></helmet>
+<div style="display:flex;flex-direction:column;height:100vh;background:#111113">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:16px;height:52px;padding:0 16px;border-bottom:1px solid #303035;background:rgba(17,17,19,.8);backdrop-filter:blur(12px);flex:none">
+<div style="display:flex;align-items:center;gap:14px">
+<x-import component-from-global-scope="B3PayDesignSystem_8a84cb.BrandMark" size="{{ 22 }}" hint-size="94px,22px"></x-import>
+<span style="width:1px;height:18px;background:#303035"></span>
+<span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:#9E9EA8">Docs</span>
+<x-import component-from-global-scope="B3PayDesignSystem_8a84cb.Badge" size="xs" color="secondary" hint-size="70px,16px">{{ pkg }}</x-import>
+</div>
+<x-import component-from-global-scope="B3PayDesignSystem_8a84cb.Button" size="sm" variant="outlined" hint-size="90px,24px">Search ⌘K</x-import>
+</div>
+
+<div style="flex:1;min-height:0;display:flex">
+<aside style="width:230px;flex:none;border-right:1px solid #303035;padding:16px 12px;overflow:auto">
+<sc-for list="{{ nav }}" as="group" hint-placeholder-count="2">
+<div style="margin-bottom:18px">
+<div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#9E9EA8;padding:0 8px 8px">{{ group.label }}</div>
+<sc-for list="{{ group.items }}" as="item" hint-placeholder-count="3">
+<a href="#" style="display:block;padding:6px 8px;border-radius:4px;font-size:12px;color:#9E9EA8">{{ item }}</a>
+</sc-for>
+</div>
+</sc-for>
+</aside>
+
+<main style="flex:1;min-width:0;overflow:auto">
+<div style="display:grid;grid-template-columns:minmax(0,1fr) 200px;gap:48px;padding:40px 48px 120px;max-width:1080px">
+<article>
+<div style="display:flex;align-items:center;gap:8px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#9E9EA8">
+<span>{{ section }}</span><span style="color:#4A4A52">/</span><span style="color:#FF8D28">{{ title }}</span>
+</div>
+<h1 style="margin:16px 0 0;font-family:'Space Grotesk',sans-serif;font-size:46px;line-height:50px;font-weight:600;letter-spacing:-.032em">{{ title }}</h1>
+<p style="margin:18px 0 34px;font-size:17px;line-height:28px;color:#9E9EA8;max-width:68ch;text-wrap:pretty">{{ lead }}</p>
+
+<h2 style="margin:44px 0 16px;font-family:'Space Grotesk',sans-serif;font-size:26px;font-weight:600;letter-spacing:-.022em">{{ h2 }}</h2>
+<p style="margin:0 0 16px;font-size:15px;line-height:26px;color:#9E9EA8;max-width:68ch;text-wrap:pretty">{{ body }}</p>
+
+<x-import component-from-global-scope="B3PayDesignSystem_8a84cb.CodeBlock" filename="{{ codeFile }}" code="{{ code }}" hint-size="100%,180px"></x-import>
+
+<div style="margin-top:20px">
+<x-import component-from-global-scope="B3PayDesignSystem_8a84cb.Alert" color="warning" title="{{ calloutTitle }}" hint-size="100%,72px">{{ calloutBody }}</x-import>
+</div>
+
+<div style="display:flex;justify-content:space-between;gap:12px;margin-top:56px;padding-top:24px;border-top:1px solid #303035">
+<x-import component-from-global-scope="B3PayDesignSystem_8a84cb.Button" variant="outlined" hint-size="110px,32px">Previous</x-import>
+<x-import component-from-global-scope="B3PayDesignSystem_8a84cb.Button" variant="outlined" hint-size="110px,32px">Next</x-import>
+</div>
+</article>
+
+<nav style="position:sticky;top:24px;align-self:start">
+<div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#9E9EA8;margin-bottom:12px">On this page</div>
+<div style="display:flex;flex-direction:column;gap:9px;border-left:1px solid #303035">
+<sc-for list="{{ toc }}" as="t" hint-placeholder-count="3">
+<a href="#" style="font-size:12px;line-height:18px;color:#9E9EA8;padding-left:12px">{{ t }}</a>
+</sc-for>
+</div>
+</nav>
+</div>
+</main>
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:820},&quot;pkg&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;IC Reactor&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Header&quot;},&quot;section&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Getting started&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Article&quot;},&quot;title&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Quick start&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Article&quot;},&quot;lead&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;One call creates the QueryClient, ClientManager, reactor and bound hooks.&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Article&quot;},&quot;h2&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Fastest path: defineReactor&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Article&quot;},&quot;body&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Point defineReactor at a canister and it wires the whole client for you.&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Article&quot;},&quot;codeFile&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;src/reactor.ts&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Code sample&quot;},&quot;code&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Code sample&quot;},&quot;calloutTitle&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Hooks are React-only&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Callout&quot;},&quot;calloutBody&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Do not call useActorQuery outside React components or custom hooks.&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Callout&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      pkg: this.props.pkg ?? "IC Reactor",
+      section: this.props.section ?? "Getting started",
+      title: this.props.title ?? "Quick start",
+      lead: this.props.lead ?? "One call creates the QueryClient, ClientManager, reactor and bound hooks — including useAuth, useAgentState and useUserPrincipal.",
+      h2: this.props.h2 ?? "Fastest path: defineReactor",
+      body: this.props.body ?? "Point defineReactor at a canister and it wires the whole client for you. The manual construction order still exists for when you need explicit control.",
+      codeFile: this.props.codeFile ?? "src/reactor.ts",
+      code: this.props.code ?? 'import { defineReactor } from "@ic-reactor/react"\nimport { idlFactory, type _SERVICE } from "./declarations/my_canister"\n\nexport const {\n  reactor,\n  useActorQuery,\n  useActorMutation,\n  useAuth,\n} = defineReactor<_SERVICE>({\n  name: "backend",\n  idlFactory,\n  canisterId: "rrkah-fqaaa-aaaaa-aaaaq-cai",\n  display: true,\n})',
+      calloutTitle: this.props.calloutTitle ?? "Hooks are React-only",
+      calloutBody: this.props.calloutBody ?? "Do not call useActorQuery outside React components or custom hooks. For loaders and services use fetch() and execute().",
+      toc: ["Fastest path", "Use in components", "What you get"],
+      nav: [
+        { label: "Getting started", items: ["Why IC Reactor", "Install", "Quick start"] },
+        { label: "Core patterns", items: ["Generic hooks", "Query factories", "DisplayReactor"] },
+        { label: "Reference", items: ["API reference", "Dynamic Candid"] },
+      ],
+    };
+  }
+}
+
+</script>
+</body>
+</html>

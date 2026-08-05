@@ -1,0 +1,24 @@
+<!-- @dsCard group="Components" viewport="700x340" name="Feedback" subtitle="Alerts, toasts, tooltips and the error panel" -->
+<!doctype html><html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css"><style>html,body{margin:0;background:var(--background)}#root{padding:20px;font-family:var(--font-sans)}.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.col{display:flex;flex-direction:column;gap:10px}.lbl{font-family:var(--font-mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-foreground)}</style></head>
+<body><div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel">
+const B = window.B3PayDesignSystem_8a84cb;
+const {Alert,Toast,Tooltip,ErrorDisplay,Button,IconOf}=B;
+const icon = IconOf;
+function Demo(){return(<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
+<div className="col">
+<Alert color="warning" title="Beta: browser execution only" icon={icon("TriangleAlert")}>Workflows run in your browser with a delegated identity.</Alert>
+<Alert color="info" title="VetKeys required" icon={icon("Key")}>B3Note needs the VetKeys API to derive note keys.</Alert>
+<Alert color="success" title="Deployed" icon={icon("Check")}>Canister upgraded to v1.4.0.</Alert>
+</div>
+<div className="col">
+<Toast color="success" title="Workflow published" icon={icon("Check")} onDismiss={()=>{}}>Anyone can now fork it from Community.</Toast>
+<div className="row" style={{gap:8}}><Tooltip content="Copy principal"><Button asIconButton icon={icon("Copy")} aria-label="Copy"/></Tooltip><Tooltip side="right" content="Runs in your browser"><Button size="sm" variant="outlined">Hover me</Button></Tooltip></div>
+<ErrorDisplay code="IC0503" title="Canister rejected the call" detail={"Reject code: 5\nReject message: Canister trapped: unreachable"} onRetry={()=>{}}/>
+</div></div>);}
+ReactDOM.createRoot(document.getElementById("root")).render(<Demo/>);
+</script></body></html>

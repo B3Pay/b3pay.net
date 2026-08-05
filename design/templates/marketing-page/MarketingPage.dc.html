@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<!-- @template name="Marketing page" description="B3Pay landing page — heat-glow hero, hairline feature rows, slab CTA" -->
+<helmet><script src="./ds-base.js"></script><style>body{margin:0;background:#111113;color:#F2F2F2;font-family:"Inter",ui-sans-serif,system-ui,sans-serif}a{color:#FF8D28;text-decoration:none}a:hover{color:#FFA056}</style></helmet>
+<div style="min-height:100vh;background:#111113">
+<header style="position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;gap:24px;height:64px;padding:0 24px;border-bottom:1px solid #303035;background:rgba(17,17,19,.78);backdrop-filter:blur(14px)">
+<x-import component-from-global-scope="B3PayDesignSystem_8a84cb.BrandMark" size="{{ 26 }}" hint-size="110px,26px"></x-import>
+<nav style="display:flex;align-items:center;gap:2px;margin-right:auto;margin-left:28px">
+<a href="#" style="display:inline-flex;align-items:center;height:32px;padding:0 10px;border-radius:6px;color:#F2F2F2;font-size:14px;font-weight:500">Products</a>
+<a href="#" style="display:inline-flex;align-items:center;height:32px;padding:0 10px;border-radius:6px;color:#9E9EA8;font-size:14px;font-weight:500">Developers</a>
+<a href="#" style="display:inline-flex;align-items:center;height:32px;padding:0 10px;border-radius:6px;color:#9E9EA8;font-size:14px;font-weight:500">Blog</a>
+</nav>
+<x-import component-from-global-scope="B3PayDesignSystem_8a84cb.Button" variant="filled" color="primary" size="sm" hint-size="112px,32px">Get started</x-import>
+</header>
+
+<section style="position:relative;overflow:hidden;border-bottom:1px solid #303035">
+<div style="position:absolute;inset:0;opacity:.55;background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);background-size:64px 64px"></div>
+<div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(237,116,55,.18),transparent)"></div>
+<div style="position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,#ED7437,transparent)"></div>
+<div style="position:relative;max-width:1240px;margin:0 auto;padding:120px 24px 96px">
+<div style="display:flex;align-items:center;gap:10px;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#9E9EA8">
+<span style="width:5px;height:5px;border-radius:9999px;background:#FF8D28"></span>{{ eyebrow }}</div>
+<h1 style="margin:26px 0 0;font-family:'Space Grotesk',Inter,sans-serif;font-size:84px;line-height:80px;font-weight:600;letter-spacing:-.035em;max-width:900px;text-wrap:balance">{{ headline }}</h1>
+<p style="margin:28px 0 0;font-size:19px;line-height:30px;color:#9E9EA8;max-width:560px;text-wrap:pretty">{{ subhead }}</p>
+<div style="display:flex;gap:10px;margin-top:36px">
+<x-import component-from-global-scope="B3PayDesignSystem_8a84cb.Button" variant="filled" color="primary" size="xl" bevel="{{ true }}" hint-size="180px,48px">{{ ctaPrimary }}</x-import>
+<x-import component-from-global-scope="B3PayDesignSystem_8a84cb.Button" variant="outlined" size="xl" hint-size="160px,48px">{{ ctaSecondary }}</x-import>
+</div>
+<div style="display:flex;gap:28px;margin-top:44px;flex-wrap:wrap">
+<span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;color:#6B6B75">Bitcoin</span>
+<span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;color:#6B6B75">Ethereum</span>
+<span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;color:#6B6B75">Internet Computer</span>
+<span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;color:#6B6B75">ckBTC</span>
+</div>
+</div>
+</section>
+
+<section style="padding:120px 24px">
+<div style="max-width:1240px;margin:0 auto">
+<div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#9E9EA8;margin-bottom:18px">How it works</div>
+<h2 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:46px;line-height:48px;font-weight:600;letter-spacing:-.022em;max-width:780px;text-wrap:balance">{{ sectionTitle }}</h2>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:44px;margin-top:56px">
+<sc-for list="{{ steps }}" as="step" hint-placeholder-count="3">
+<div>
+<div style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#FF8D28;letter-spacing:.14em">{{ step.n }}</div>
+<div style="height:1px;background:#303035;margin:14px 0 18px"></div>
+<h3 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:21px;font-weight:600;letter-spacing:-.018em">{{ step.h }}</h3>
+<p style="margin:12px 0 0;font-size:15px;line-height:24px;color:#9E9EA8;text-wrap:pretty">{{ step.b }}</p>
+</div>
+</sc-for>
+</div>
+</div>
+</section>
+
+<section style="padding:72px 24px 120px">
+<div style="max-width:1240px;margin:0 auto">
+<div style="position:relative;background:#111111;border:1px solid #303035;border-radius:14px;overflow:hidden;background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px);background-size:64px 64px">
+<div style="position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% -10%,rgba(237,116,55,.18),transparent)"></div>
+<div style="position:relative;padding:64px 48px;display:flex;align-items:center;justify-content:space-between;gap:40px">
+<div>
+<h2 style="margin:0;font-family:'Space Grotesk',sans-serif;font-size:38px;line-height:42px;font-weight:600;letter-spacing:-.028em;max-width:520px;text-wrap:balance">{{ ctaTitle }}</h2>
+<p style="margin:16px 0 0;font-size:16px;line-height:26px;color:#9E9EA8;max-width:480px">{{ ctaBody }}</p>
+</div>
+<x-import component-from-global-scope="B3PayDesignSystem_8a84cb.Button" variant="filled" color="primary" size="xl" bevel="{{ true }}" hint-size="180px,48px">{{ ctaPrimary }}</x-import>
+</div>
+</div>
+</div>
+</section>
+
+<footer style="border-top:1px solid #303035;background:#111111;position:relative">
+<div style="position:absolute;left:0;right:0;top:0;height:1px;background:linear-gradient(90deg,transparent,#ED7437,transparent);opacity:.6"></div>
+<div style="max-width:1240px;margin:0 auto;padding:40px 24px;display:flex;justify-content:space-between;align-items:center">
+<x-import component-from-global-scope="B3PayDesignSystem_8a84cb.BrandMark" size="{{ 22 }}" hint-size="94px,22px"></x-import>
+<span style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.1em;color:#6B6B75">BUILT ON THE INTERNET COMPUTER</span>
+</div>
+</footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1280,&quot;height&quot;:900},&quot;eyebrow&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Open source · Internet Computer · since 2023&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Hero&quot;},&quot;headline&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Infrastructure for apps that hold their own keys.&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Hero&quot;},&quot;subhead&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;B3Pay builds open-source wallets, TypeScript libraries and workflow tooling for the Internet Computer.&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Hero&quot;},&quot;ctaPrimary&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Start building&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Calls to action&quot;},&quot;ctaSecondary&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;View the repos&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Calls to action&quot;},&quot;sectionTitle&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;No backend. No custody handover.&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Sections&quot;},&quot;ctaTitle&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Read the integration guide.&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Sections&quot;},&quot;ctaBody&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;Install one package, point it at a canister, and get typed hooks with caching built in.&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Sections&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return {
+      eyebrow: this.props.eyebrow ?? "Open source · Internet Computer · since 2023",
+      headline: this.props.headline ?? "Infrastructure for apps that hold their own keys.",
+      subhead: this.props.subhead ?? "B3Pay builds open-source wallets, TypeScript libraries and workflow tooling for the Internet Computer. No centralized backend sits between your users and their assets.",
+      ctaPrimary: this.props.ctaPrimary ?? "Start building",
+      ctaSecondary: this.props.ctaSecondary ?? "View the repos",
+      sectionTitle: this.props.sectionTitle ?? "No backend. No custody handover.",
+      ctaTitle: this.props.ctaTitle ?? "Read the integration guide.",
+      ctaBody: this.props.ctaBody ?? "Install one package, point it at a canister, and get typed hooks with caching built in.",
+      steps: [
+        { n: "01", h: "Identity stays with the user", b: "Internet Identity issues a delegated identity in the browser. No key, seed phrase or session lives on a server." },
+        { n: "02", h: "State lives in a canister", b: "The wallet is a canister the user controls. Upgrades, signers and thresholds are their decisions, made on-chain." },
+        { n: "03", h: "Types survive the boundary", b: "IC Reactor generates TypeScript from Candid, so a method signature is a compile error before it is a runtime failure." },
+      ],
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -1,0 +1,28 @@
+<!-- @dsCard group="Components" viewport="700x360" name="Forms" subtitle="Inputs, select, combobox, toggles, dropzone, validation" -->
+<!doctype html><html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css"><style>html,body{margin:0;background:var(--background)}#root{padding:20px;font-family:var(--font-sans)}.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.col{display:flex;flex-direction:column;gap:10px}.lbl{font-family:var(--font-mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-foreground)}</style></head>
+<body><div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel">
+const B = window.B3PayDesignSystem_8a84cb;
+const {Input,Textarea,Select,Checkbox,Switch,FieldError,Combobox,FileDropzone,IconOf}=B;
+const icon = IconOf;
+const {Label}=B;
+function Demo(){const[v,setV]=React.useState("icrc1_transfer");return(<div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:20}}>
+<div className="col"><span className="lbl">Sizes</span>
+{["xs","sm","md","lg"].map(s=>(<Input key={s} size={s} placeholder={"size "+s}/>))}
+<Input icon={icon("Search")} placeholder="Search workflows"/>
+<Input mono defaultValue="ryjl3-tyaaa-aaaaa-aaaba-cai" onClear={()=>{}}/>
+<div><Input invalid defaultValue="not-a-principal"/><FieldError>Not a valid principal.</FieldError></div>
+</div>
+<div className="col"><span className="lbl">Controls</span>
+<Select options={["ICP","ckBTC","ckETH"]} defaultValue="ckBTC"/>
+<Combobox options={["icrc1_transfer","icrc1_balance_of","icrc2_approve"]} value={v} onSelect={setV}/>
+<Textarea rows={3} defaultValue={"(record {\n  amount = $N0.Ok : nat;\n})"}/>
+<div className="row" style={{gap:16}}><Checkbox id="c1" defaultChecked label="Public"/><Checkbox id="r1" type="radio" name="m" defaultChecked label="Browser"/><Switch id="s1" defaultChecked label="Mock preview"/></div>
+<FileDropzone icon={icon("FileCode")} label="Drop a .did file"/>
+</div></div>);}
+ReactDOM.createRoot(document.getElementById("root")).render(<Demo/>);
+</script></body></html>

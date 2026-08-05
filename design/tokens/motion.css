@@ -1,0 +1,24 @@
+/* Durations, easings and keyframes lifted from the B3Forge app. */
+:root{
+  --dur-instant:120ms; /* @kind other */
+  --dur-fast:150ms; /* @kind other */      /* every button transition in the app */
+  --dur-base:200ms; /* @kind other */      /* accordion / panel slide */
+  --dur-slow:250ms; /* @kind other */      /* dock panel enter */
+  --dur-slower:300ms; /* @kind other */    /* dock pill enter */
+  --dur-hero:900ms; /* @kind other */
+
+  --ease-out:cubic-bezier(0,0,0.2,1); /* @kind other */
+  --ease-in-out:cubic-bezier(0.4,0,0.2,1); /* @kind other */
+  --ease-dock:cubic-bezier(0.22,1,0.36,1); /* @kind other */   /* the app's signature spring-ish curve */
+  --ease-linear:linear; /* @kind other */
+
+  --transition-control:color var(--dur-fast) var(--ease-out),background-color var(--dur-fast) var(--ease-out),box-shadow var(--dur-fast) var(--ease-out),border-color var(--dur-fast) var(--ease-out); /* @kind other */
+}
+@keyframes b3-border-pulse{50%{border-color:transparent}}
+@keyframes b3-glow-breathe{0%,100%{opacity:.5}50%{opacity:1}}
+@keyframes b3-edge-flow{to{stroke-dashoffset:-10}}
+@keyframes b3-dock-enter{from{opacity:0;transform:translateY(8px) scale(.96)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes b3-slide-in-right{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes b3-shimmer{100%{transform:translateX(100%)}}
+@keyframes b3-ember{0%,100%{opacity:.35;transform:translateY(0)}50%{opacity:1;transform:translateY(-6px)}}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}

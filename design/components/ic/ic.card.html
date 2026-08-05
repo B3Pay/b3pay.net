@@ -1,0 +1,27 @@
+<!-- @dsCard group="Components" viewport="700x300" name="Internet Computer" subtitle="Principals, truncation and workflow graph nodes" -->
+<!doctype html><html lang="en"><head><meta charset="utf-8"><link rel="stylesheet" href="../../styles.css"><style>html,body{margin:0;background:var(--background)}#root{padding:20px;font-family:var(--font-sans)}.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.col{display:flex;flex-direction:column;gap:10px}.lbl{font-family:var(--font-mono);font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted-foreground)}</style></head>
+<body><div id="root"></div>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="../../_ds_bundle.js"></script>
+<script type="text/babel">
+const B = window.B3PayDesignSystem_8a84cb;
+const {PrincipalDisplay,TruncatedString,WorkflowNode,IconOf}=B;
+const icon = IconOf;
+function Demo(){return(<div className="col" style={{gap:16}}>
+<div className="row" style={{gap:10}}><span className="lbl" style={{width:70}}>Principal</span>
+<PrincipalDisplay value="ryjl3-tyaaa-aaaaa-aaaba-cai"/>
+<PrincipalDisplay value="mxzaz-hqaaa-aaaar-qaada-cai" head={3} tail={2}/>
+<TruncatedString value="workflow_7f3a91c4e2b8d05a6134" max={20}/></div>
+<div className="row" style={{gap:26,alignItems:"flex-start"}}>
+<WorkflowNode kind="trigger" index={0} title="Manual trigger" subtitle="entry" icon={icon("Zap")} ports={false}/>
+<WorkflowNode kind="query" index={1} title="icrc1_balance_of" subtitle="ryjl3-tyaaa-aaaaa-aaaba-cai" icon={icon("Search")} selected>owner = $N0.principal</WorkflowNode>
+<WorkflowNode kind="update" index={2} title="icrc1_transfer" subtitle="ckBTC ledger" icon={icon("ArrowRightLeft")}>amount = $N1.Ok : nat</WorkflowNode>
+</div>
+<div className="row" style={{gap:26}}>
+<WorkflowNode kind="variables" index={3} title="Variables" subtitle="typed inputs" icon={icon("Braces")}/>
+<WorkflowNode kind="utility" index={4} title="Format amount" subtitle="e8s → decimal" icon={icon("Wrench")}/>
+</div></div>);}
+ReactDOM.createRoot(document.getElementById("root")).render(<Demo/>);
+</script></body></html>
