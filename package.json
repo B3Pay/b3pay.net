@@ -1,0 +1,28 @@
+{
+  "name": "b3pay-net",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "engines": {
+    "node": ">=20.19 <21 || >=22.12"
+  },
+  "scripts": {
+    "dev": "npm run dev -w apps/web",
+    "build": "npm run build -w apps/web",
+    "preview": "node scripts/serve-dist.mjs 4180",
+    "typecheck": "npm run typecheck -w apps/web && tsc -p tsconfig.api.json --noEmit",
+    "smoke": "node scripts/smoke.mjs",
+    "brand:images": "node scripts/generate-brand-images.mjs"
+  },
+  "devDependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "@vercel/node": "^5.9.5",
+    "puppeteer-core": "^24.43.1",
+    "sharp": "^0.34.4"
+  },
+  "dependencies": {
+    "resend": "^4.8.0"
+  }
+}

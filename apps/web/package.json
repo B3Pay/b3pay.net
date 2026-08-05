@@ -1,0 +1,29 @@
+{
+  "name": "@b3pay/web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build && vite build --ssr src/entry-server.tsx --outDir dist-ssr && node scripts/prerender.mjs",
+    "typecheck": "tsc --noEmit --pretty",
+    "preview": "vite preview",
+    "lint": "tsc --noEmit --pretty"
+  },
+  "dependencies": {
+    "@b3pay/ui": "*",
+    "lucide-react": "0.469.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router-dom": "^6.30.1",
+    "sonner": "^2.0.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.1",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "typescript": "~5.7.3",
+    "vite": "^6.0.11"
+  }
+}

@@ -1,0 +1,17 @@
+/* Generated from Figma Variables. First mode = :root default.
+   FLOAT tokens are unitless — multiply by 1px in calc() where a length is needed. */
+
+:root {
+  --accents-orange: rgb(255,141,40); /* @kind color */
+  --color: var(--accents-orange); /* @kind color */
+  --forge: rgb(237,116,55); /* @kind color */
+}
+
+:root[data-theme="dark"], .dark {
+  --accents-orange: rgb(255,146,48); /* @kind color */
+  --accents-orange: rgb(255,160,86); /* @kind color */
+}
+
+:root[data-theme="light"], .light {
+  --accents-orange: rgb(197,83,0); /* @kind color */
+}

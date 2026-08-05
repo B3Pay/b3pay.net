@@ -1,0 +1,47 @@
+/* Self-hosted webfonts. The four families named in b3forge/frontend/styles.css,
+   served from the bundle rather than fonts.googleapis.com — an @import from a
+   third-party CDN blocks rendering and, on a canister-served build, is a
+   dependency B3Pay does not control.
+
+   latin + latin-ext only. Every subset carries its own unicode-range, so a
+   browser fetches nothing it cannot use; the other subsets are dropped because
+   an asset canister pays cycles to store bytes it will never serve. Add the
+   subset files back here if B3Pay ships non-Latin copy.
+
+   These are still Google Fonts cuts (see readme.md > Font substitutions). If
+   B3Pay licenses its own, replace the imports below with an @font-face set and
+   leave the variable block untouched — every component reads it. */
+
+/* Space Grotesk — --font-display. 600 is the heading weight, 700 the .b3-display cut. */
+@import "@fontsource/space-grotesk/latin-400.css";
+@import "@fontsource/space-grotesk/latin-500.css";
+@import "@fontsource/space-grotesk/latin-600.css";
+@import "@fontsource/space-grotesk/latin-700.css";
+@import "@fontsource/space-grotesk/latin-ext-400.css";
+@import "@fontsource/space-grotesk/latin-ext-500.css";
+@import "@fontsource/space-grotesk/latin-ext-600.css";
+@import "@fontsource/space-grotesk/latin-ext-700.css";
+
+/* Inter — --font-sans. */
+@import "@fontsource/inter/latin-400.css";
+@import "@fontsource/inter/latin-500.css";
+@import "@fontsource/inter/latin-600.css";
+@import "@fontsource/inter/latin-700.css";
+@import "@fontsource/inter/latin-ext-400.css";
+@import "@fontsource/inter/latin-ext-500.css";
+@import "@fontsource/inter/latin-ext-600.css";
+@import "@fontsource/inter/latin-ext-700.css";
+
+/* JetBrains Mono — --font-mono. Variable: one file covers 100–800. */
+@import "@fontsource-variable/jetbrains-mono/wght.css";
+
+/* Instrument Serif — --font-accent. Pull quotes only; 400 is the only cut. */
+@import "@fontsource/instrument-serif/latin-400.css";
+@import "@fontsource/instrument-serif/latin-400-italic.css";
+
+:root{
+  --font-display:"Space Grotesk","Inter",ui-sans-serif,system-ui,sans-serif;
+  --font-sans:"Inter",ui-sans-serif,system-ui,-apple-system,sans-serif;
+  --font-mono:"JetBrains Mono Variable","JetBrains Mono",ui-monospace,"Cascadia Code","Fira Code",monospace;
+  --font-accent:"Instrument Serif","Georgia",serif;
+}

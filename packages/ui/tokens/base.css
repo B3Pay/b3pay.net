@@ -1,0 +1,12 @@
+/* Minimal base layer. Consumers get sane defaults without a reset library. */
+:root{color-scheme:dark}
+:root[data-theme="light"],.light{color-scheme:light}
+body{background:var(--background);color:var(--foreground);font-family:var(--font-sans);font-size:var(--text-base);line-height:var(--text-base-lh);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:var(--forge-500);text-decoration:none;transition:color var(--dur-fast) var(--ease-out)}
+a:hover{color:var(--forge-300)}
+::selection{background:var(--forge-600);color:#150800}
+*{scrollbar-width:thin;scrollbar-color:rgb(158 158 168 / .3) transparent}
+*::-webkit-scrollbar{width:6px;height:6px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background-color:rgb(158 158 168 / .3);border-radius:9999px;transition:background-color .2s ease}
+*::-webkit-scrollbar-thumb:hover{background-color:rgb(158 158 168 / .6)}

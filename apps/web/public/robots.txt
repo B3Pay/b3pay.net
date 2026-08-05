@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://b3pay.net/sitemap.xml

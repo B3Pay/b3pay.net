@@ -1,0 +1,112 @@
+/* B3Pay colour system — dark-first.
+   Ink ramp follows the B3Forge app's cool 240deg neutral axis.
+   Forge ramp is the Figma variable set (Accents/Orange, Forge) across its modes. */
+:root{
+  /* ── Ink (cool near-black neutral axis) ── */
+  --ink-000:#000000;
+  --ink-050:#0A0A0B;
+  --ink-100:#111111;            /* brand near-black, from the logo artboards */
+  --ink-150:#111113;            /* app --background  hsl(240 8% 7%) */
+  --ink-200:#1A1A1D;            /* app --card        hsl(240 8% 11%) */
+  --ink-250:#212125;            /* app --secondary   hsl(240 6% 14%) */
+  --ink-300:#26262A;            /* app --muted       hsl(240 5% 16%) */
+  --ink-400:#303035;            /* app --border      hsl(240 4% 20%) */
+  --ink-500:#4A4A52;
+  --ink-600:#6B6B75;
+  --ink-700:#9E9EA8;            /* app --muted-fg    hsl(240 4% 64%) */
+  --ink-800:#C4C4CA;
+  --ink-900:#F2F2F2;            /* app --foreground  hsl(0 0% 95%) */
+  --white:#FFFFFF;
+
+  /* ── Forge (brand orange) ── */
+  --forge-300:#FFA056;          /* Figma: IC - Dark */
+  --forge-400:#FF9230;          /* Figma: Dark */
+  --forge-500:#FF8D28;          /* Figma: Accents/Orange */
+  --forge-600:#ED7437;          /* Figma: Forge — brand primary */
+  --forge-700:#C55300;          /* Figma: Light */
+  --forge-800:#8A3A00;
+  --forge-900:#3D1A00;
+
+  /* ── Status hues (B3Forge dark-theme values) ── */
+  --error-500:#811D1D;          /* hsl(0 63% 31%) */
+  --error-fg:#F2F2F2;
+  --success-500:#199A48;        /* hsl(142 71% 35%) */
+  --success-fg:#EAFBF0;
+  --warning-500:#C47F09;        /* hsl(38 92% 40%) */
+  --warning-fg:#FDF6E8;
+  --info-500:#0EA5E9;           /* hsl(199 89% 48%) */
+  --info-fg:#E9F7FE;
+  --alert-500:#DF5F06;          /* hsl(25 95% 45%) */
+  --alert-fg:#FEF2E9;
+
+  /* ── Flow-studio node accents (exact, from the app) ── */
+  --node-trigger:#F59E0B;   --node-trigger-strong:#D97706;
+  --node-variables:#8B5CF6; --node-variables-strong:#6D28D9;
+  --node-query:#2563EB;     --node-query-strong:#1D4ED8;
+  --node-update:#F97316;    --node-update-strong:#EA580C;
+  --node-utility:#10B981;   --node-utility-strong:#059669;
+
+  /* ── Semantic aliases (names match the B3Forge app 1:1) ── */
+  --background:var(--ink-150);
+  --foreground:var(--ink-900);
+  --card:var(--ink-200);
+  --card-foreground:var(--ink-900);
+  --popover:var(--ink-200);
+  --popover-foreground:var(--ink-900);
+  --primary:var(--forge-600);
+  --primary-foreground:#150800;
+  --primary-background:#2A1509;
+  --secondary:var(--ink-250);
+  --secondary-foreground:#E5E5E5;
+  --muted:var(--ink-300);
+  --muted-foreground:var(--ink-700);
+  --text-mark:var(--ink-600);   /* decoration only — registration marks, figure numbers, spines. Never content. */
+  --accent:var(--forge-500);
+  --accent-foreground:#150800;
+  --border:var(--ink-400);
+  --input:var(--ink-400);
+  --ring:var(--forge-500);
+  --error:var(--error-500);         --error-foreground:var(--error-fg);
+  --success:var(--success-500);     --success-foreground:var(--success-fg);
+  --warning:var(--warning-500);     --warning-foreground:var(--warning-fg);
+  --info:var(--info-500);           --info-foreground:var(--info-fg);
+  --alert:var(--alert-500);         --alert-foreground:var(--alert-fg);
+
+  /* ── Forge atmospherics ── */
+  --heat-glow:radial-gradient(ellipse 80% 60% at 50% -10%,rgb(237 116 55 / 0.18),transparent); /* @kind other */
+  --heat-edge:linear-gradient(90deg,transparent,var(--forge-600),transparent); /* @kind other */
+  --gradient-brand:linear-gradient(100deg,var(--forge-700),var(--forge-500) 45%,var(--forge-300)); /* @kind other */
+  --scanline:repeating-linear-gradient(0deg,transparent 0 3px,rgb(255 255 255 / 0.012) 3px 4px); /* @kind other */
+  --hairline:rgb(255 255 255 / 0.08);
+  --hairline-strong:rgb(255 255 255 / 0.14);
+}
+
+:root[data-theme="light"],.light{
+  --background:#FAFAFA;         /* app light hsl(0 0% 98%) */
+  --foreground:#17171A;         /* hsl(240 10% 10%) */
+  --card:#FFFFFF;
+  --card-foreground:#17171A;
+  --popover:#FFFFFF;
+  --popover-foreground:#17171A;
+  --primary:var(--forge-700);
+  --primary-foreground:#FFFFFF;
+  --primary-background:#FDF1E6;
+  --secondary:#EDEDEF;          /* hsl(240 5% 93%) */
+  --secondary-foreground:#31313A;
+  --muted:#F4F4F5;
+  --muted-foreground:#71717A;
+  --text-mark:#A1A1AA;
+  --accent:var(--forge-600);
+  --accent-foreground:#FFFFFF;
+  --border:#E4E4E7;             /* hsl(240 6% 90%) */
+  --input:#E4E4E7;
+  --ring:var(--forge-600);
+  --error:#DC2626;   --error-foreground:#FFFFFF;
+  --success:#22C55E; --success-foreground:#052E16;
+  --warning:#F59E0B; --warning-foreground:#452508;
+  --info:#0EA5E9;    --info-foreground:#062B3B;
+  --alert:#F97316;   --alert-foreground:#431407;
+  --hairline:rgb(0 0 0 / 0.08);
+  --hairline-strong:rgb(0 0 0 / 0.16);
+  --heat-glow:radial-gradient(ellipse 80% 60% at 50% -10%,rgb(237 116 55 / 0.12),transparent); /* @kind other */
+}
