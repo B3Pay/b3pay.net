@@ -42,7 +42,7 @@ export const ROUTES: RouteMeta[] = [
     label: "Products",
     title: "Products — B3Pay",
     description:
-      "Five open-source projects: B3Forge, B3Wallet, IC Reactor, B3Note and B3Utils. All MIT-licensed and developed in the open.",
+      "Four open-source projects: B3Forge, B3Wallet, IC Reactor and B3Note. All MIT-licensed and developed in the open.",
     inNav: true,
     // /products redirects to the first product, so the slug URLs are canonical.
     inSitemap: false,

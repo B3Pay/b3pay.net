@@ -18,7 +18,6 @@ const COLUMNS: { heading: string; items: FooterLink[] }[] = [
     items: [
       { label: "Documentation", to: "/developers" },
       { label: "npm packages", to: "https://www.npmjs.com/package/@ic-reactor/react" },
-      { label: "docs.rs", to: "https://docs.rs/b3_utils" },
       { label: "Agent skills", to: `${GITHUB_ORG}/ic-reactor` },
     ],
   },

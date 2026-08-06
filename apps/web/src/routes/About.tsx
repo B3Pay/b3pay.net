@@ -6,7 +6,6 @@ import { useSeo } from "../lib/seo";
 
 const TIMELINE: [string, string][] = [
   ["2023", "B3Wallet — multi-chain, multi-owner canister wallet"],
-  ["2023", "b3_utils published to crates.io"],
   ["2023", "B3Note — witness-like encryption demo on VetKeys"],
   ["2024", "IC Reactor reaches seven packages"],
   ["2025", "B3Forge enters beta — browser workflow execution"],

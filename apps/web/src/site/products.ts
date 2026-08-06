@@ -82,22 +82,6 @@ export const PRODUCTS: Product[] = [
     repo: "B3Pay/B3Note",
     ic: "BLS pairing · VetKeys · timelock",
   },
-  {
-    key: "b3utils",
-    name: "B3Utils",
-    tag: "Crate",
-    tagColor: "secondary",
-    lang: "Rust",
-    line: "The foundation crate. Stable memory, timers, logging, transfers, tokens and timestamps for canister development.",
-    points: [
-      "Reserved stable-memory IDs 248–254",
-      "Transfer and token primitives",
-      "Timer and notifier memory",
-      "Published on docs.rs",
-    ],
-    repo: "B3Pay/b3_utils",
-    ic: "docs.rs/b3_utils",
-  },
 ];
 
 export const GITHUB_ORG = "https://github.com/B3Pay";

@@ -15,7 +15,6 @@ const PACKAGES = [
     hint: "npm",
     href: "https://www.npmjs.com/package/@ic-reactor/core",
   },
-  { label: "b3_utils", hint: "crates.io", href: "https://docs.rs/b3_utils" },
 ];
 
 export function CommandPalette({ onClose }: { onClose: () => void }) {

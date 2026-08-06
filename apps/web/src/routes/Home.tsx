@@ -60,7 +60,7 @@ export default function Home() {
       <Section
         eyebrow="What we build"
         spec="FIG. 01"
-        title="Five open-source projects, one thesis."
+        title="Four open-source projects, one thesis."
         lead="Users should keep custody. Developers should not have to give up type safety to make that happen. Everything below is MIT-licensed and runs on the Internet Computer."
       >
         <div className="site-grid-products">

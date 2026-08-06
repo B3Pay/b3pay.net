@@ -104,7 +104,7 @@ function ProductAside({ sel }: { sel: string }) {
       </Card>
     );
   }
-  return <CodeBlock filename="Cargo.toml" code={'[dependencies]\nb3_utils = "0.11"'} />;
+  return null;
 }
 
 export default function Products() {
@@ -124,7 +124,7 @@ export default function Products() {
         as="h1"
         eyebrow="Products & ecosystem"
         title="Everything B3Pay ships is public."
-        lead="Pick a project to see what it does, how it is built and where the code lives. All five are MIT-licensed and developed in the open."
+        lead="Pick a project to see what it does, how it is built and where the code lives. All four are MIT-licensed and developed in the open."
       />
 
       <div className="site-shell">

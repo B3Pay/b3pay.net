@@ -10,7 +10,7 @@ import { usePrefersReducedMotion } from "../../lib/use-reduced-motion";
 
 const STAT_STRIP: [string, string][] = [
   ["03", "chains"],
-  ["05", "projects"],
+  ["04", "projects"],
   ["07", "packages"],
   ["MIT", "licence"],
 ];

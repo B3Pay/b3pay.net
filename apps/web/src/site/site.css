@@ -125,13 +125,27 @@ body {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 44px;
 }
+/* Six tracks, so a card can be a third (2) or a half (3) of a row.
+   HANDOFF.md composes this as thirds with B3Forge spanning two of them; the
+   extra granularity is what lets the last row still fill when the product
+   count is even. */
 .site-grid-products {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 16px;
 }
-.site-grid-products > :first-child {
+.site-grid-products > * {
   grid-column: span 2;
+}
+.site-grid-products > :first-child {
+  grid-column: span 4;
+}
+/* Four products: 4+2 over 3+3. With thirds it would be 4+2 over 2+2 and the
+   second row would stop a column short. Remove this rule if a fifth returns —
+   the selector already stands down on its own. */
+.site-grid-products:has(> :nth-child(4):last-child) > :nth-child(3),
+.site-grid-products:has(> :nth-child(4):last-child) > :nth-child(4) {
+  grid-column: span 3;
 }
 .site-slab-split {
   display: grid;
@@ -187,7 +201,7 @@ body {
   flex-wrap: wrap;
 }
 
-/* Product tab strip — five flex tabs, scrollable rather than crushed. */
+/* Product tab strip — one flex tab per product, scrollable rather than crushed. */
 .site-tabs {
   display: flex;
   border-top: 1px solid var(--border);
@@ -303,11 +317,12 @@ body {
   .site-slab-split__code {
     padding: 28px 32px 44px;
   }
-  .site-grid-products {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-  .site-grid-products > :first-child {
-    grid-column: span 2;
+  /* Two across, flagship included — giving it a full row here would push the
+     count odd again and reopen the hole this grid exists to avoid. */
+  .site-grid-products > *,
+  .site-grid-products > :first-child,
+  .site-grid-products:has(> :nth-child(4):last-child) > :nth-child(n) {
+    grid-column: span 3;
   }
   .site-section__title {
     font-size: 42px;
@@ -361,11 +376,14 @@ body {
 
 /* ── 680px — remaining multi-column rows stack ─────────────────────── */
 @media (max-width: 680px) {
-  .site-grid-products,
-  .site-grid-products > :first-child,
   .site-grid-pair {
     grid-template-columns: minmax(0, 1fr);
-    grid-column: auto;
+  }
+  /* One across. */
+  .site-grid-products > *,
+  .site-grid-products > :first-child,
+  .site-grid-products:has(> :nth-child(4):last-child) > :nth-child(n) {
+    grid-column: span 6;
   }
   .site-blog-row {
     grid-template-columns: minmax(0, 1fr);

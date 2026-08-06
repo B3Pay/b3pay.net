@@ -34,7 +34,6 @@ const LINKS: { label: string; sub: string; icon: string; href: string }[] = [
     icon: "BookOpen",
     href: `${GITHUB_ORG}/ic-reactor#readme`,
   },
-  { label: "Crates", sub: "docs.rs/b3_utils", icon: "Package", href: "https://docs.rs/b3_utils" },
   {
     label: "Live demo",
     sub: "B3Note on icp0.io",
