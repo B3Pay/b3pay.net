@@ -1,0 +1,68 @@
+---
+title: CLI
+lead: The same declaration codegen as the Vite plugin, as a command — for CI, for non-Vite bundlers, and for generating once rather than on every dev start.
+---
+
+## Install
+
+```bash terminal
+pnpm add -D @ic-reactor/cli
+```
+
+## Generate
+
+```bash terminal
+npx ic-reactor generate
+```
+
+With no arguments it reads `./dfx.json`, generates every canister it lists, and
+writes to `./src/declarations`.
+
+## Options
+
+| Flag | Default | |
+|---|---|---|
+| `--config <path>` | `./dfx.json` | Where the canister list comes from |
+| `--out <dir>` | `./src/declarations` | Output directory |
+| `--network <name>` | `local` | Which network's canister ids to embed |
+| `--canister <name>` | all | Generate one canister instead of every one |
+| `--clean` | off | Empty the output directory first |
+
+## In CI
+
+Generate before the typecheck, so a canister interface change fails the build
+rather than shipping.
+
+```yaml .github/workflows/build.yml
+- run: npx ic-reactor generate --network ic --clean
+- run: npm run typecheck
+- run: npm run build
+```
+
+`--clean` matters here: without it, a canister removed from `dfx.json` leaves its
+declarations behind and imports of a canister that no longer exists keep compiling.
+
+## Watching
+
+For a bundler with no plugin, the CLI can hold the watch itself.
+
+```bash terminal
+npx ic-reactor generate --watch
+```
+
+<Callout color="info" title="Use the plugin if you can">
+  Under Vite the plugin does the same work inside the build graph, so a regeneration
+  triggers HMR instead of a full reload. The CLI's watch mode exists for everything
+  else. See the <a href="/ic-reactor/vite">Vite plugin</a>.
+</Callout>
+
+## Verifying output
+
+```bash terminal
+npx ic-reactor generate --canister backend
+ls src/declarations/backend
+# index.ts  backend.did  backend.did.d.ts
+```
+
+If `index.ts` is missing an export you expected, the `.did` dfx produced is the
+place to look — the generator does not add to the interface, only translate it.

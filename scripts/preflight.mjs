@@ -17,7 +17,12 @@ const entries = readdirSync(cwd, { withFileTypes: true })
 console.log(`preflight  node ${process.version}  cwd ${cwd}`);
 console.log(`preflight  contents: ${entries.join(" ")}`);
 
-const required = ["package.json", "apps/web/package.json", "packages/ui/package.json"];
+const required = [
+  "package.json",
+  "apps/web/package.json",
+  "apps/docs/package.json",
+  "packages/ui/package.json",
+];
 const missing = required.filter((f) => !existsSync(join(cwd, f)));
 
 if (missing.length) {

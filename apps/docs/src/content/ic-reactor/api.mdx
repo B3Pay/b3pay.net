@@ -1,0 +1,63 @@
+---
+title: API reference
+lead: Every export in @ic-reactor/react, with the package that owns it.
+---
+
+## Factories
+
+<ApiList rows={[
+  ["defineReactor<T>(config)", "@ic-reactor/react", "Creates QueryClient, ClientManager, Reactor and bound hooks in one call."],
+  ["createActorHooks(reactor)", "@ic-reactor/react", "Returns useActorQuery, useActorMutation, useActorSuspenseQuery, useActorInfiniteQuery."],
+  ["createAuthHooks(auth)", "@ic-reactor/react", "Returns useAuth and useUserPrincipal."],
+  ["createQuery(reactor, opts)", "@ic-reactor/react", "Reusable query object usable inside and outside React."],
+  ["createMutation(reactor, opts)", "@ic-reactor/react", "Reusable mutation with invalidateQueries support."],
+]} />
+
+## Hooks
+
+<ApiList rows={[
+  ["useActorQuery(opts)", "@ic-reactor/react", "Cached canister query. Returns the TanStack Query result with a typed data field."],
+  ["useActorSuspenseQuery(opts)", "@ic-reactor/react", "The same query inside a Suspense boundary — no isPending branch."],
+  ["useActorInfiniteQuery(opts)", "@ic-reactor/react", "Paginated read driven by a cursor argument."],
+  ["useActorMutation(opts)", "@ic-reactor/react", "Update call, with invalidateQueries naming what goes stale."],
+  ["useAuth()", "@ic-reactor/react", "login, logout, identity and isAuthenticated over the shared AuthenticationManager."],
+  ["useUserPrincipal()", "@ic-reactor/react", "The current principal, or the anonymous one before sign-in."],
+  ["useAgentState()", "@ic-reactor/react", "Network, host and in-flight state of the shared agent."],
+  ["useIdentityAttributes()", "@ic-reactor/react", "Delegation metadata for the active identity."],
+]} />
+
+## Managers
+
+<ApiList rows={[
+  ["ClientManager", "@ic-reactor/core", "Shared agent and cache coordination."],
+  ["AuthenticationManager", "@ic-reactor/react", "Internet Identity login, logout and delegation."],
+  ["Reactor<T>", "@ic-reactor/core", "Typed canister runtime: fetchQuery, callMethod, invalidateQueries."],
+  ["DisplayReactor", "@ic-reactor/core", "Reactor with UI-friendly transforms — bigint and Principal as strings."],
+  ["CandidDisplayReactor", "@ic-reactor/candid", "Runtime Candid parsing for explorers and dev tools."],
+]} />
+
+## Reactor methods
+
+Everything the hooks do is reachable directly on a reactor, which is what the
+non-React path uses.
+
+<ApiList rows={[
+  ["reactor.fetchQuery(opts)", "@ic-reactor/core", "Resolve from cache when fresh, call the canister when not."],
+  ["reactor.callMethod(opts)", "@ic-reactor/core", "Update call, bypassing the cache."],
+  ["reactor.invalidateQueries(filter)", "@ic-reactor/core", "Mark matching cache entries stale."],
+  ["reactor.actor", "@ic-reactor/core", "The underlying @icp-sdk/core actor, for anything not covered here."],
+]} />
+
+## Config
+
+The object `defineReactor` and `createReactor` take.
+
+| Field | Type | |
+|---|---|---|
+| `name` | `string` | Cache namespace. Must be unique per canister |
+| `idlFactory` | `IDL.InterfaceFactory` | From the generated declarations |
+| `canisterId` | `string \| Principal` | Target canister |
+| `clientManager` | `ClientManager` | Share one across reactors to share auth |
+| `display` | `boolean` | Return display-transformed values |
+| `host` | `string` | Replica or gateway URL |
+| `queryClient` | `QueryClient` | Reuse the app's existing client |

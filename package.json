@@ -11,9 +11,13 @@
   "scripts": {
     "dev": "npm run dev -w apps/web",
     "build": "node scripts/preflight.mjs && npm run build -w apps/web",
-    "preview": "node scripts/serve-dist.mjs 4180",
-    "typecheck": "npm run typecheck -w apps/web && tsc -p tsconfig.api.json --noEmit",
+    "preview": "node scripts/serve-dist.mjs 4180 dist",
+    "dev:docs": "npm run dev -w apps/docs",
+    "build:docs": "node scripts/preflight.mjs && npm run build -w apps/docs",
+    "preview:docs": "node scripts/serve-dist.mjs 4181 dist-docs",
+    "typecheck": "npm run typecheck -w apps/web && npm run typecheck -w apps/docs && tsc -p tsconfig.api.json --noEmit",
     "smoke": "node scripts/smoke.mjs",
+    "smoke:docs": "node scripts/smoke-docs.mjs",
     "brand:images": "node scripts/generate-brand-images.mjs"
   },
   "devDependencies": {

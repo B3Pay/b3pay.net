@@ -1,0 +1,91 @@
+---
+title: Quick start
+lead: One call creates the QueryClient, ClientManager, reactor and bound hooks — including useAuth, useAgentState, useUserPrincipal and useIdentityAttributes.
+---
+
+## Fastest path: defineReactor
+
+Point `defineReactor` at a canister and it wires the whole client for you. The
+manual construction order still exists for when you need explicit control.
+
+```ts src/reactor.ts
+import { defineReactor } from "@ic-reactor/react"
+import { idlFactory, type _SERVICE } from "./declarations/my_canister"
+
+export const {
+  reactor: backendReactor,
+  queryClient,
+  clientManager,
+  useActorQuery,
+  useActorMutation,
+  useAuth,
+} = defineReactor<_SERVICE>({
+  name: "backend",
+  idlFactory,
+  canisterId: "rrkah-fqaaa-aaaaa-aaaaq-cai",
+  display: true,
+})
+```
+
+`display: true` returns a [DisplayReactor](/ic-reactor/display), which hands back
+`bigint` and `Principal` values as strings. Leave it off when you want the raw
+Candid types.
+
+## Use in components
+
+```tsx src/App.tsx
+function Greeting() {
+  const { data, isPending, error } = useActorQuery({
+    functionName: "greet",
+    args: ["World"],
+  })
+
+  if (isPending) return <div>Loading…</div>
+  if (error) return <div>Error: {error.message}</div>
+  return <h1>{data}</h1>
+}
+```
+
+The hooks come back from `defineReactor` already bound to the canister's service
+type, so `functionName` autocompletes and `args` is checked against the method's
+signature. A typo is a compile error, not a rejected call at runtime.
+
+<Callout color="warning" title="Hooks are React-only">
+  Do not call useActorQuery, .useQuery() or .useMutation() outside React components
+  or custom hooks. For loaders and services use fetch() and execute().
+</Callout>
+
+## Writing
+
+Mutations follow the same shape, with `invalidateQueries` naming what goes stale.
+
+```tsx src/Counter.tsx
+function Increment() {
+  const { mutate, isPending } = useActorMutation({
+    functionName: "increment",
+    invalidateQueries: [{ functionName: "get_count" }],
+  })
+
+  return (
+    <button onClick={() => mutate([])} disabled={isPending}>
+      {isPending ? "Working…" : "Increment"}
+    </button>
+  )
+}
+```
+
+## What you get
+
+| Feature | Standard Actor | IC Reactor |
+|---|---|---|
+| Type-safe method calls | yes | yes |
+| Query caching | no | yes |
+| Background refetching | no | yes |
+| Typed Ok/Err handling | manual | yes |
+| Shared auth + cache | no | ClientManager |
+| Display transforms | no | DisplayReactor |
+
+## Next
+
+[Generic hooks](/ic-reactor/hooks) covers the multi-canister case, and
+[query factories](/ic-reactor/factories) covers calling from outside React.

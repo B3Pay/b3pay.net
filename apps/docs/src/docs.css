@@ -1,0 +1,653 @@
+/* docs.b3pay.net layout layer.
+   -----------------------------------------------------------------------
+   Same rules as apps/web/src/site/site.css: every value here is a token. No new
+   colours, sizes, radii or durations. What this file adds over the design
+   system is the reading column — prose measure, heading rhythm, table and list
+   treatment — plus the responsive work the docs prototype never had, since it
+   was drawn once at 1280px.
+
+   Breakpoints, matching HANDOFF.md > Responsive:
+     1024px  the on-this-page rail is dropped
+      900px  the sidebar collapses into the top-bar menu
+      680px  the top bar sheds the search field and version switcher
+*/
+
+/* The design system ships no box model reset and its geometry assumes one —
+   see the note in apps/web/src/site/site.css. Same fix, same reason. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+}
+
+/* ── Shell ──────────────────────────────────────────────────────────── */
+
+/* `.b3-shell__main` is the scroll container, not the document, so anchor
+   offsets belong here rather than on html. 70px clears the 52px bar. */
+.docs-shell .b3-shell__main {
+  scroll-padding-top: 70px;
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .docs-shell .b3-shell__main {
+    scroll-behavior: auto;
+  }
+}
+
+.docs-shell .b3-shell__aside {
+  width: 248px;
+  padding: 16px 12px 48px;
+}
+
+.docs-skip {
+  position: absolute;
+  left: 12px;
+  top: -60px;
+  z-index: 60;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--card);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  text-decoration: none;
+  transition: top var(--dur-fast) var(--ease-out);
+}
+
+.docs-skip:focus-visible {
+  top: 12px;
+}
+
+/* ── Top bar ────────────────────────────────────────────────────────── */
+
+.docs-bar__left,
+.docs-bar__right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.docs-bar__left {
+  gap: 14px;
+}
+
+.docs-bar__divider {
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+}
+
+.docs-bar__wordmark {
+  text-decoration: none;
+  color: var(--muted-foreground);
+}
+
+.docs-bar__wordmark:hover {
+  color: var(--foreground);
+}
+
+/* `flex: none` because `.b3-field` is width-driven and the bar is a flex row —
+   without it the field is the thing that gives when the version switcher and the
+   project badge are both present, and "Search docs" wraps to two lines. */
+.docs-search {
+  width: 260px;
+  flex: none;
+  justify-content: space-between;
+  gap: 8px;
+  white-space: nowrap;
+  cursor: pointer;
+  color: var(--muted-foreground);
+}
+
+.docs-search:hover {
+  color: var(--foreground);
+}
+
+/* Select sets `width: 100%` inline on its positioning wrapper, which outranks a
+   class — the width has to be passed as a style prop. This is only the flex
+   behaviour the inline style cannot carry. */
+.docs-bar__version {
+  flex: none;
+}
+
+/* Both are shown only once the control they stand in for is dropped: the menu
+   button when the sidebar collapses, the search button when the field goes. */
+.docs-bar__menu,
+.docs-bar__searchicon {
+  display: none;
+}
+
+/* ── Sidebar ────────────────────────────────────────────────────────── */
+
+/* `.b3-menu__item` was written for buttons; these are anchors. */
+.docs-nav__link {
+  text-decoration: none;
+}
+
+.docs-nav__badge {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: var(--tracking-wide);
+  color: var(--muted-foreground);
+  flex: none;
+}
+
+.docs-aside__switch {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+}
+
+/* ── Page frame ─────────────────────────────────────────────────────── */
+
+.docs-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 200px;
+  gap: 48px;
+  padding: 40px 48px 120px;
+  max-width: 1080px;
+}
+
+.docs-home {
+  padding: 56px 48px 120px;
+  max-width: 940px;
+}
+
+.docs-crumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+}
+
+.docs-crumb__sep {
+  color: var(--ink-500);
+}
+
+.docs-crumb__here {
+  color: var(--forge-500);
+}
+
+.docs-title {
+  margin: 16px 0 0;
+  font-family: var(--font-display);
+  font-size: var(--text-5xl);
+  line-height: var(--text-5xl-lh);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tightest);
+  text-wrap: balance;
+}
+
+.docs-lead {
+  margin: 18px 0 34px;
+  font-size: var(--text-lg);
+  line-height: var(--text-lg-lh);
+  color: var(--muted-foreground);
+  max-width: 68ch;
+  text-wrap: pretty;
+}
+
+/* ── Prose ──────────────────────────────────────────────────────────── */
+/* The reading column. 68ch is the measure the prototype set; everything that
+   is not running text — code, tables, API rows — is allowed the full width. */
+
+.docs-prose {
+  font-size: var(--text-md);
+  line-height: var(--text-md-lh);
+  color: var(--muted-foreground);
+}
+
+.docs-prose > :first-child {
+  margin-top: 0;
+}
+
+.docs-prose h2 {
+  margin: 44px 0 16px;
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  line-height: var(--text-2xl-lh);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tighter);
+  color: var(--foreground);
+  scroll-margin-top: 70px;
+}
+
+.docs-prose h3 {
+  margin: 32px 0 12px;
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  line-height: var(--text-lg-lh);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tight);
+  color: var(--foreground);
+  scroll-margin-top: 70px;
+}
+
+.docs-prose h4 {
+  margin: 24px 0 10px;
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  font-weight: var(--weight-semibold);
+  color: var(--foreground);
+  scroll-margin-top: 70px;
+}
+
+.docs-prose p {
+  margin: 0 0 16px;
+  max-width: 68ch;
+  text-wrap: pretty;
+}
+
+.docs-prose strong {
+  color: var(--foreground);
+  font-weight: var(--weight-semibold);
+}
+
+.docs-prose ul,
+.docs-prose ol {
+  margin: 0 0 16px;
+  padding-left: 22px;
+  max-width: 68ch;
+}
+
+.docs-prose li {
+  margin: 0 0 8px;
+}
+
+.docs-prose li::marker {
+  color: var(--ink-500);
+}
+
+.docs-prose blockquote {
+  margin: 0 0 20px;
+  padding: 2px 0 2px 18px;
+  border-left: 2px solid var(--forge-600);
+  max-width: 68ch;
+  color: var(--muted-foreground);
+}
+
+.docs-prose blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.docs-prose hr {
+  height: 1px;
+  border: 0;
+  margin: 36px 0;
+  background: var(--border);
+}
+
+.docs-prose img {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+/* Inline code. Fenced blocks go through the design system's CodeBlock and are
+   not touched here. */
+.docs-prose :not(pre) > code,
+.docs-inline-code {
+  padding: 1px 5px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xs);
+  background: var(--ink-050);
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  color: var(--foreground);
+}
+
+.docs-prose__code {
+  margin: 0 0 20px;
+}
+
+.docs-prose__callout {
+  margin: 0 0 20px;
+  max-width: 68ch;
+}
+
+.docs-link {
+  color: var(--forge-500);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--forge-500) 35%, transparent);
+  transition: border-color var(--dur-fast) var(--ease-out);
+}
+
+.docs-link:hover {
+  border-bottom-color: var(--forge-500);
+}
+
+.docs-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── Tables ─────────────────────────────────────────────────────────── */
+
+.docs-table {
+  overflow: hidden;
+  margin: 0 0 20px;
+}
+
+.docs-table table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--text-sm);
+}
+
+.docs-table th {
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-widest);
+  text-transform: uppercase;
+  color: var(--muted-foreground);
+  font-weight: var(--weight-regular);
+}
+
+.docs-table td {
+  padding: 10px 14px;
+  border-top: 1px solid var(--border);
+  color: var(--muted-foreground);
+  vertical-align: top;
+}
+
+.docs-table tbody tr:first-child td {
+  border-top: 0;
+}
+
+/* First column carries the subject, so it reads at full contrast. */
+.docs-table td:first-child {
+  color: var(--foreground);
+}
+
+.docs-table td:not(:first-child) {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+/* ── API rows ───────────────────────────────────────────────────────── */
+
+.docs-api {
+  margin: 0 0 20px;
+}
+
+.docs-api__row {
+  padding: 16px 0;
+  border-top: 1px solid var(--border);
+}
+
+.docs-api__head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.docs-api__sig {
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  color: var(--forge-500);
+  overflow-wrap: anywhere;
+}
+
+.docs-api__pkg {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  color: var(--ink-600);
+  flex: none;
+}
+
+.docs-api__desc {
+  margin: 8px 0 0;
+  font-size: var(--text-sm);
+  line-height: var(--text-sm-lh);
+  color: var(--muted-foreground);
+  max-width: 68ch;
+}
+
+/* ── Pager ──────────────────────────────────────────────────────────── */
+
+.docs-pager {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 56px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+/* ── On this page ───────────────────────────────────────────────────── */
+
+.docs-toc {
+  position: sticky;
+  top: 24px;
+  align-self: start;
+}
+
+.docs-toc__list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-left: 1px solid var(--border);
+}
+
+.docs-toc__link {
+  display: block;
+  font-size: var(--text-xs);
+  line-height: var(--text-xs-lh);
+  color: var(--muted-foreground);
+  text-decoration: none;
+  padding-left: 12px;
+  border-left: 1px solid transparent;
+  margin-left: -1px;
+  transition: color var(--dur-fast) var(--ease-out);
+}
+
+.docs-toc__link[data-depth="3"] {
+  padding-left: 24px;
+}
+
+.docs-toc__link:hover {
+  color: var(--foreground);
+}
+
+.docs-toc__link[data-active] {
+  color: var(--forge-500);
+  border-left-color: var(--forge-500);
+}
+
+.docs-toc__meta {
+  margin-top: 28px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.docs-toc__meta a {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-xs);
+  color: var(--muted-foreground);
+  text-decoration: none;
+}
+
+.docs-toc__meta a:hover {
+  color: var(--foreground);
+}
+
+/* ── Home ───────────────────────────────────────────────────────────── */
+
+.docs-home__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.docs-home__card {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.docs-home__card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.docs-home__card-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-semibold);
+  letter-spacing: var(--tracking-tight);
+}
+
+.docs-home__card-title a {
+  color: var(--foreground);
+  text-decoration: none;
+}
+
+.docs-home__card-title a:hover {
+  color: var(--forge-500);
+}
+
+.docs-home__card-line {
+  margin: 0;
+  flex: 1;
+  font-size: var(--text-sm);
+  line-height: var(--text-sm-lh);
+  color: var(--muted-foreground);
+  text-wrap: pretty;
+}
+
+.docs-home__card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.docs-home__count {
+  font-family: var(--font-mono);
+  font-size: var(--text-2xs);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--ink-600);
+}
+
+.docs-home__cta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: var(--text-sm);
+  color: var(--forge-500);
+  text-decoration: none;
+}
+
+.docs-home__foot {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────── */
+
+@media (max-width: 1024px) {
+  .docs-page {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    padding: 32px 32px 96px;
+  }
+
+  /* The rail is a convenience, not content — the headings are all still in the
+     document above it. Dropping it beats stacking a second nav under the
+     article the reader has already finished. */
+  .docs-toc {
+    display: none;
+  }
+
+  .docs-home {
+    padding: 40px 32px 96px;
+  }
+}
+
+@media (max-width: 900px) {
+  .docs-shell .b3-shell__aside {
+    display: none;
+  }
+
+  .docs-bar__menu {
+    display: inline-flex;
+  }
+
+  .docs-home__grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 680px) {
+  .docs-search,
+  .docs-bar__version {
+    display: none;
+  }
+
+  .docs-bar__searchicon {
+    display: inline-flex;
+  }
+
+  .docs-page,
+  .docs-home {
+    padding: 24px 20px 80px;
+  }
+
+  .docs-title {
+    font-size: var(--text-4xl);
+    line-height: var(--text-4xl-lh);
+  }
+
+  .docs-pager {
+    flex-direction: column;
+  }
+}

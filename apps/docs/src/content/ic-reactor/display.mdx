@@ -1,0 +1,85 @@
+---
+title: DisplayReactor
+lead: Candid's numeric and principal types do not survive contact with a React render. DisplayReactor converts them at the boundary instead of in every component.
+---
+
+## The problem
+
+A Candid `nat64` arrives as a `bigint`, and `bigint` has no `toLocaleString` in
+older targets, does not serialize to JSON, and throws if you mix it with a `number`.
+A `Principal` is an object with a `toText()` you have to remember to call.
+
+So components fill up with conversions:
+
+```tsx src/Row.tsx
+// Every render site repeating the same two conversions
+<td>{Number(row.amount) / 1e8}</td>
+<td>{row.owner.toText()}</td>
+```
+
+Each one is a place to get the decimals wrong.
+
+## The transform
+
+Ask for a display reactor and the conversion happens once, on the way out of the
+canister call.
+
+```ts src/reactor.ts
+export const { useActorQuery } = defineReactor<_SERVICE>({
+  name: "ledger",
+  idlFactory,
+  canisterId,
+  display: true,
+})
+```
+
+```tsx src/Row.tsx
+// amount is a string, owner is a principal string
+<td>{row.amount}</td>
+<td>{row.owner}</td>
+```
+
+## What changes
+
+| Candid type | Raw reactor | DisplayReactor |
+|---|---|---|
+| `nat` / `nat64` / `int` | `bigint` | `string` |
+| `principal` | `Principal` | `string` |
+| `vec nat8` | `Uint8Array` | hex `string` |
+| `opt T` | `[] \| [T]` | `T \| null` |
+| `variant` | tagged object | tagged object, unchanged |
+
+The `opt` case is the one that saves the most code: Candid options arrive as a
+zero-or-one-element array, and `value[0] ?? fallback` is easy to write and easy to
+get subtly wrong when the value itself is falsy.
+
+## Keeping both
+
+Display transforms are lossy — a formatted string cannot go back into a canister
+call. When you need to both render a value and send it, keep two reactors over the
+same `ClientManager`.
+
+```ts src/reactor.ts
+const clientManager = createClientManager({ host })
+
+export const ledger = createReactor<_SERVICE>({ name: "ledger", idlFactory, canisterId, clientManager })
+export const ledgerDisplay = createReactor<_SERVICE>({
+  name: "ledger",
+  idlFactory,
+  canisterId,
+  clientManager,
+  display: true,
+})
+```
+
+<Callout color="warning" title="One agent, one cache">
+  Pass the same clientManager to both. Constructing a second one gives you a second
+  agent that does not see the first one's login, and the display copy will keep
+  answering as the anonymous principal after a sign-in.
+</Callout>
+
+## Runtime Candid
+
+For an explorer that does not know its canister at build time, `CandidDisplayReactor`
+in `@ic-reactor/candid` does the same transforms against a Candid interface parsed at
+runtime. See [Dynamic Candid](/ic-reactor/candid).
