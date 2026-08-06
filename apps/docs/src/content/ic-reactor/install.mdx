@@ -1,0 +1,49 @@
+---
+title: Install
+lead: Pick the entry point that matches your app.
+---
+
+## React apps
+
+```bash terminal
+pnpm add @ic-reactor/react @icp-sdk/core @tanstack/react-query
+```
+
+`@ic-reactor/react` re-exports what you need from `@ic-reactor/core`, so there is no
+reason to install both.
+
+## Non-React apps
+
+The runtime works on its own — Node services, loaders, CLI tools, Svelte and Vue
+apps all use this pair.
+
+```bash terminal
+pnpm add @ic-reactor/core @icp-sdk/core @tanstack/query-core
+```
+
+## Optional packages
+
+```bash terminal
+# Internet Identity auth helpers
+pnpm add @icp-sdk/auth
+
+# Dynamic Candid support (explorers / dev tools)
+pnpm add @ic-reactor/candid @ic-reactor/parser
+```
+
+## Peer dependencies
+
+`@icp-sdk/core` and the matching TanStack Query package are peers, not
+dependencies — IC Reactor uses whichever copy your app already has, so a single
+QueryClient serves your canister calls and your REST calls alike.
+
+<Callout color="warning" title="One QueryClient">
+  Installing TanStack Query twice gives you two caches that never see each other,
+  and the symptom is a query that refuses to invalidate. If a refetch is silently
+  ignored, check for a duplicate in your lockfile first.
+</Callout>
+
+## Next
+
+Generate the declarations for your canister with the [CLI](/ic-reactor/cli) or the
+[Vite plugin](/ic-reactor/vite), then go to the [quick start](/ic-reactor/quickstart).

@@ -1,0 +1,92 @@
+---
+title: Query factories
+lead: createQuery and createMutation produce an object usable from a component, a route loader or a plain function — one definition of a call, three call sites.
+---
+
+## Why a factory
+
+A hook cannot run in a route loader, a service or a test. That leaves two ways to
+express the same canister call, and they drift.
+
+`createQuery` defines the call once and gives back an object with both interfaces:
+`.useQuery()` inside React, `.fetch()` anywhere.
+
+```ts src/queries.ts
+import { createQuery } from "@ic-reactor/react"
+
+import { backendReactor } from "./reactor"
+
+export const profileQuery = createQuery(backendReactor, {
+  functionName: "get_profile",
+  staleTime: 30_000,
+})
+```
+
+## In a component
+
+```tsx src/Profile.tsx
+function Profile({ id }: { id: string }) {
+  const { data, isPending } = profileQuery.useQuery({ args: [id] })
+
+  if (isPending) return <Skeleton />
+  return <h2>{data.name}</h2>
+}
+```
+
+## Outside React
+
+The same object, same cache, no hook rules.
+
+```ts src/routes.ts
+export async function profileLoader({ params }) {
+  // Populates the cache the component will read from, so the render is instant
+  return profileQuery.fetch({ args: [params.id] })
+}
+```
+
+`fetch()` resolves from cache when the entry is fresh and hits the canister when it
+is not — the decision is TanStack Query's, using the `staleTime` on the factory.
+
+## Mutations
+
+```ts src/mutations.ts
+import { createMutation } from "@ic-reactor/react"
+
+export const saveProfile = createMutation(backendReactor, {
+  functionName: "set_profile",
+  invalidateQueries: [{ functionName: "get_profile" }],
+})
+```
+
+```ts src/actions.ts
+// A form action, no component in sight
+export async function action(formData: FormData) {
+  await saveProfile.execute([{ name: String(formData.get("name")) }])
+}
+```
+
+`invalidateQueries` runs after either call form, so a mutation fired from an action
+still refreshes the components reading that data.
+
+## Typed results
+
+Candid variants come back as a discriminated union rather than an object with
+optional keys, so narrowing works and the compiler catches the branch you forgot.
+
+```ts src/transfer.ts
+const result = await transferMutation.execute([{ to, amount }])
+
+if ("Err" in result) {
+  // result.Err is the canister's typed error variant
+  throw new Error(Object.keys(result.Err)[0])
+}
+
+// result.Ok is the success payload, narrowed
+return result.Ok
+```
+
+<Callout color="info" title="Errors versus rejections">
+  An <code>Err</code> variant is a successful call that returned a failure — the
+  promise resolves. A trapped canister or an unreachable host rejects instead, and
+  surfaces as <code>error</code> on the hook. Handle both.
+</Callout>

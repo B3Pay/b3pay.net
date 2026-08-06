@@ -1,0 +1,87 @@
+---
+title: Generic hooks
+lead: The hooks defineReactor returns are bound to one canister. The generic forms take a reactor as an argument, which is what an app talking to several canisters needs.
+---
+
+## Bound versus generic
+
+`defineReactor` returns hooks that already know their canister. That is the right
+default for an app with one backend, and it is why the quick start never mentions a
+reactor after the first file.
+
+An app with a ledger, an index canister and its own backend has three reactors, and
+binding a hook set per canister means three near-identical modules. The generic
+hooks take the reactor at the call site instead.
+
+```ts src/canisters.ts
+import { createReactor } from "@ic-reactor/core"
+import { createActorHooks } from "@ic-reactor/react"
+
+export const ledger = createReactor<_LEDGER>({ name: "ledger", idlFactory, canisterId })
+export const backend = createReactor<_BACKEND>({ name: "backend", idlFactory, canisterId })
+
+// One hook set, used against either reactor
+export const { useActorQuery, useActorMutation } = createActorHooks()
+```
+
+```tsx src/Balance.tsx
+function Balance({ owner }: { owner: string }) {
+  const { data } = useActorQuery(ledger, {
+    functionName: "icrc1_balance_of",
+    args: [{ owner, subaccount: [] }],
+  })
+
+  return <span>{data ?? "—"}</span>
+}
+```
+
+## The four query hooks
+
+Each mirrors its TanStack Query counterpart and adds the Candid layer.
+
+| Hook | Use it for |
+|---|---|
+| `useActorQuery` | A read that should cache and revalidate |
+| `useActorSuspenseQuery` | The same, inside a Suspense boundary |
+| `useActorInfiniteQuery` | A paginated read with a cursor argument |
+| `useActorMutation` | An update call, plus what it invalidates |
+
+## Shared client state
+
+Every reactor built from the same `ClientManager` shares one agent and one cache.
+That is what makes a single login apply everywhere.
+
+```tsx src/Login.tsx
+function Login() {
+  const { login, logout, identity, isAuthenticated } = useAuth()
+
+  if (!isAuthenticated) return <button onClick={() => login()}>Sign in</button>
+  return (
+    <>
+      <code>{identity?.getPrincipal().toText()}</code>
+      <button onClick={() => logout()}>Sign out</button>
+    </>
+  )
+}
+```
+
+After `login()` resolves, queries bound to an authenticated call are invalidated and
+refetch under the new identity. Nothing needs to remount.
+
+<Callout color="info" title="Anonymous first">
+  Queries run under the anonymous identity before a login completes. If a method
+  rejects anonymous callers, gate the hook with `enabled: isAuthenticated` rather
+  than letting the first call fail and retry.
+</Callout>
+
+## Reading agent state
+
+`useAgentState` reports what the shared agent is doing — useful for a connection
+indicator, and for telling "not signed in" apart from "host unreachable".
+
+```tsx src/Status.tsx
+function Status() {
+  const { network, isFetching } = useAgentState()
+  return <span>{network} {isFetching ? "· syncing" : ""}</span>
+}
+```

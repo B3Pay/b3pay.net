@@ -1,0 +1,82 @@
+---
+title: Dynamic Candid
+lead: An explorer does not know its canister at build time, so there are no generated declarations to import. @ic-reactor/candid fetches the interface and builds the reactor at runtime.
+---
+
+## When you need it
+
+Almost never, in an application. If you know which canister you are calling, generate
+declarations with the [CLI](/ic-reactor/cli) and get compile-time types.
+
+Dynamic Candid is for the tools that take a canister id as input: explorers, method
+playgrounds, the B3Forge node editor. There the interface is data, not a type.
+
+## Install
+
+```bash terminal
+pnpm add @ic-reactor/candid @ic-reactor/parser
+```
+
+`@ic-reactor/parser` is the WASM Candid parser. It is a separate package so that
+apps using static declarations never download it.
+
+## Fetching an interface
+
+Canisters expose their own interface through the management canister, so a
+principal is enough.
+
+```ts src/explorer.ts
+import { createCandidReactor } from "@ic-reactor/candid"
+
+const reactor = await createCandidReactor({
+  canisterId: "ryjl3-tyaaa-aaaaa-aaaba-cai",
+  host: "https://icp-api.io",
+  display: true,
+})
+
+// The parsed interface, as data
+for (const [name, method] of reactor.methods) {
+  console.log(name, method.type) // "query" | "update"
+}
+```
+
+## Calling a method by name
+
+There is no `_SERVICE` type here, so arguments are validated against the parsed
+interface at call time rather than by the compiler.
+
+```ts src/explorer.ts
+const result = await reactor.fetchQuery({
+  functionName: "icrc1_metadata",
+  args: [],
+})
+```
+
+<Callout color="warning" title="No compile-time safety">
+  Nothing checks these calls before they run. A wrong argument shape is a runtime
+  rejection, and the error comes back from the replica. Validate against
+  <code>reactor.methods</code> before calling, or wrap every call in a boundary that
+  can show the failure.
+</Callout>
+
+## Building a form from the interface
+
+The reason the parser exposes an AST rather than just types: a visitor can walk a
+method's argument list and produce input fields for it. This is how B3Forge builds
+a node's inputs from the Candid signature alone.
+
+```ts src/form.ts
+import { VisitFields } from "@ic-reactor/visitor"
+
+const fields = reactor.visit(new VisitFields(), { functionName: "icrc1_transfer" })
+// [{ label: "to", type: "record", fields: [...] }, { label: "amount", type: "nat" }]
+```
+
+`@ic-reactor/visitor` ships the visitors the form builders use; a custom one
+implements the same interface for whatever the tool renders.
+
+## Cost
+
+The parser is WASM and the interface fetch is a network round trip, so a dynamic
+reactor is measurably slower to first call than a generated one. Cache the parsed
+interface per canister id — it changes only when the canister is upgraded.

@@ -8,18 +8,20 @@
  * the filesystem, so it cannot show whether the per-route HTML is reachable.
  * This can.
  *
- *     node scripts/serve-dist.mjs [port]
+ *     node scripts/serve-dist.mjs [port] [dist-dir]
  */
 import { createServer } from "node:http";
 import { createReadStream } from "node:fs";
 import { stat } from "node:fs/promises";
 import { createGzip } from "node:zlib";
-import { extname, join, normalize } from "node:path";
+import { basename, extname, join, normalize } from "node:path";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "dist");
 const PORT = Number(process.argv[2] || 4180);
+// Second argument selects the build: `dist` for b3pay.net, `dist-docs` for the
+// documentation site. They are separate Vercel projects served the same way.
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", process.argv[3] || "dist");
 
 const TYPES = {
   ".html": "text/html; charset=utf-8",
@@ -65,4 +67,4 @@ createServer(async (req, res) => {
   const stream = createReadStream(file);
   if (gzip) stream.pipe(createGzip()).pipe(res);
   else stream.pipe(res);
-}).listen(PORT, () => console.log(`dist on http://localhost:${PORT}`));
+}).listen(PORT, () => console.log(`${basename(ROOT)} on http://localhost:${PORT}`));

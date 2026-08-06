@@ -1,0 +1,85 @@
+---
+title: Vite plugin
+lead: Regenerate canister declarations whenever dfx redeploys, without leaving the dev server running against a stale interface.
+---
+
+## Install
+
+```bash terminal
+pnpm add -D @ic-reactor/vite
+```
+
+## Configure
+
+The plugin reads `dfx.json` for the canister list and the local replica port, so
+there is nothing to repeat in the Vite config.
+
+```ts vite.config.ts
+import react from "@vitejs/plugin-react"
+import { icReactor } from "@ic-reactor/vite"
+import { defineConfig } from "vite"
+
+export default defineConfig({
+  plugins: [
+    react(),
+    icReactor({
+      // Defaults to ./dfx.json
+      dfxConfig: "./dfx.json",
+      // Where the generated declarations land
+      outDir: "./src/declarations",
+      // Regenerate when a .did changes during dev
+      watch: true,
+    }),
+  ],
+})
+```
+
+## What it emits
+
+One directory per canister, each with the IDL factory, the `_SERVICE` type and the
+canister id for the current network.
+
+```text src/declarations/
+src/declarations/
+  my_canister/
+    index.ts          # idlFactory, canisterId, _SERVICE
+    my_canister.did   # copied from the build
+    my_canister.did.d.ts
+```
+
+That is the shape `defineReactor` expects, so wiring a new canister is an import:
+
+```ts src/reactor.ts
+import { canisterId, idlFactory, type _SERVICE } from "./declarations/my_canister"
+
+export const { useActorQuery } = defineReactor<_SERVICE>({
+  name: "my_canister",
+  idlFactory,
+  canisterId,
+})
+```
+
+## Watch mode
+
+With `watch: true` the plugin subscribes to the `.did` files dfx writes on deploy.
+A `dfx deploy` in another terminal regenerates the declarations and triggers an HMR
+update, so a changed method signature becomes a type error in your editor rather
+than a rejected call in the browser.
+
+<Callout color="warning" title="Generated output is not source">
+  Add the output directory to .gitignore and generate in CI. Committing
+  declarations means a stale interface can be merged, and the conflict it causes on
+  every deploy is noise.
+</Callout>
+
+## Networks
+
+The canister id the plugin writes depends on the network dfx last deployed to. For
+a build that must target mainnet regardless of local state, pass the network
+explicitly:
+
+```ts vite.config.ts
+icReactor({ network: process.env.DFX_NETWORK ?? "local" })
+```
+
+The [CLI](/ic-reactor/cli) takes the same flag, for projects not built with Vite.

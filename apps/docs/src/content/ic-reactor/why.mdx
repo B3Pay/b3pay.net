@@ -1,0 +1,77 @@
+---
+title: Why IC Reactor
+lead: The Internet Computer's Actor API is typed and complete. What it has no opinion about is caching, invalidation, auth state and the shape of a Candid result — and every app ends up writing the same answers.
+---
+
+## The gap
+
+`@icp-sdk/core` gives you a typed actor. Call a method, get a promise. That is the
+correct primitive and IC Reactor does not replace it — `reactor.actor` is the same
+object underneath.
+
+What the actor does not carry is everything around the call. A canister query is a
+network round trip with a cache key, a staleness window, a retry policy and a
+loading state, and none of that is in the Actor contract. So each app grows its
+own copy:
+
+```ts src/canister.ts
+// The shape every IC frontend converges on, written by hand
+const [balance, setBalance] = useState<bigint>()
+const [loading, setLoading] = useState(true)
+const [error, setError] = useState<Error>()
+
+useEffect(() => {
+  let cancelled = false
+  actor.get_balance(principal)
+    .then((v) => !cancelled && setBalance(v))
+    .catch((e) => !cancelled && setError(e))
+    .finally(() => !cancelled && setLoading(false))
+  return () => { cancelled = true }
+}, [principal])
+```
+
+That is fifteen lines that do not mention your product, repeated per method, and it
+still has no cache, no deduplication and no background refresh.
+
+## What IC Reactor adds
+
+IC Reactor sits above the raw Actor API and binds it to TanStack Query. You keep
+type safety and control; you stop writing cache keys by hand.
+
+- **Query caching and deduplication.** Two components asking for the same method
+  with the same arguments make one call.
+- **Typed `Ok` / `Err` handling.** Candid variants come back as a discriminated
+  union you can narrow, not a bare object you have to probe.
+- **Shared auth and agent state.** One `ClientManager` for every canister in the
+  app, so a login updates all of them.
+- **Display transforms.** `bigint` and `Principal` arrive as strings when a
+  component needs to render them, without a conversion layer per view.
+
+## What it does not do
+
+It is not a framework and it does not own your app.
+
+<Callout color="info" title="Still your actor">
+  Everything IC Reactor exposes is reachable from the underlying actor. If a case
+  is not covered, drop to <code>reactor.actor</code> and call the method directly —
+  the cache and the auth state stay valid.
+</Callout>
+
+It also does not require React. `@ic-reactor/core` is the runtime; the React
+package is bindings over it. Loaders, services and CLI tools use `fetch()` and
+`execute()` and never touch a hook.
+
+## Seven packages
+
+The split exists so a non-React consumer does not pull React, and a project without
+dynamic Candid does not pull a parser.
+
+| Package | For |
+|---|---|
+| `@ic-reactor/core` | The runtime: reactors, managers, queries |
+| `@ic-reactor/react` | Hooks, context and the `defineReactor` factory |
+| `@ic-reactor/candid` | Runtime Candid parsing for explorers and dev tools |
+| `@ic-reactor/parser` | The WASM Candid parser `candid` depends on |
+| `@ic-reactor/cli` | Declaration codegen from a `dfx.json` |
+| `@ic-reactor/vite` | The same codegen as a Vite plugin |
+| `@ic-reactor/visitor` | Candid AST visitors used by the form builders |
