@@ -33,7 +33,9 @@ export function Hero() {
       i += 1;
       setStep(i);
       if (i >= STEPS.length) clearInterval(t);
-    }, 1100);
+      // 900ms, not the 1100ms of the four-step run: the Bitcoin leg added two
+      // steps and the whole sequence should still land in under six seconds.
+    }, 900);
     return () => clearInterval(t);
   }, [run, reduced]);
 

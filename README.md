@@ -143,9 +143,21 @@ Things that came up building this, in the order they matter.
   brand glyphs (`Github`).
 - **The home page carries three Forge-orange surfaces**, against the brand
   guide's one-per-view rule: `Get started` in the nav, `Start building` in the
-  hero, and `Pay 0.0241 ckBTC` in the run panel until it settles. All three are
+  hero, and `Pay 0.0241 BTC` in the run panel until it settles. All three are
   specified explicitly in `HANDOFF.md`. The one that was not — `Read the guide`
   in the developer slab — is outlined here. Worth a decision.
+- **The hero run shows the Bitcoin leg, so it is ahead of `HANDOFF.md`.** The
+  handoff specifies four steps over fifteen nodes at 1100ms; the panel in
+  [HeroRun.tsx](apps/web/src/routes/home/HeroRun.tsx) runs six over seventeen
+  at 900ms, because a buyer paying a ckBTC checkout starts by holding BTC. The
+  three added calls are the real ckBTC minter flow — `get_btc_address`,
+  `bitcoin_get_utxos`, `update_balance` — and the deposit bar above the list
+  states the BTC → ckBTC conversion before any of them run. Two changes came
+  with it: `icrc2_approve` is now followed by `icrc2_transfer_from` rather than
+  `icrc1_transfer`, which would have ignored the allowance the approve just
+  created, and the settlement fee reads `0.0000001` — the ckBTC ledger's actual
+  10-satoshi fee. `btc-network` and `ckbtc-minter` are appended to `NODES` as
+  15 and 16 so the indices the handoff documents still point at the same nodes.
 - **Product docs links point at `#readme`** on each repository. There is no
   documentation site yet; these are the closest real URLs.
 - **Fonts are still Google Fonts cuts**, now self-hosted via `@fontsource`

@@ -3,6 +3,9 @@ import { useEffect, useRef } from "react";
 /**
  * The background is a payment-gateway topology: every node is a real hop a
  * ckBTC checkout passes through. The run panel lights them as it executes.
+ *
+ * 0–14 are the indices the design handoff documents; the Bitcoin leg (15, 16)
+ * is appended rather than inserted so those stay stable.
  */
 export const NODES = [
   { x: 6, y: 18, l: "checkout" },
@@ -20,12 +23,17 @@ export const NODES = [
   { x: 85, y: 84, l: "audit-log" },
   { x: 88, y: 40, l: "payout" },
   { x: 95, y: 66, l: "refund" },
+  { x: 3, y: 45, l: "btc-network" },
+  { x: 16, y: 88, l: "ckbtc-minter" },
 ] as const;
 
 export const EDGES: ReadonlyArray<readonly [number, number]> = [
   [0, 2], [1, 2], [2, 3], [2, 6], [3, 4], [3, 6], [4, 6], [4, 7], [5, 7], [6, 7],
   [6, 8], [7, 8], [7, 9], [8, 9], [9, 10], [9, 11], [10, 12], [10, 13], [11, 13],
   [12, 14], [13, 14],
+  // The Bitcoin leg: UTXOs arrive from the network, the minter mints against
+  // them, and the ckBTC lands on the ledger the rest of the graph already uses.
+  [15, 16], [16, 2], [16, 4], [16, 7],
 ];
 
 /**

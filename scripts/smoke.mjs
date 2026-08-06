@@ -109,14 +109,14 @@ async function newPage(width = 1440, height = 900) {
   const buttonText = () =>
     page.evaluate(() => {
       const b = [...document.querySelectorAll("button")].find((x) =>
-        /Pay 0\.0241 ckBTC|Run it again/.test(x.textContent),
+        /Pay 0\.0241 BTC|Run it again/.test(x.textContent),
       );
       return b?.textContent.trim() ?? null;
     });
 
-  check("hero starts at the pay button", (await buttonText()) === "Pay 0.0241 ckBTC");
+  check("hero starts at the pay button", (await buttonText()) === "Pay 0.0241 BTC");
 
-  await new Promise((r) => setTimeout(r, 5200)); // 4 steps × 1100ms + slack
+  await new Promise((r) => setTimeout(r, 6200)); // 6 steps × 900ms + slack
   check("hero settles into Run it again", (await buttonText()) === "Run it again");
   check(
     "settled state reads Settled / Paid",
@@ -145,7 +145,7 @@ async function newPage(width = 1440, height = 900) {
   );
   check(
     "Run it again relights the field from zero",
-    litAfter < litBefore && (await buttonText()) === "Pay 0.0241 ckBTC",
+    litAfter < litBefore && (await buttonText()) === "Pay 0.0241 BTC",
     `${litBefore} lit → ${litAfter} lit`,
   );
 
