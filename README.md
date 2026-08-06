@@ -158,16 +158,25 @@ So both settings live in each project's dashboard, where they can differ.
 | **docs.b3pay.net** | *empty* (the repo root) | `npm run build:docs` | `dist-docs` |
 
 Set all four explicitly rather than leaving any empty. Empty means "whatever
-Vercel's framework detection infers", and detection runs against the repo root,
-where there is no bundler to find.
+Vercel's framework detection infers", detection runs against the Root Directory,
+and the repo root has no bundler in its `package.json` — so the preset resolves
+to "Other", whose default output directory is `public`. Leaving Output Directory
+empty is what produced the error in the third row below, on a build that had
+otherwise succeeded.
 
 What each one costs when it is wrong:
 
 | Setting | If it is wrong |
 |---|---|
-| Root Directory | `npm error No workspaces found: --workspace=apps/web`, because `apps/` is not visible from wherever the build ran |
-| Output Directory | `Error: No Output Directory named "dist" found after the Build completed` |
+| Root Directory, pointing outside the repo root | `npm error No workspaces found: --workspace=apps/web`, because `apps/` is not visible from wherever the build ran |
+| Root Directory, pointing at a workspace member | `npm error Missing script: "build:docs"` — npm resolves the script against that member's `package.json`, and fails before preflight can say why |
+| Output Directory, wrong | `Error: No Output Directory named "dist" found after the Build completed` |
+| Output Directory, empty | `Error: No Output Directory named "public" found after the Build completed` — nothing asked for `public`; it is the "Other" preset's default |
 | Build Command on the docs project | No error at all — docs.b3pay.net silently serves a second copy of the marketing site |
+
+The last line of every build prints the absolute path that was written. When
+Vercel reports it cannot find the output, compare the two — `output
+/vercel/path0/dist` against a message naming `public` is the whole diagnosis.
 
 Both build scripts start with [scripts/preflight.mjs](scripts/preflight.mjs),
 which prints the working directory and its contents and fails with the Root

@@ -153,17 +153,27 @@ body {
 
 /* ── Page frame ─────────────────────────────────────────────────────── */
 
+/* The prototype was drawn at 1280px, where a 1080px column beside a 230px rail
+   fills the window almost exactly, and it was never asked what happens wider.
+   Past about 1400px the column stops growing, so without the centring below it
+   pins to the left edge with the rest of the screen empty.
+
+   The shell itself stays full-bleed: `.b3-shell__aside` is app chrome and
+   belongs against the edge. It is the reading column that centres, in whatever
+   space the sidebar leaves it. */
 .docs-page {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 200px;
   gap: 48px;
   padding: 40px 48px 120px;
   max-width: 1080px;
+  margin-inline: auto;
 }
 
 .docs-home {
   padding: 56px 48px 120px;
   max-width: 940px;
+  margin-inline: auto;
 }
 
 .docs-crumb {
