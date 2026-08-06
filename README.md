@@ -55,13 +55,25 @@ listed in one place and missing from another.
 
 ## Deploying
 
-`vercel.json` at the repo root points Vercel at
-`npm run build -w apps/web` → `apps/web/dist`, with an SPA rewrite for anything
-the prerendered files do not cover. `/api` is excluded from that rewrite on
-purpose — see [api/contact.ts](api/contact.ts).
+`vercel.json` at the repo root sets `npm ci` → `npm run build` →
+`apps/web/dist`, with an SPA rewrite for anything the prerendered files do not
+cover. `/api` is excluded from that rewrite on purpose — see
+[api/contact.ts](api/contact.ts).
 
 Connect this repo in the Vercel dashboard for per-PR previews, then add the
 custom domain.
+
+**Two project settings have to match, and the dashboard wins over
+`vercel.json`** — this cost two failed deploys:
+
+| Setting | Value | If it is wrong |
+|---|---|---|
+| Root Directory | *empty* (the repo root) | `npm error No workspaces found: --workspace=apps/web`, because `apps/` is not visible from wherever the build ran |
+| Output Directory | `apps/web/dist` | `Error: No Output Directory named "dist" found after the Build completed` |
+
+`npm run build` starts with [scripts/preflight.mjs](scripts/preflight.mjs),
+which prints the working directory and its contents and fails with the Root
+Directory instruction rather than letting npm report a symptom four steps later.
 
 ### Contact form
 
