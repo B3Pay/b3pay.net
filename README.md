@@ -16,7 +16,7 @@ design/          the design system, unchanged, as delivered
 
 ## Running it
 
-Node 20.19+ or 22.12+.
+Node 22.12 or newer. Built and tested on 22.22.2 and 24.15.0.
 
 ```bash
 npm install
@@ -98,10 +98,10 @@ failure. It never reports a delivery it did not achieve.
 
 ### Later: the Internet Computer
 
-The same `apps/web/dist` deploys as an asset canister:
+The same `dist/` deploys as an asset canister:
 
 ```json
-{ "canisters": { "b3pay_web": { "type": "assets", "source": ["apps/web/dist"] } } }
+{ "canisters": { "b3pay_web": { "type": "assets", "source": ["dist"] } } }
 ```
 
 ```bash
