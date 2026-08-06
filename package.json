@@ -6,11 +6,11 @@
     "packages/*"
   ],
   "engines": {
-    "node": "22.x"
+    "node": ">=22.12"
   },
   "scripts": {
     "dev": "npm run dev -w apps/web",
-    "build": "npm run build -w apps/web",
+    "build": "node scripts/preflight.mjs && npm run build -w apps/web",
     "preview": "node scripts/serve-dist.mjs 4180",
     "typecheck": "npm run typecheck -w apps/web && tsc -p tsconfig.api.json --noEmit",
     "smoke": "node scripts/smoke.mjs",
