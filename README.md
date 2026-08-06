@@ -44,6 +44,12 @@ contact form never reports a send it did not make.
    `react-dom/server` and writes `dist/<route>/index.html` with that route's
    `<title>`, description, canonical and Open Graph tags baked into the head.
 
+The client build lands in `dist/` at the repo root — not under `apps/web` —
+because that is where Vercel looks by default for a Vite app, and its dashboard
+Output Directory setting outranks `vercel.json`. The SSR bundle stays in
+`apps/web/dist-ssr`; it is an intermediate the prerender step consumes and
+never ships.
+
 The client hydrates whatever it finds. Without step 3 a crawler sees one empty
 `<div id="root">` for six routes, and first paint waits on 165 kB of React —
 Lighthouse performance sat at 74. With it, 93–95.
@@ -55,8 +61,8 @@ listed in one place and missing from another.
 
 ## Deploying
 
-`vercel.json` at the repo root sets `npm ci` → `npm run build` →
-`apps/web/dist`, with an SPA rewrite for anything the prerendered files do not
+`vercel.json` at the repo root sets `npm ci` → `npm run build` → `dist`,
+with an SPA rewrite for anything the prerendered files do not
 cover. `/api` is excluded from that rewrite on purpose — see
 [api/contact.ts](api/contact.ts).
 
@@ -69,7 +75,7 @@ custom domain.
 | Setting | Value | If it is wrong |
 |---|---|---|
 | Root Directory | *empty* (the repo root) | `npm error No workspaces found: --workspace=apps/web`, because `apps/` is not visible from wherever the build ran |
-| Output Directory | `apps/web/dist` | `Error: No Output Directory named "dist" found after the Build completed` |
+| Output Directory | *empty* (`dist`, Vercel's own default) | `Error: No Output Directory named "dist" found after the Build completed` |
 
 `npm run build` starts with [scripts/preflight.mjs](scripts/preflight.mjs),
 which prints the working directory and its contents and fails with the Root

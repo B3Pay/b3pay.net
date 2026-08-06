@@ -7,6 +7,16 @@ export default defineConfig(({ isSsrBuild }) => ({
   // it rather than hand it to node as-is.
   ssr: { noExternal: ["@b3pay/ui", "lucide-react", "sonner"] },
   build: {
+    // The client build goes to the repo root. Vercel resolves its output
+    // directory from the project's Root Directory, and its default for a Vite
+    // app is `dist` there — emitting anywhere else makes the deploy depend on a
+    // dashboard override that silently outranks vercel.json.
+    //
+    // The SSR bundle stays inside apps/web: it is an intermediate the prerender
+    // step consumes and never ships, and this package is the one that declares
+    // "type": "module", which node needs to load it without reparsing.
+    outDir: isSsrBuild ? "dist-ssr" : "../../dist",
+    emptyOutDir: true,
     target: "es2020",
     // One stylesheet: the site is small, and a second request in the critical
     // path costs more than the bytes it saves.

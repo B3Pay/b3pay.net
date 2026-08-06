@@ -18,7 +18,7 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const APP = join(dirname(fileURLToPath(import.meta.url)), "..");
-const DIST = join(APP, "dist");
+const DIST = join(APP, "..", "..", "dist");
 
 const { render, ALL_ROUTES, OG_IMAGE, SITE_NAME, SITE_URL } = await import(
   join(APP, "dist-ssr/entry-server.js")

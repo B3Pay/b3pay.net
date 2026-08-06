@@ -18,7 +18,7 @@ import { extname, join, normalize } from "node:path";
 import { dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "apps/web/dist");
+const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..", "dist");
 const PORT = Number(process.argv[2] || 4180);
 
 const TYPES = {
