@@ -117,3 +117,11 @@ await writeFile(
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls}\n</urlset>\n`,
 );
 console.log(`  sitemap.xml              ${ALL_ROUTES.filter((r) => r.inSitemap).length} urls`);
+
+// Vercel resolves its Output Directory from the project's Root Directory, and
+// reports a miss without saying where it looked. State the absolute path so the
+// build log answers that on its own.
+const top = (await readdir(DIST)).sort().join(" ");
+console.log(`\noutput  ${DIST}`);
+console.log(`output  cwd was ${process.cwd()}`);
+console.log(`output  contains: ${top}`);
