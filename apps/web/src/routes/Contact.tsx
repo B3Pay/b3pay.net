@@ -14,7 +14,7 @@ import {
   toast,
 } from "@b3pay/ui";
 
-import { GITHUB_ORG } from "../site/products";
+import { DOCS_URL, GITHUB_ORG } from "../site/products";
 import { Section } from "../site/furniture";
 import { routeMeta } from "../site/routes";
 import { useSeo } from "../lib/seo";
@@ -30,9 +30,9 @@ const LINKS: { label: string; sub: string; icon: string; href: string }[] = [
   { label: "GitHub", sub: "github.com/B3Pay", icon: "Github", href: GITHUB_ORG },
   {
     label: "Documentation",
-    sub: "IC Reactor docs and package READMEs",
+    sub: "docs.b3pay.net",
     icon: "BookOpen",
-    href: `${GITHUB_ORG}/ic-reactor#readme`,
+    href: DOCS_URL,
   },
   {
     label: "Live demo",
