@@ -1,0 +1,13 @@
+/* Derived from the app's --radius: 0.625rem. Do not round these to a 4/8 grid. */
+:root{
+  --radius:10px;
+  --radius-xs:4px;    /* calc(--radius - 6px) */
+  --radius-sm:6px;    /* calc(--radius - 4px) */
+  --radius-md:8px;    /* calc(--radius - 2px) */
+  --radius-lg:10px;   /* --radius */
+  --radius-xl:14px;   /* calc(--radius + 4px) */
+  --radius-2xl:20px;
+  --radius-full:9999px;
+  --border-width:1px;
+  --bevel:10px;       /* machined corner cut, used with clip-path */
+}

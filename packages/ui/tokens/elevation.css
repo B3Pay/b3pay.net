@@ -1,0 +1,13 @@
+/* Shadows copied from the B3Forge stylesheet, plus the brand heat glows. */
+:root{
+  --shadow-xs:0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-sm:0 1px 3px 0 rgb(0 0 0 / 0.1),0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md:0 4px 12px -2px rgb(0 0 0 / 0.35);
+  --shadow-lg:0 18px 48px -12px rgb(0 0 0 / 0.55);
+  --shadow-button-inner:0 1px 3px 0 rgb(0 0 0 / 0.3),0 0 8px 0 rgb(255 255 255 / 0.05);
+  --shadow-icon-card:inset -2px -2px 6px 0px rgb(255 255 255 / 0.05);
+  --shadow-icon-glow:0 0 12px 2px rgb(237 116 55 / 0.3);
+  --glow-forge-sm:0 0 0 1px rgb(237 116 55 / 0.35),0 0 16px -2px rgb(237 116 55 / 0.45);
+  --glow-forge-lg:0 0 60px -10px rgb(255 141 40 / 0.55);
+  --ring-focus:0 0 0 1px var(--ring);
+}

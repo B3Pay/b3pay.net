@@ -1,1 +1,10 @@
-/.DS_Store
+.DS_Store
+node_modules/
+dist/
+.vercel/
+*.local
+.env
+.env.*
+!.env.example
+.turbo/
+dist-ssr/

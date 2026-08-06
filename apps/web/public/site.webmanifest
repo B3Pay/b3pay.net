@@ -1,0 +1,14 @@
+{
+  "name": "B3Pay",
+  "short_name": "B3Pay",
+  "description": "Open-source infrastructure for decentralized applications, wallets and payments on the Internet Computer.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#111113",
+  "theme_color": "#111113",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

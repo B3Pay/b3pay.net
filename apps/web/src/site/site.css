@@ -1,0 +1,389 @@
+/* b3pay.net layout layer.
+   -----------------------------------------------------------------------
+   The prototype was drawn at 1280px and is correct from ~1024px up; below that
+   the two-column compositions had never been stacked. This file is that work,
+   and nothing else. Every value it uses is a token — no new colours, sizes,
+   radii or durations are introduced here.
+
+   Breakpoints, from HANDOFF.md > Responsive:
+     1024px  two-column layouts stack; the spine is hidden
+      900px  the nav collapses to a menu; three-up grids go single
+      768px  the colgrid drops from 12 hairlines to 6
+      680px  remaining multi-column rows stack
+*/
+
+/* The design system ships no box model reset, and its geometry assumes one:
+   `.b3-btn--md { height: 32px; padding: 0 16px }` is only a 32px control under
+   border-box, and `.b3-field { width: 100%; padding: 0 12px; border: 1px }`
+   otherwise overflows its container by 26px. This belongs in
+   `@b3pay/ui`'s tokens/base.css — it is here because that file is the design
+   system's to change, not the site's. */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-padding-top: 88px; /* sticky 64px NavBar + breathing room */
+}
+
+body {
+  margin: 0;
+  overflow-x: hidden;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.site-main {
+  flex: 1;
+}
+
+/* Keyboard entry point. Visible the moment it takes focus, never before. */
+.site-skip {
+  position: absolute;
+  left: 12px;
+  top: -60px;
+  z-index: 60;
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 16px;
+  border-radius: var(--radius-md);
+  background: var(--primary);
+  color: var(--primary-foreground);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  text-decoration: none;
+  transition: top var(--dur-fast) var(--ease-dock);
+}
+.site-skip:focus-visible {
+  top: 12px;
+  color: var(--primary-foreground);
+  outline: none;
+  box-shadow: 0 0 0 1px var(--background), 0 0 0 3px var(--ring);
+}
+
+/* Section rhythm — --section-y / --section-y-tight, compressed on small screens. */
+.site-section {
+  padding: var(--section-y) var(--gutter);
+}
+.site-section--tight {
+  padding: var(--section-y-tight) var(--gutter);
+}
+.site-section__title {
+  font-size: 52px;
+}
+
+.site-shell {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 0 var(--gutter) var(--section-y);
+}
+.site-shell--tight {
+  padding-bottom: var(--section-y-tight);
+}
+
+/* ── Grids ─────────────────────────────────────────────────────────── */
+.site-grid-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 56px;
+  align-items: center;
+}
+/* 1.15 / 0.85 — Products */
+.site-grid-split-a {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+  gap: 48px;
+  align-items: start;
+}
+/* 0.85 / 1.15 — Developers */
+.site-grid-split-b {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: 48px;
+  align-items: start;
+}
+.site-grid-half {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 64px;
+}
+.site-grid-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+.site-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 44px;
+}
+.site-grid-products {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+.site-grid-products > :first-child {
+  grid-column: span 2;
+}
+.site-slab-split {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+}
+.site-slab-split__copy {
+  padding: 56px 48px;
+}
+.site-slab-split__code {
+  padding: 48px 40px 48px 0;
+}
+.site-blog-row {
+  display: grid;
+  grid-template-columns: 120px 1fr auto;
+  gap: 28px;
+  align-items: baseline;
+  padding: 26px 0;
+  border-top: 1px solid var(--border);
+  text-decoration: none;
+  color: inherit;
+}
+.site-blog-row:hover {
+  color: inherit;
+}
+.site-blog-row:hover .site-blog-row__title {
+  color: var(--forge-500);
+}
+.site-blog-row__title {
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.site-blog-row:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 1px var(--background), 0 0 0 3px var(--ring);
+}
+.site-footer-grid {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 64px var(--gutter) 40px;
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr 1fr;
+  gap: 40px;
+}
+.site-footer-bar {
+  max-width: var(--page-max);
+  margin: 0 auto;
+  padding: 20px var(--gutter) 40px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* Product tab strip — five flex tabs, scrollable rather than crushed. */
+.site-tabs {
+  display: flex;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 40px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.site-tabs::-webkit-scrollbar {
+  display: none;
+}
+.site-tab {
+  flex: 1 0 auto;
+  min-width: 132px;
+  background: transparent;
+  border: 0;
+  border-right: 1px solid var(--border);
+  border-top: 2px solid transparent;
+  padding: 20px 18px;
+  text-align: left;
+  cursor: pointer;
+  text-decoration: none;
+  display: block;
+  transition: background-color var(--dur-fast) var(--ease-out);
+}
+.site-tab[data-selected="true"] {
+  background: var(--card);
+  border-top-color: var(--forge-500);
+}
+.site-tab:hover {
+  background: color-mix(in srgb, var(--foreground) 4%, transparent);
+}
+.site-tab:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 1px var(--background), inset 0 0 0 3px var(--ring);
+}
+
+/* ── Chrome ────────────────────────────────────────────────────────── */
+.site-nav-menu-button {
+  display: none;
+}
+
+/* Anchors inside the footer and link lists inherit their colour; only the
+   underline offset is site-level. */
+.site-link-list a:hover {
+  color: var(--foreground);
+}
+.site-link-list a:focus-visible {
+  outline: none;
+  color: var(--foreground);
+  box-shadow: 0 0 0 1px var(--background), 0 0 0 3px var(--ring);
+  border-radius: var(--radius-xs);
+}
+
+.site-row-link:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 1px var(--background), 0 0 0 3px var(--ring);
+}
+
+/* --success and --warning are the B3Forge app's *surface* hues. `.b3-badge--soft`
+   uses them as text over a 12% wash of themselves, which at the badge's 9–11px
+   lands at 4.15:1 — under AA for small text. Lifting the text toward
+   --foreground keeps the hue doing the work and clears 4.5:1 for every tone.
+   No new colour: it is a mix of two tokens. Belongs in the design system's
+   b3-components.css. */
+.b3-badge--soft {
+  color: color-mix(in srgb, var(--c) 62%, var(--foreground));
+}
+
+/* A product card is a link, not a div with onClick — so it is tabbable, has a
+   real href, and carries the ring the brand guide specifies for focus. */
+.site-card-link {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+}
+.site-card-link:hover {
+  color: inherit;
+}
+.site-card-link:focus-visible {
+  outline: none;
+}
+.site-card-link:focus-visible > .b3-card {
+  box-shadow: 0 0 0 1px var(--background), 0 0 0 3px var(--ring);
+  border-color: color-mix(in srgb, var(--forge-600) 55%, transparent);
+}
+
+/* ── 1024px — two-column layouts stack ─────────────────────────────── */
+@media (max-width: 1024px) {
+  .b3-spine {
+    display: none;
+  }
+  .site-grid-hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 44px;
+  }
+  /* The run panel is the thing worth seeing first on a narrow screen. */
+  .site-grid-hero > .site-hero-copy {
+    order: 2;
+  }
+  .site-grid-hero > .site-hero-run {
+    order: 1;
+  }
+  .site-grid-split-a,
+  .site-grid-split-b,
+  .site-slab-split {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 40px;
+  }
+  .site-slab-split__copy {
+    padding: 44px 32px 0;
+  }
+  .site-slab-split__code {
+    padding: 28px 32px 44px;
+  }
+  .site-grid-products {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .site-grid-products > :first-child {
+    grid-column: span 2;
+  }
+  .site-section__title {
+    font-size: 42px;
+  }
+}
+
+/* ── 900px — nav collapses, three-up grids go single ───────────────── */
+@media (max-width: 900px) {
+  /* .b3-nav is NavBar's own link row; the Drawer takes over below this width. */
+  .b3-nav {
+    display: none;
+  }
+  .site-nav-desktop-action {
+    display: none;
+  }
+  .site-nav-menu-button {
+    display: inline-flex;
+  }
+  .site-grid-3 {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 36px;
+  }
+  .site-grid-half {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 44px;
+  }
+  .site-footer-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px;
+  }
+  .site-section {
+    padding: 80px var(--gutter);
+  }
+  .site-section--tight {
+    padding: 56px var(--gutter);
+  }
+  .site-shell {
+    padding-bottom: 80px;
+  }
+}
+
+/* ── 768px — the colgrid halves ────────────────────────────────────── */
+@media (max-width: 768px) {
+  .b3-colgrid {
+    background-size: calc(100% / 6) 100%;
+  }
+  .site-section__title {
+    font-size: 34px;
+  }
+}
+
+/* ── 680px — remaining multi-column rows stack ─────────────────────── */
+@media (max-width: 680px) {
+  .site-grid-products,
+  .site-grid-products > :first-child,
+  .site-grid-pair {
+    grid-template-columns: minmax(0, 1fr);
+    grid-column: auto;
+  }
+  .site-blog-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 10px;
+  }
+  .site-footer-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .site-section {
+    padding: 64px var(--gutter);
+  }
+  .site-shell {
+    padding-bottom: 64px;
+  }
+  .site-slab-split__copy {
+    padding: 32px 24px 0;
+  }
+  .site-slab-split__code {
+    padding: 24px 24px 32px;
+  }
+}
