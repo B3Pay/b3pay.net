@@ -133,25 +133,33 @@ Two sites deploy from this one repository, as **two Vercel projects** pointed at
 the same GitHub repo. They are separate so that a docs build failure cannot take
 down b3pay.net, and so editing a guide does not rebuild the marketing site.
 
-`vercel.json` at the repo root sets `npm ci` → `npm run build` → `dist`, with an
-SPA rewrite for anything the prerendered files do not cover. `/api` is excluded
-from that rewrite on purpose — see [api/contact.ts](api/contact.ts).
+`vercel.json` at the repo root carries what both sites share: `npm ci`, the SPA
+rewrite for anything the prerendered files do not cover, and the security and
+cache headers. `/api` is excluded from that rewrite on purpose — see
+[api/contact.ts](api/contact.ts).
 
-Both projects read that same `vercel.json`, because both have their Root
-Directory at the repo root. The rewrite and the headers are what the docs site
-wants too; only the build command and the output directory differ, and those are
-overridden per project in the dashboard.
+**What it deliberately does not carry is `buildCommand` and `outputDirectory`,
+and they must not be added back.**
 
-Connect the repo in the Vercel dashboard for per-PR previews, then add the
-domain.
+Those two fields — and `installCommand` — behave the opposite way round to the
+rest of Vercel's configuration. When `vercel.json` defines them, **the file wins
+and the dashboard fields are disabled**, greyed out with the file's values shown
+as placeholders. That is fine for one project. With two projects reading one
+`vercel.json`, it makes the per-project difference impossible to express: the
+docs project cannot be told to run a different build, because the field it needs
+is locked by a file it shares with the marketing site.
 
-**These settings have to match, and the dashboard wins over `vercel.json`** —
-getting this wrong cost two failed deploys:
+So both settings live in each project's dashboard, where they can differ.
+`installCommand` stays in the file because both projects want the same `npm ci`.
 
 | Project | Root Directory | Build Command | Output Directory |
 |---|---|---|---|
-| **b3pay.net** | *empty* (the repo root) | *empty* (from `vercel.json`) | *empty* (`dist`, Vercel's own default) |
+| **b3pay.net** | *empty* (the repo root) | `npm run build` | `dist` |
 | **docs.b3pay.net** | *empty* (the repo root) | `npm run build:docs` | `dist-docs` |
+
+Set all four explicitly rather than leaving any empty. Empty means "whatever
+Vercel's framework detection infers", and detection runs against the repo root,
+where there is no bundler to find.
 
 What each one costs when it is wrong:
 
@@ -159,7 +167,7 @@ What each one costs when it is wrong:
 |---|---|
 | Root Directory | `npm error No workspaces found: --workspace=apps/web`, because `apps/` is not visible from wherever the build ran |
 | Output Directory | `Error: No Output Directory named "dist" found after the Build completed` |
-| Build Command on the docs project | The docs project silently deploys a second copy of the marketing site |
+| Build Command on the docs project | No error at all — docs.b3pay.net silently serves a second copy of the marketing site |
 
 Both build scripts start with [scripts/preflight.mjs](scripts/preflight.mjs),
 which prints the working directory and its contents and fails with the Root
