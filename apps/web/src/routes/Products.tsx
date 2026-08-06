@@ -12,7 +12,7 @@ import {
 } from "@b3pay/ui";
 import { Link, Navigate, useParams } from "react-router-dom";
 
-import { PRODUCTS, repoUrl } from "../site/products";
+import { docsUrl, PRODUCTS, repoUrl } from "../site/products";
 import { Section } from "../site/furniture";
 import { routeMeta } from "../site/routes";
 import { useSeo } from "../lib/seo";
@@ -243,7 +243,7 @@ export default function Products() {
               <Button
                 variant="outlined"
                 as="a"
-                href={`${repoUrl(p.repo)}#readme`}
+                href={docsUrl(p)}
                 target="_blank"
                 rel="noreferrer"
                 icon={IconOf("BookOpen")}

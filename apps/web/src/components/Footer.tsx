@@ -1,7 +1,7 @@
 import { BrandMark } from "@b3pay/ui";
 import { Link } from "react-router-dom";
 
-import { GITHUB_ORG, PRODUCTS } from "../site/products";
+import { DOCS_URL, GITHUB_ORG, PRODUCTS } from "../site/products";
 
 interface FooterLink {
   label: string;
@@ -16,7 +16,7 @@ const COLUMNS: { heading: string; items: FooterLink[] }[] = [
   {
     heading: "Developers",
     items: [
-      { label: "Documentation", to: "/developers" },
+      { label: "Documentation", to: DOCS_URL },
       { label: "npm packages", to: "https://www.npmjs.com/package/@ic-reactor/react" },
       { label: "Agent skills", to: `${GITHUB_ORG}/ic-reactor` },
     ],

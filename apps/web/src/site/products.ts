@@ -15,6 +15,16 @@ export interface Product {
   points: string[];
   repo: string;
   ic: string;
+  /**
+   * This project's first page on docs.b3pay.net, origin excluded.
+   *
+   * Must match the first nav entry for the project in
+   * `apps/docs/src/content/registry.ts`. The two sites deploy as separate
+   * Vercel projects, so nothing checks this at build time — the deep link is
+   * still worth it over `/<key>`, which exists only as a client-side redirect
+   * and would hand a crawler an empty document.
+   */
+  docs: string;
 }
 
 export const PRODUCTS: Product[] = [
@@ -32,6 +42,7 @@ export const PRODUCTS: Product[] = [
       "Community catalog — publish and fork workflows",
     ],
     repo: "B3Pay/b3forge",
+    docs: "/b3forge/overview",
     ic: "Rust/WASM compatibility engine",
   },
   {
@@ -48,6 +59,7 @@ export const PRODUCTS: Product[] = [
       "Self-upgrading canister",
     ],
     repo: "B3Pay/B3Wallet",
+    docs: "/b3wallet/overview",
     ic: "b3wallet_lib · operations · b3_utils",
   },
   {
@@ -64,6 +76,7 @@ export const PRODUCTS: Product[] = [
       "Codegen via CLI or the Vite plugin",
     ],
     repo: "B3Pay/ic-reactor",
+    docs: "/ic-reactor/why",
     ic: "@ic-reactor/core · react · candid · cli",
   },
   {
@@ -80,10 +93,16 @@ export const PRODUCTS: Product[] = [
       "Auto-delete on first read or after one hour",
     ],
     repo: "B3Pay/B3Note",
+    docs: "/b3note/overview",
     ic: "BLS pairing · VetKeys · timelock",
   },
 ];
 
 export const GITHUB_ORG = "https://github.com/B3Pay";
 
+/** The documentation site. A separate Vercel project over the same repository. */
+export const DOCS_URL = "https://docs.b3pay.net";
+
 export const repoUrl = (repo: string) => `https://github.com/${repo}`;
+
+export const docsUrl = (p: Product) => `${DOCS_URL}${p.docs}`;
