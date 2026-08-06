@@ -1,17 +1,24 @@
 import { Badge, Button, Icon, IconOf } from "@b3pay/ui";
 
 /**
- * One checkout paid in Bitcoin. The buyer only ever holds BTC; the ckBTC minter
- * turns their on-chain deposit into ckBTC, and the checkout is settled with it.
+ * One checkout, priced in dollars and paid in Bitcoin. The buyer only ever
+ * holds BTC; the ckBTC minter turns their on-chain deposit into ckBTC, and the
+ * checkout is settled with that. Nine calls, because that is what a payment
+ * this shape costs — the panel is worth nothing if it pretends otherwise.
  *
- * These are the calls that flow actually makes:
+ * The calls that flow actually makes:
+ *   get_exchange_rate  the Exchange Rate Canister. A cart priced in USD has to
+ *                      be quoted in BTC before anything can be charged.
+ *   invoice_create     B3Pay's own; the merchant gets an invoice to settle.
  *   get_btc_address    ckBTC minter — a deposit address derived per account
  *                      with threshold ECDSA. The buyer sends BTC to it.
  *   bitcoin_get_utxos  the minter reads the Bitcoin network through the
  *                      management canister and waits out `min_confirmations`
  *                      (6 on mainnet — the one step here measured in blocks).
- *   update_balance     the minter KYT-checks the new UTXOs and mints ckBTC 1:1
- *                      on the ledger, minus its check fee.
+ *   check_transaction  the Bitcoin checker canister screens those UTXOs. The
+ *                      minter will not mint against a deposit that fails it.
+ *   update_balance     the minter mints ckBTC on the ledger against the
+ *                      screened UTXOs, less its check fee.
  *   icrc2_approve      the buyer approves the merchant canister as spender.
  *   icrc2_transfer_from the merchant pulls the approved amount. Approve pairs
  *                      with transfer_from — a plain icrc1_transfer would not
@@ -19,36 +26,51 @@ import { Badge, Button, Icon, IconOf } from "@b3pay/ui";
  *   settle_receipt     B3Pay's own call; the browser gets the receipt.
  *
  * Each step declares which nodes it lights in the background topology.
- * `refund` is never in `lights` — a successful payment leaves that node dark,
- * and that is the point of showing it.
+ * `refund` and `dispute` are never in `lights` — a payment that goes right
+ * leaves both dark, and that is the point of showing them.
  */
 export const STEPS = [
-  { fn: "get_btc_address", target: "ckbtc-minter", ms: "9ms", phase: "mint", lights: [0, 2, 16] },
+  { fn: "get_exchange_rate", target: "rate-oracle", ms: "1.4s", phase: "quote", lights: [5] },
+  { fn: "invoice_create", target: "merchant", ms: "9ms", phase: "quote", lights: [0, 1, 2] },
+  { fn: "get_btc_address", target: "ckbtc-minter", ms: "11ms", phase: "mint", lights: [16] },
   { fn: "bitcoin_get_utxos", target: "btc-network", ms: "6 conf", phase: "mint", lights: [15] },
-  { fn: "update_balance", target: "ckbtc-minter", ms: "2.1s", phase: "mint", lights: [4, 7] },
+  { fn: "check_transaction", target: "btc-checker", ms: "240ms", phase: "mint", lights: [17, 4] },
+  { fn: "update_balance", target: "ckbtc-minter", ms: "2.1s", phase: "mint", lights: [7, 18] },
   { fn: "icrc2_approve", target: "wallet", ms: "12ms", phase: "pay", lights: [3, 6] },
-  { fn: "icrc2_transfer_from", target: "ckbtc-ledger", ms: "38ms", phase: "pay", lights: [1, 5, 8] },
-  { fn: "settle_receipt", target: "browser", ms: "4ms", phase: "pay", lights: [9, 10, 11, 12, 13] },
+  { fn: "icrc2_transfer_from", target: "ckbtc-ledger", ms: "38ms", phase: "pay", lights: [8, 9] },
+  { fn: "settle_receipt", target: "browser", ms: "4ms", phase: "pay", lights: [10, 11, 12, 13, 19] },
 ] as const;
 
-/** The two halves of the run: acquire the ckBTC, then spend it. */
+/** The three acts: price the order, acquire the ckBTC, then spend it. */
 const PHASES = [
+  { key: "quote", title: "Quote" },
   { key: "mint", title: "Mint" },
   { key: "pay", title: "Pay" },
 ] as const;
 
-/** Amounts. ckBTC is 1:1 with BTC; the ledger's transfer fee is 10 satoshi. */
+/**
+ * The money. $1 784.17 at 74 032.10 is 0.0241 BTC, ckBTC is 1:1 with that, and
+ * the ckBTC ledger takes 10 satoshi to move it — so the merchant nets
+ * 0.02409990. Every figure the panel prints comes from these four.
+ */
 export const AMOUNT = "0.0241";
+const FIAT = "$1 784.17";
+const RATE = "74 032.10";
+const SUBTOTAL = "0.02410000";
+const LEDGER_FEE = "0.00000010";
+const MERCHANT_NET = "0.02409990";
 /**
  * Truncated the way the minter's address is shown in a real checkout. Kept
  * short enough that `bc1q…f8k3 · 6/6 conf` still fits the leg at 390px.
  */
 const DEPOSIT_ADDRESS = "bc1q…f8k3";
 
-/** The step index each part of the deposit bar switches on at. */
-const BTC_AT = 1; // get_btc_address returned — the deposit address exists
-const CONFIRMED_AT = 2; // bitcoin_get_utxos saw min_confirmations
-const MINTED_AT = 3; // update_balance settled — ckBTC is on the ledger
+/** The step index each part of the panel switches on at. */
+const QUOTED_AT = 1; // get_exchange_rate returned — the cart has a BTC price
+const BTC_AT = 3; // get_btc_address returned — the deposit address exists
+const CONFIRMED_AT = 4; // bitcoin_get_utxos saw min_confirmations
+const SCREENED_AT = 5; // check_transaction cleared the UTXOs
+const MINTED_AT = 6; // update_balance settled — ckBTC is on the ledger
 
 const mono = (size: number) => ({
   fontFamily: "var(--font-mono)",
@@ -107,11 +129,19 @@ function Leg({
 /** The right column shows that checkout processing, then its result. */
 export function HeroRun({ step, onRetry }: { step: number; onRetry: () => void }) {
   const done = step >= STEPS.length;
+  const quoted = step >= QUOTED_AT;
   const btcIn = step >= BTC_AT;
   const minted = step >= MINTED_AT;
   const deposit = !btcIn
     ? "awaiting deposit address"
     : `${DEPOSIT_ADDRESS} · ${step >= CONFIRMED_AT ? "6/6" : "0/6"} conf`;
+  // The screening verdict rides the ckBTC leg — the BTC leg has no room for it
+  // at 390px, and it is the minter's answer anyway, not the deposit's.
+  const mint = minted
+    ? "minted · ckbtc-ledger"
+    : step >= SCREENED_AT
+      ? "utxos clean · minting"
+      : "awaiting mint";
 
   return (
     <div
@@ -146,11 +176,36 @@ export function HeroRun({ step, onRetry }: { step: number; onRetry: () => void }
             textOverflow: "ellipsis",
           }}
         >
-          Checkout — order 4821 · 2 seats
+          Order 4821 · 2 × b3forge seat
         </span>
         <Badge color={done ? "success" : "warning"} size="xs" dot>
           {done ? "Paid" : "Running"}
         </Badge>
+      </div>
+
+      {/* The cart is priced in dollars. Everything below is downstream of the
+          rate that converts it, so the rate is stated before any of it. */}
+      <div
+        style={{
+          ...mono(10),
+          display: "flex",
+          flexWrap: "wrap",
+          gap: "2px 8px",
+          padding: "9px 16px",
+          color: "var(--muted-foreground)",
+          borderBottom: "1px solid var(--border)",
+          background: "color-mix(in srgb,var(--card) 55%,transparent)",
+        }}
+      >
+        {quoted ? (
+          <>
+            <span style={{ color: "var(--foreground)" }}>{FIAT} USD</span>
+            <span>· BTC/USD {RATE}</span>
+            <span>· quote locked 15:00</span>
+          </>
+        ) : (
+          <span>pricing order · awaiting rate</span>
+        )}
       </div>
 
       {/* The buyer pays in BTC and the merchant is settled in ckBTC. That
@@ -161,7 +216,7 @@ export function HeroRun({ step, onRetry }: { step: number; onRetry: () => void }
           gridTemplateColumns: "minmax(0,1fr) auto minmax(0,1fr)",
           gap: 12,
           alignItems: "center",
-          padding: "12px 16px",
+          padding: "10px 16px",
           borderBottom: "1px solid var(--border)",
         }}
       >
@@ -186,14 +241,14 @@ export function HeroRun({ step, onRetry }: { step: number; onRetry: () => void }
           on={minted}
           tone="var(--success)"
           align="right"
-          note={minted ? "minted · ckbtc-ledger" : "awaiting mint"}
+          note={mint}
         />
       </div>
 
-      <div style={{ padding: "14px 16px" }}>
+      <div style={{ padding: "12px 16px" }}>
         {PHASES.map((p, pi) => (
-          <div key={p.key} style={{ marginTop: pi ? 16 : 0 }}>
-            <h2 className="b3-eyebrow" style={{ margin: "0 0 8px" }}>
+          <div key={p.key} style={{ marginTop: pi ? 13 : 0 }}>
+            <h2 className="b3-eyebrow" style={{ margin: "0 0 6px" }}>
               {p.title}
             </h2>
             <div style={{ display: "flex", flexDirection: "column" }} aria-live="polite">
@@ -210,7 +265,7 @@ export function HeroRun({ step, onRetry }: { step: number; onRetry: () => void }
                         gridTemplateColumns: "12px minmax(0,1fr) auto auto",
                         gap: 10,
                         alignItems: "center",
-                        padding: "7px 0",
+                        padding: "6px 0",
                         borderTop: row ? "1px solid var(--border)" : 0,
                         opacity: ran ? 1 : 0.34,
                         transition: "opacity var(--dur-slow) var(--ease-dock)",
@@ -257,7 +312,7 @@ export function HeroRun({ step, onRetry }: { step: number; onRetry: () => void }
           </div>
         ))}
 
-        <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "18px 0 12px" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, margin: "14px 0 10px" }}>
           <h2 className="b3-eyebrow" style={{ margin: 0 }}>
             Result
           </h2>
@@ -269,7 +324,7 @@ export function HeroRun({ step, onRetry }: { step: number; onRetry: () => void }
               "1px solid " +
               (done ? "color-mix(in srgb,var(--success) 45%,transparent)" : "var(--border)"),
             background: done ? "color-mix(in srgb,var(--success) 8%,transparent)" : "transparent",
-            padding: "14px",
+            padding: "12px 14px",
             transition:
               "border-color var(--dur-slow) var(--ease-out), background-color var(--dur-slow) var(--ease-out)",
           }}
@@ -315,15 +370,48 @@ export function HeroRun({ step, onRetry }: { step: number; onRetry: () => void }
               {done ? "Settled" : "Pending"}
             </span>
           </div>
-          <div style={{ ...mono(10), color: "var(--muted-foreground)", marginTop: 8 }}>
+          {/* What the merchant actually banks, which is not what the buyer
+              paid. A receipt that hides the fee is not a receipt. */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(3, minmax(0,1fr))",
+              gap: 8,
+              margin: "10px 0 9px",
+              paddingTop: 9,
+              borderTop: "1px solid var(--border)",
+            }}
+          >
+            {[
+              ["Subtotal", SUBTOTAL, "left"],
+              ["Ledger fee", LEDGER_FEE, "center"],
+              ["Net", MERCHANT_NET, "right"],
+            ].map(([label, value, align]) => (
+              <div key={label} style={{ minWidth: 0, textAlign: align as "left" }}>
+                <div className="b3-eyebrow">{label}</div>
+                <div
+                  style={{
+                    ...mono(11),
+                    marginTop: 3,
+                    fontVariantNumeric: "tabular-nums",
+                    color: done ? "var(--foreground)" : "var(--muted-foreground)",
+                    transition: "color var(--dur-slow) var(--ease-out)",
+                  }}
+                >
+                  {done ? value : "—"}
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ ...mono(10), color: "var(--muted-foreground)" }}>
             {done
-              ? "block 1 284 907 · fee 0.0000001 · payout to merchant"
+              ? "block 1 284 907 · index 4 918 220 · payout to merchant"
               : "awaiting settlement"}
           </div>
           <Button
             size="sm"
             fullWidth
-            style={{ marginTop: 14 }}
+            style={{ marginTop: 12 }}
             variant={done ? "outlined" : "filled"}
             color={done ? "secondary" : "primary"}
             isLoading={step > 0 && !done}

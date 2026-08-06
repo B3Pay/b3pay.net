@@ -25,6 +25,16 @@ export const NODES = [
   { x: 95, y: 66, l: "refund" },
   { x: 3, y: 45, l: "btc-network" },
   { x: 16, y: 88, l: "ckbtc-minter" },
+  // The band under the run panel read as dead space. These are the hops a
+  // checkout of this size really has and the panel had no room to name.
+  //
+  // They sit below y=94 on purpose. The panel is the tallest thing in the hero,
+  // so it always spans the grid's content box — roughly 12% to 94% — whatever
+  // its own height happens to be. Everything above 94% here is behind it.
+  { x: 52, y: 96, l: "btc-checker" },
+  { x: 64, y: 97, l: "archive" },
+  { x: 78, y: 95, l: "index-canister" },
+  { x: 95, y: 92, l: "dispute" },
 ] as const;
 
 export const EDGES: ReadonlyArray<readonly [number, number]> = [
@@ -34,6 +44,8 @@ export const EDGES: ReadonlyArray<readonly [number, number]> = [
   // The Bitcoin leg: UTXOs arrive from the network, the minter mints against
   // them, and the ckBTC lands on the ledger the rest of the graph already uses.
   [15, 16], [16, 2], [16, 4], [16, 7],
+  // Screening, history and the two nodes a clean payment never reaches.
+  [16, 17], [17, 7], [7, 18], [18, 12], [18, 19], [10, 19], [12, 20], [14, 20],
 ];
 
 /**

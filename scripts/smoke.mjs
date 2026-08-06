@@ -116,7 +116,7 @@ async function newPage(width = 1440, height = 900) {
 
   check("hero starts at the pay button", (await buttonText()) === "Pay 0.0241 BTC");
 
-  await new Promise((r) => setTimeout(r, 6200)); // 6 steps × 900ms + slack
+  await new Promise((r) => setTimeout(r, 8000)); // 9 steps × 750ms + slack
   check("hero settles into Run it again", (await buttonText()) === "Run it again");
   check(
     "settled state reads Settled / Paid",
