@@ -28,7 +28,11 @@ function parsePosts(data: unknown): BlogPost[] | null {
       typeof p === "object" &&
       p !== null &&
       typeof (p as BlogPost).title === "string" &&
+      // The href lands in an <a> verbatim, so accept only canonical blog
+      // URLs — never javascript:/foreign-origin values from a compromised
+      // or misconfigured feed.
       typeof (p as BlogPost).url === "string" &&
+      (p as BlogPost).url.startsWith(`${BLOG_URL}/`) &&
       typeof (p as BlogPost).date === "string" &&
       typeof (p as BlogPost).category === "string" &&
       typeof (p as BlogPost).summary === "string",

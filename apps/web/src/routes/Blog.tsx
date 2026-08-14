@@ -26,7 +26,13 @@ export default function Blog() {
       <div className="site-shell">
         {posts &&
           posts.map((p) => (
-            <a key={p.url} href={p.url} className="site-blog-row">
+            <a
+              key={p.url}
+              href={p.url}
+              target="_blank"
+              rel="noreferrer"
+              className="site-blog-row"
+            >
               <time
                 dateTime={p.date}
                 style={{
@@ -77,6 +83,8 @@ export default function Blog() {
             variant="outlined"
             as="a"
             href={BLOG_URL}
+            target="_blank"
+            rel="noreferrer"
             icon={IconOf("ArrowUpRight")}
           >
             Read the blog
