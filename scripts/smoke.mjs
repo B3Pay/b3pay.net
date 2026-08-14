@@ -211,7 +211,7 @@ for (const [path, expectTitle] of [
   ["/products/b3wallet", "B3Wallet — B3Pay"],
   ["/developers", "Developers — B3Pay"],
   ["/about", "About — B3Pay"],
-  ["/blog", "Writing — B3Pay"],
+  ["/blog", "Blog — B3Pay"],
   ["/contact", "Contact — B3Pay"],
 ]) {
   const page = await newPage();
@@ -264,10 +264,13 @@ for (const [path, expectTitle] of [
   const external = [];
   page.on("request", (r) => {
     const u = new URL(r.url());
-    if (u.hostname !== "localhost" && u.protocol !== "data:") external.push(r.url());
+    // blog.b3pay.net is first-party: the homepage's "From the blog" section
+    // fetches its feed on hydration by design. Everything else stays banned.
+    if (u.hostname !== "localhost" && u.protocol !== "data:" && u.hostname !== "blog.b3pay.net")
+      external.push(r.url());
   });
   await page.goto(`${BASE}/`, { waitUntil: "networkidle0" });
-  check("no external requests", external.length === 0, external.join(", "));
+  check("no third-party requests", external.length === 0, external.join(", "));
   await page.close();
 }
 

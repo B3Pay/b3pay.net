@@ -68,14 +68,11 @@ export const ROUTES: RouteMeta[] = [
   {
     path: "/blog",
     label: "Blog",
-    title: "Writing — B3Pay",
+    title: "Blog — B3Pay",
     description:
-      "Notes from the build. Implementation write-ups from the B3Forge, IC Reactor, B3Wallet and B3Note repositories.",
-    // The four posts have real titles, dates and summaries but no bodies exist
-    // in any B3Pay source. The index is honest; the nav entry would not be.
-    // Flip both flags once B3Pay writes the posts.
-    inNav: false,
-    inSitemap: false,
+      "Stories on AI, Web3 and the Internet Computer from the B3Pay blog — a machine-run technical wire with grounded sources on every story. Full posts at blog.b3pay.net.",
+    inNav: true,
+    inSitemap: true,
   },
   {
     path: "/contact",

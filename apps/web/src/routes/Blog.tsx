@@ -1,120 +1,95 @@
-import { Alert, Badge, Button, IconOf } from "@b3pay/ui";
+import { Badge, Button, IconOf } from "@b3pay/ui";
 
-import { GITHUB_ORG } from "../site/products";
 import { Section } from "../site/furniture";
+import { BLOG_URL, useBlogPosts } from "../lib/blog-feed";
 import { routeMeta } from "../site/routes";
 import { useSeo } from "../lib/seo";
 
 /**
- * Titles, dates and summaries are from the design system's `Pages.jsx`. No post
- * bodies exist in any B3Pay source, so the rows are an index and nothing more —
- * they deliberately do not link anywhere. `/blog` is also kept out of the
- * NavBar and the sitemap until the posts are written; both flags live on the
- * route entry in `site/routes.ts`.
+ * Index of the B3Pay blog (blog.b3pay.net). The posts live there, not here —
+ * this page fetches the latest stories client-side and every row links out.
+ * The prerendered HTML ships only the header and the "Read the blog" pointer,
+ * so a failed fetch (or a crawler without JS) still lands on a working page.
  */
-const POSTS = [
-  {
-    t: "Candid expressions: referencing prior node outputs",
-    d: "2025-11-04",
-    tag: "B3Forge",
-    e: "How $N0.Ok.amount resolves, why opt-depth matters, and what the Rust compatibility engine rejects at edit time.",
-  },
-  {
-    t: "defineReactor: one call instead of three",
-    d: "2025-09-18",
-    tag: "IC Reactor",
-    e: "The manual construction order still works. Here is when you still need it.",
-  },
-  {
-    t: "Why B3Wallet upgrades itself",
-    d: "2025-06-02",
-    tag: "B3Wallet",
-    e: "Self-upgrade keeps a user-owned canister current without asking us for permission.",
-  },
-  {
-    t: "Timelock notes with VetKeys",
-    d: "2024-12-11",
-    tag: "B3Note",
-    e: "Identity-based encryption without email addresses or pre-shared keys.",
-  },
-];
-
 export default function Blog() {
   useSeo(routeMeta("/blog"));
+  const posts = useBlogPosts(8);
 
   return (
     <>
       <Section
         as="h1"
         eyebrow="Writing"
-        title="Notes from the build."
-        lead="Implementation write-ups, not announcements."
+        title="Notes from the wire."
+        lead="Stories on AI, Web3 and the Internet Computer from the B3Pay blog — researched, written and published by an AI pipeline, with grounded sources on every one."
       />
       <div className="site-shell">
-        <Alert
-          color="info"
-          title="These posts are not published yet"
-          icon={IconOf("Info")}
-          action={
-            <Button
-              size="sm"
-              variant="outlined"
-              as="a"
-              href={GITHUB_ORG}
+        {posts &&
+          posts.map((p) => (
+            <a
+              key={p.url}
+              href={p.url}
               target="_blank"
               rel="noreferrer"
-              icon={IconOf("Github")}
+              className="site-blog-row"
             >
-              Repositories
-            </Button>
-          }
-          style={{ marginBottom: 40 }}
-        >
-          The index below lists what has been written. The code each one describes is already
-          public.
-        </Alert>
-
-        {POSTS.map((p) => (
-          <article key={p.t} className="site-blog-row">
-            <time
-              dateTime={p.d}
-              style={{
-                fontFamily: "var(--font-mono)",
-                fontSize: 11,
-                color: "var(--muted-foreground)",
-              }}
-            >
-              {p.d}
-            </time>
-            <div>
-              <h2
+              <time
+                dateTime={p.date}
                 style={{
-                  margin: 0,
-                  fontFamily: "var(--font-display)",
-                  fontSize: 24,
-                  fontWeight: 600,
-                  letterSpacing: "-0.022em",
-                }}
-              >
-                {p.t}
-              </h2>
-              <p
-                style={{
-                  fontSize: 15,
-                  lineHeight: "24px",
+                  fontFamily: "var(--font-mono)",
+                  fontSize: 11,
                   color: "var(--muted-foreground)",
-                  margin: "8px 0 0",
-                  maxWidth: 620,
                 }}
               >
-                {p.e}
-              </p>
-            </div>
-            <Badge size="xs" color="secondary">
-              {p.tag}
-            </Badge>
-          </article>
-        ))}
+                {p.date.slice(0, 10)}
+              </time>
+              <div>
+                <h2
+                  className="site-blog-row__title"
+                  style={{
+                    margin: 0,
+                    fontFamily: "var(--font-display)",
+                    fontSize: 24,
+                    fontWeight: 600,
+                    letterSpacing: "-0.022em",
+                  }}
+                >
+                  {p.title}
+                </h2>
+                <p
+                  style={{
+                    fontSize: 15,
+                    lineHeight: "24px",
+                    color: "var(--muted-foreground)",
+                    margin: "8px 0 0",
+                    maxWidth: 620,
+                  }}
+                >
+                  {p.summary}
+                </p>
+              </div>
+              <Badge size="xs" color="secondary">
+                {p.category}
+              </Badge>
+            </a>
+          ))}
+        <div
+          style={{
+            padding: "26px 0 0",
+            borderTop: posts ? "1px solid var(--border)" : "none",
+          }}
+        >
+          <Button
+            variant="outlined"
+            as="a"
+            href={BLOG_URL}
+            target="_blank"
+            rel="noreferrer"
+            icon={IconOf("ArrowUpRight")}
+          >
+            Read the blog
+          </Button>
+        </div>
       </div>
     </>
   );

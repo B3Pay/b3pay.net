@@ -12,6 +12,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { Hero } from "./home/Hero";
 import { Rule, Section, Slab } from "../site/furniture";
 import { PRODUCTS } from "../site/products";
+import { BLOG_URL, useBlogPosts } from "../lib/blog-feed";
 import { linkProps } from "../lib/router-link";
 import { routeMeta } from "../site/routes";
 import { useSeo } from "../lib/seo";
@@ -52,6 +53,7 @@ export const {
 export default function Home() {
   const navigate = useNavigate();
   useSeo(routeMeta("/"));
+  const posts = useBlogPosts(3);
 
   return (
     <>
@@ -201,6 +203,81 @@ export default function Home() {
             </div>
           </div>
         </Slab>
+      </Section>
+
+      <Section
+        eyebrow="From the blog"
+        spec="FIG. 03"
+        title="The wire keeps publishing."
+        lead="Our blog is a machine-run technical wire: stories on AI, Web3 and the Internet Computer, researched and published by an AI pipeline with grounded sources on every one."
+      >
+        {/* Rows are fetched client-side; the prerendered HTML ships only the
+            link below, so a failed fetch degrades to a plain pointer at the
+            blog rather than an empty grid. */}
+        {posts && (
+          <div>
+            {posts.map((p) => (
+              <a
+                key={p.url}
+                href={p.url}
+                target="_blank"
+                rel="noreferrer"
+                className="site-blog-row"
+              >
+                <time
+                  dateTime={p.date}
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 11,
+                    color: "var(--muted-foreground)",
+                  }}
+                >
+                  {p.date.slice(0, 10)}
+                </time>
+                <div>
+                  <h3
+                    className="site-blog-row__title"
+                    style={{
+                      margin: 0,
+                      fontFamily: "var(--font-display)",
+                      fontSize: 21,
+                      fontWeight: 600,
+                      letterSpacing: "-0.018em",
+                    }}
+                  >
+                    {p.title}
+                  </h3>
+                  <p
+                    style={{
+                      fontSize: 15,
+                      lineHeight: "24px",
+                      color: "var(--muted-foreground)",
+                      margin: "8px 0 0",
+                      maxWidth: 620,
+                    }}
+                  >
+                    {p.summary}
+                  </p>
+                </div>
+                <Badge size="xs" color="secondary">
+                  {p.category}
+                </Badge>
+              </a>
+            ))}
+          </div>
+        )}
+        <div style={{ marginTop: posts ? 30 : 0 }}>
+          <Button
+            variant="outlined"
+            as="a"
+            href={BLOG_URL}
+            target="_blank"
+            rel="noreferrer"
+            icon={IconOf("ArrowUpRight")}
+          >
+            Read the blog
+          </Button>
+        </div>
       </Section>
     </>
   );
