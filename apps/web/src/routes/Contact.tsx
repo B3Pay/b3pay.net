@@ -67,6 +67,7 @@ export default function Contact() {
           topic: String(data.get("topic") ?? TOPICS[0]),
           message: String(data.get("message") ?? ""),
           publicIssue: data.get("publicIssue") === "on",
+          website: String(data.get("website") ?? ""),
         }),
       });
       // Only a JSON body that says { ok: true } counts as delivered. A 200 that
@@ -138,6 +139,30 @@ export default function Contact() {
                 noValidate={false}
                 style={{ display: "flex", flexDirection: "column", gap: 14 }}
               >
+                {/* Honeypot. Off-screen, out of the tab order and hidden from
+                    screen readers, so nobody sees it to fill it in. Bots that
+                    fill every input they can parse do, and /api/contact drops
+                    those submissions. */}
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    left: -9999,
+                    width: 1,
+                    height: 1,
+                    overflow: "hidden",
+                  }}
+                >
+                  <label htmlFor="website">Website</label>
+                  <input
+                    id="website"
+                    name="website"
+                    type="text"
+                    tabIndex={-1}
+                    autoComplete="off"
+                    defaultValue=""
+                  />
+                </div>
                 <div>
                   <Label htmlFor="n" required>
                     Name

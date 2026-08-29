@@ -26,6 +26,31 @@ const TOPICS = [
 
 const MAX = { name: 120, email: 200, message: 5000 };
 
+/**
+ * Origin allowlist. A browser sends `Origin` on every POST, and this endpoint
+ * answers no CORS preflight, so a request carrying none — or a foreign one —
+ * did not come from the site's own form. A determined bot can forge the
+ * header; this only turns away the ones that do not bother.
+ */
+const ALLOWED_HOSTS = new Set(["b3pay.net", "www.b3pay.net"]);
+
+function originAllowed(origin: string | undefined): boolean {
+  if (!origin) return false;
+  let hostname: string;
+  try {
+    ({ hostname } = new URL(origin));
+  } catch {
+    return false;
+  }
+  if (ALLOWED_HOSTS.has(hostname)) return true;
+  // Preview deployments post from <project>-<hash>.vercel.app.
+  if (hostname.endsWith(".vercel.app")) return true;
+  // `vercel dev` against a local build — never accepted in production.
+  if (process.env.VERCEL_ENV !== "production")
+    return hostname === "localhost" || hostname === "127.0.0.1";
+  return false;
+}
+
 interface Payload {
   name: string;
   email: string;
@@ -73,6 +98,27 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   if (req.method !== "POST") {
     res.setHeader("Allow", "POST");
     return res.status(405).json({ error: "Method not allowed." });
+  }
+
+  const origin = typeof req.headers.origin === "string" ? req.headers.origin : undefined;
+  if (!originAllowed(origin)) {
+    console.warn(`contact: rejected origin ${origin ?? "(none)"}`);
+    return res
+      .status(403)
+      .json({ error: "This endpoint only accepts submissions from b3pay.net." });
+  }
+
+  // Honeypot. `website` sits off-screen, unfocusable and hidden from assistive
+  // technology, so a person never fills it — a bot filling every input it can
+  // parse does. Answer 200 so the sender learns nothing, and log it: the
+  // submission is dropped here, but it is not dropped quietly.
+  const raw =
+    typeof req.body === "object" && req.body !== null
+      ? (req.body as Record<string, unknown>)
+      : {};
+  if (typeof raw.website === "string" && raw.website.trim() !== "") {
+    console.warn("contact: honeypot tripped, submission discarded");
+    return res.status(200).json({ ok: true });
   }
 
   const { RESEND_API_KEY, CONTACT_TO_EMAIL, CONTACT_FROM_EMAIL } = process.env;
