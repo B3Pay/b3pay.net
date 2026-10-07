@@ -161,19 +161,23 @@ export function DocsLayout() {
               />
             ) : null}
 
-            <Tooltip content="View on GitHub">
-              <Button
-                as="a"
-                href={repoUrl(project?.repo ?? "B3Pay/b3pay.net")}
-                target="_blank"
-                rel="noreferrer"
-                asIconButton
-                size="md"
-                variant="ghost"
-                icon={Github}
-                aria-label="View on GitHub"
-              />
-            </Tooltip>
+            {/* Off the docs home this is the project's repo, and a project with
+                private source has none to show. */}
+            {project && !project.repo ? null : (
+              <Tooltip content="View on GitHub">
+                <Button
+                  as="a"
+                  href={repoUrl(project?.repo ?? "B3Pay/b3pay.net")}
+                  target="_blank"
+                  rel="noreferrer"
+                  asIconButton
+                  size="md"
+                  variant="ghost"
+                  icon={Github}
+                  aria-label="View on GitHub"
+                />
+              </Tooltip>
+            )}
           </div>
         </>
       }

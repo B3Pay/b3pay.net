@@ -62,15 +62,15 @@ export default function Home() {
       <Section
         eyebrow="What we build"
         spec="FIG. 01"
-        title="Four open-source projects, one thesis."
-        lead="Users should keep custody. Developers should not have to give up type safety to make that happen. Everything below is MIT-licensed and runs on the Internet Computer."
+        title="Three open-source projects, one platform."
+        lead="Users should keep custody. Developers should not have to give up type safety to make that happen. Our libraries and wallet are MIT-licensed and run on the Internet Computer. B3Forge is in private beta."
       >
         <div className="site-grid-products">
           {PRODUCTS.map((p) => (
-            <Link key={p.key} to={`/products/${p.key}`} className="site-card-link">
-              <Card interactive style={{ borderRadius: 0, height: "100%" }}>
-                <CardHeader
-                  title={
+            <Card key={p.key} interactive style={{ borderRadius: 0, height: "100%" }}>
+              <CardHeader
+                title={
+                  <Link to={`/products/${p.key}`} className="site-card-link">
                     <span
                       style={{
                         fontFamily: "var(--font-display)",
@@ -80,28 +80,43 @@ export default function Home() {
                     >
                       {p.name}
                     </span>
-                  }
-                  description={p.line}
-                  action={
-                    <Badge color={p.tagColor} size="xs">
-                      {p.tag}
-                    </Badge>
-                  }
-                />
-                <CardFooter>
-                  <span
-                    style={{
-                      fontFamily: "var(--font-mono)",
-                      fontSize: 11,
-                      color: "var(--muted-foreground)",
-                      letterSpacing: "0.06em",
-                    }}
+                  </Link>
+                }
+                description={p.line}
+                action={
+                  <Badge color={p.tagColor} size="xs">
+                    {p.tag}
+                  </Badge>
+                }
+              />
+              <CardFooter style={{ justifyContent: "space-between" }}>
+                <span
+                  style={{
+                    fontFamily: "var(--font-mono)",
+                    fontSize: 11,
+                    color: "var(--muted-foreground)",
+                    letterSpacing: "0.06em",
+                  }}
+                >
+                  {p.lang}
+                </span>
+                {p.app ? (
+                  <Button
+                    className="site-card-aside"
+                    variant="link"
+                    color="primary"
+                    size="sm"
+                    as="a"
+                    href={p.app}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    iconRight={IconOf("ArrowUpRight")}
                   >
-                    {p.lang}
-                  </span>
-                </CardFooter>
-              </Card>
-            </Link>
+                    Launch app
+                  </Button>
+                ) : null}
+              </CardFooter>
+            </Card>
           ))}
         </div>
       </Section>

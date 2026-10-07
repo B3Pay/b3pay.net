@@ -20,7 +20,7 @@ export default function About() {
         as="h1"
         eyebrow="About"
         title="A small team building in the open since 2023."
-        lead="B3Pay started as a self-custodial wallet experiment on the Internet Computer and grew into a set of libraries other teams now depend on. Every line is public."
+        lead="B3Pay started as a self-custodial wallet experiment on the Internet Computer and grew into a set of libraries other teams now depend on."
       />
       <div className="site-shell">
         <div className="site-grid-half">
@@ -111,7 +111,7 @@ export default function About() {
               <Card>
                 <CardHeader
                   title="Open by default"
-                  description="MIT on every repository. Issues and PRs welcome."
+                  description="Our libraries and wallet are MIT-licensed. Issues and PRs welcome."
                   icon={IconOf("Github")}
                 />
               </Card>

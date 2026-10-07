@@ -31,8 +31,11 @@ export interface DocProject {
   /** Badge beside "Docs" in the top bar. */
   tag: string;
   tagColor: B3Color;
-  /** `owner/name` on GitHub. */
-  repo: string;
+  /**
+   * `owner/name` on GitHub. Omitted when the source is private — B3Forge's is —
+   * so the top bar does not link a repo readers cannot open.
+   */
+  repo?: string;
   /** Version switcher contents. Newest first; the first is the one served. */
   versions: string[];
   sections: DocNavSection[];
@@ -99,7 +102,6 @@ export const PROJECTS: DocProject[] = [
     line: "Candid-native workflow platform. Compose canister calls into typed workflows in a visual graph editor and run them in the browser.",
     tag: "Beta",
     tagColor: "warning",
-    repo: "B3Pay/b3forge",
     versions: ["beta"],
     sections: [
       {

@@ -13,7 +13,14 @@ export interface Product {
   lang: string;
   line: string;
   points: string[];
-  repo: string;
+  /**
+   * Public GitHub repository, `owner/name`. Omitted when the source is private
+   * — B3Forge's is — so nothing links to a repo visitors cannot open, and the
+   * product page drops the MIT row along with it.
+   */
+  repo?: string;
+  /** The hosted app, for a product people use in the browser. */
+  app?: string;
   ic: string;
   /**
    * This project's first page on docs.b3pay.net, origin excluded.
@@ -41,7 +48,7 @@ export const PRODUCTS: Product[] = [
       "Browser execution with a delegated identity",
       "Community catalog — publish and fork workflows",
     ],
-    repo: "B3Pay/b3forge",
+    app: "https://forge.b3pay.net",
     docs: "/b3forge/overview",
     ic: "Rust/WASM compatibility engine",
   },

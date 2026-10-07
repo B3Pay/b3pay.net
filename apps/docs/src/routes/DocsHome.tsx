@@ -15,9 +15,9 @@ export default function DocsHome() {
       <div className="b3-eyebrow">B3Pay · Documentation</div>
       <h1 className="docs-title">Four projects, one reference.</h1>
       <p className="docs-lead">
-        Everything B3Pay ships is open source and developed in the open. These are the
-        guides for building on it — the workflow platform, the wallet canister, the
-        TypeScript packages and the encryption demo.
+        These are the guides for building on B3Pay — the workflow platform, the wallet
+        canister, the TypeScript packages and the encryption demo. Our libraries and wallet
+        are MIT-licensed and run on the Internet Computer. B3Forge is in private beta.
       </p>
 
       <div className="docs-home__grid">

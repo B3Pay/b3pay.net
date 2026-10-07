@@ -123,8 +123,8 @@ export default function Products() {
       <Section
         as="h1"
         eyebrow="Products & ecosystem"
-        title="Everything B3Pay ships is public."
-        lead="Pick a project to see what it does, how it is built and where the code lives. All four are MIT-licensed and developed in the open."
+        title="Everything B3Pay ships."
+        lead="Pick a project to see what it does, how it is built and where the code lives. Our libraries and wallet are MIT-licensed and run on the Internet Computer. B3Forge is in private beta."
       />
 
       <div className="site-shell">
@@ -185,7 +185,7 @@ export default function Products() {
               >
                 {p.name}
               </h2>
-              <Badge color={p.tagColor}>{p.tag}</Badge>
+              <Badge color={p.tagColor}>{p.repo ? p.tag : `${p.tag} · Private source`}</Badge>
             </div>
             <p
               style={{
@@ -229,17 +229,34 @@ export default function Products() {
             </ul>
 
             <div style={{ display: "flex", gap: 8, marginTop: 32, flexWrap: "wrap" }}>
-              <Button
-                variant="filled"
-                color="primary"
-                as="a"
-                href={repoUrl(p.repo)}
-                target="_blank"
-                rel="noreferrer"
-                icon={IconOf("Github")}
-              >
-                {p.repo}
-              </Button>
+              {/* The app, when there is one, is the primary action and the repo
+                  steps down — two primaries means no primary. */}
+              {p.app ? (
+                <Button
+                  variant="filled"
+                  color="primary"
+                  as="a"
+                  href={p.app}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  iconRight={IconOf("ArrowUpRight")}
+                >
+                  Launch {p.name}
+                </Button>
+              ) : null}
+              {p.repo ? (
+                <Button
+                  variant={p.app ? "outlined" : "filled"}
+                  color={p.app ? "secondary" : "primary"}
+                  as="a"
+                  href={repoUrl(p.repo)}
+                  target="_blank"
+                  rel="noreferrer"
+                  icon={IconOf("Github")}
+                >
+                  {p.repo}
+                </Button>
+              ) : null}
               <Button
                 variant="outlined"
                 as="a"
@@ -263,8 +280,12 @@ export default function Products() {
                   [
                     ["Language", p.lang],
                     ["Modules", p.ic],
-                    ["Licence", "MIT"],
-                    ["Repository", p.repo],
+                    ...(p.repo
+                      ? [
+                          ["Licence", "MIT"],
+                          ["Repository", p.repo],
+                        ]
+                      : []),
                   ] as const
                 ).map(([k, v]) => (
                   <div

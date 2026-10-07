@@ -33,7 +33,7 @@ export const ROUTES: RouteMeta[] = [
     label: "Home",
     title: "B3Pay — open infrastructure for the Internet Computer",
     description:
-      "B3Pay builds open-source wallets, TypeScript libraries and workflow tooling for the Internet Computer. No centralized backend sits between your users and their assets.",
+      "B3Pay builds open-source wallets and TypeScript libraries, plus workflow tooling, for the Internet Computer. No centralized backend sits between your users and their assets.",
     inNav: false,
     inSitemap: true,
   },
@@ -42,7 +42,7 @@ export const ROUTES: RouteMeta[] = [
     label: "Products",
     title: "Products — B3Pay",
     description:
-      "Four open-source projects: B3Forge, B3Wallet, IC Reactor and B3Note. All MIT-licensed and developed in the open.",
+      "Four projects: B3Forge, B3Wallet, IC Reactor and B3Note. Our libraries and wallet are MIT-licensed and run on the Internet Computer. B3Forge is in private beta.",
     inNav: true,
     // /products redirects to the first product, so the slug URLs are canonical.
     inSitemap: false,
@@ -61,7 +61,7 @@ export const ROUTES: RouteMeta[] = [
     label: "About",
     title: "About — B3Pay",
     description:
-      "B3Pay started as a self-custodial wallet experiment on the Internet Computer and grew into a set of libraries other teams now depend on. Every line is public.",
+      "B3Pay started as a self-custodial wallet experiment on the Internet Computer and grew into a set of libraries other teams now depend on.",
     inNav: true,
     inSitemap: true,
   },
