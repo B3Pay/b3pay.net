@@ -12,7 +12,7 @@ const STAT_STRIP: [string, string][] = [
   ["03", "chains"],
   ["04", "projects"],
   ["07", "packages"],
-  ["MIT", "licence"],
+  ["03", "open source"],
 ];
 
 export function Hero() {
@@ -133,9 +133,9 @@ export function Hero() {
                 textWrap: "pretty",
               }}
             >
-              B3Pay builds open-source wallets, TypeScript libraries and workflow tooling for
-              the Internet Computer. No centralized backend sits between your users and their
-              assets.
+              B3Pay builds open-source wallets and TypeScript libraries, plus workflow tooling,
+              for the Internet Computer. No centralized backend sits between your users and
+              their assets.
             </p>
           </div>
           <div style={{ display: "flex", gap: 10, marginTop: 38, flexWrap: "wrap" }}>

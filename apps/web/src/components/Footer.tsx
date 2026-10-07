@@ -32,9 +32,10 @@ const COLUMNS: { heading: string; items: FooterLink[] }[] = [
   },
 ];
 
-// The prototype set this line in --ink-600 (--text-mark). A copyright and a
-// licence are content, not registration marks, and --text-mark is 3.6:1 by
-// design — below AA. Content gets --muted-foreground.
+// The prototype set this line in --ink-600 (--text-mark). A copyright is
+// content, not a registration mark, and --text-mark is 3.6:1 by design — below
+// AA. Content gets --muted-foreground. The line no longer claims an MIT licence:
+// B3Forge's source is private, and this repo carries no LICENSE file.
 const markStyle = {
   fontFamily: "var(--font-mono)",
   fontSize: 10,
@@ -114,7 +115,7 @@ export function Footer() {
         ))}
       </div>
       <div className="site-footer-bar">
-        <span style={markStyle}>© 2026 B3PAY · MIT LICENCE</span>
+        <span style={markStyle}>© 2026 B3PAY</span>
         <span style={markStyle}>BUILT ON THE INTERNET COMPUTER</span>
       </div>
     </footer>

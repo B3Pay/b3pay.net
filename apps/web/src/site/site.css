@@ -272,11 +272,18 @@ body {
 }
 
 /* A product card is a link, not a div with onClick — so it is tabbable, has a
-   real href, and carries the ring the brand guide specifies for focus. */
+   real href, and carries the ring the brand guide specifies for focus. The
+   link is the title, stretched over the card (.b3-card is position: relative),
+   rather than an anchor around it: anchors cannot nest, and B3Forge's card
+   carries a second link to the app. */
 .site-card-link {
-  display: block;
   text-decoration: none;
   color: inherit;
+}
+.site-card-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
 }
 .site-card-link:hover {
   color: inherit;
@@ -284,9 +291,14 @@ body {
 .site-card-link:focus-visible {
   outline: none;
 }
-.site-card-link:focus-visible > .b3-card {
+.b3-card:has(.site-card-link:focus-visible) {
   box-shadow: 0 0 0 1px var(--background), 0 0 0 3px var(--ring);
   border-color: color-mix(in srgb, var(--forge-600) 55%, transparent);
+}
+/* A second link inside a card sits above the stretched one. */
+.site-card-aside {
+  position: relative;
+  z-index: 1;
 }
 
 /* ── 1024px — two-column layouts stack ─────────────────────────────── */
