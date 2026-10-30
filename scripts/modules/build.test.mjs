@@ -134,6 +134,36 @@ test("build-module refuses an output folder it would empty over its own input", 
   assert.deepEqual(JSON.parse(await readFile(join(out, "b3pay-module.json"), "utf8")).origin, { repository: "B3Pay/example", commit: COMMIT });
 });
 
+test("build-module empties only a new or empty folder or an earlier build, never one holding what it reads", async () => {
+  const repo = await repository({
+    "b3pay-module.json": JSON.stringify(manifest({ docs: "website/docs" }, { sidebar: ["index"] })),
+    "website/docs/index.md": "# Hi\n",
+    "website/notes.txt": "keep\n",
+  });
+  const run = (out) => spawnSync(process.execPath, [BUILD_MODULE, "--source", repo, "--out", out], { encoding: "utf8" });
+  const alias = join(dirname(repo), "alias");
+  await symlink(repo, alias);
+  for (const out of [join(repo, "website"), join(alias, "website/docs/built")]) {
+    const result = run(out);
+    assert.equal(result.status, 1, out);
+    assert.match(result.stderr, /--out must be a new folder/, out);
+  }
+  assert.equal(existsSync(join(repo, "website/docs/built")), false);
+
+  const other = join(dirname(repo), "other");
+  await mkdir(other);
+  await writeFile(join(other, "notes.txt"), "keep\n");
+  const result = run(other);
+  assert.equal(result.status, 1);
+  assert.match(result.stderr, /--out already holds files that are not a module build/);
+  assert.equal(await readFile(join(other, "notes.txt"), "utf8"), "keep\n");
+
+  const out = await outFolder();
+  for (const time of ["first", "again"]) assert.equal(run(out).status, 0, time);
+  assert.equal(await readFile(join(repo, "website/docs/index.md"), "utf8"), "# Hi\n");
+  assert.equal(await readFile(join(repo, "website/notes.txt"), "utf8"), "keep\n");
+});
+
 test("build-module builds a local preview, outside GitHub Actions and with no repository named, without an origin", async () => {
   const repo = await repository({ "b3pay-module.json": JSON.stringify(manifest({ docs: "docs" }, { sidebar: ["index"] })), "docs/index.md": "# Hi\n" });
   const out = await outFolder();
