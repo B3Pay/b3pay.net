@@ -190,7 +190,8 @@ what the rules name:
 Static pages are served as they are, so their links are checked after the
 build instead (`npm run check:links`). The one change the site makes is for
 its search: it adds `data-pagefind-body` to each page's `<main>`, or its
-`<body>` when it has none, so the pages are found with the rest of the docs;
+`<body>` when it has none, so the pages are found with the rest of the docs.
+A page where an element has it already is left as it is, and
 `data-pagefind-ignore` keeps a part out. Their files are pages, styles,
 scripts, data, images and fonts; hidden files are left out. Their scripts run
 on b3pay.net as the site's own do, and none of the rules above reach them, so

@@ -14,8 +14,10 @@ The site is not versioned; changes are listed by the date they merged.
 ### Changed
 
 - Static module pages are in the site search: the site marks each page's
-  `<main>`, or its `<body>`, with `data-pagefind-body`. Meant's pages are
-  found with the rest of the docs.
+  `<main>`, or its `<body>`, with `data-pagefind-body`, unless an element of
+  the page has it already. Meant's pages are found with the rest of the docs.
+- `publish-module.yml`'s publish job is named "Publish the module", so a
+  skipped one no longer shows its name's expression unevaluated.
 
 ## 2026-10-30
 

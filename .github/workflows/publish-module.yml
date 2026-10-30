@@ -110,7 +110,7 @@ jobs:
           retention-days: 7
 
   publish:
-    name: Publish to the ${{ inputs.branch }} branch
+    name: Publish the module
     needs: build
     if: inputs.publish
     runs-on: ubuntu-24.04
