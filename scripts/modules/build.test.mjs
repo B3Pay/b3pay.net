@@ -131,4 +131,14 @@ test("build-module refuses an output folder it would empty over its own input", 
   const result = spawnSync(process.execPath, [BUILD_MODULE, "--source", repo, "--out", out, "--repository", "B3Pay/example", "--commit", COMMIT], { encoding: "utf8" });
   assert.equal(result.status, 0, result.stderr);
   assert.match(result.stdout, /module {2}example: 1 pages, 0 static files/);
+  assert.deepEqual(JSON.parse(await readFile(join(out, "b3pay-module.json"), "utf8")).origin, { repository: "B3Pay/example", commit: COMMIT });
+});
+
+test("build-module builds a local preview, outside GitHub Actions and with no repository named, without an origin", async () => {
+  const repo = await repository({ "b3pay-module.json": JSON.stringify(manifest({ docs: "docs" }, { sidebar: ["index"] })), "docs/index.md": "# Hi\n" });
+  const out = await outFolder();
+  const { GITHUB_REPOSITORY, GITHUB_SHA, ...env } = process.env;
+  const result = spawnSync(process.execPath, [BUILD_MODULE, "--source", repo, "--out", out], { encoding: "utf8", env });
+  assert.equal(result.status, 0, result.stderr);
+  assert.equal("origin" in JSON.parse(await readFile(join(out, "b3pay-module.json"), "utf8")), false);
 });

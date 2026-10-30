@@ -9,6 +9,9 @@
  *       [--repository owner/name]  default: $GITHUB_REPOSITORY
  *       [--commit <sha>]           default: $GITHUB_SHA
  *
+ * The repository and commit become the module's `origin`, which the site
+ * records in /modules.json. A local preview with neither has no origin.
+ *
  * Exits 1, with every problem listed, when the manifest or the built module
  * breaks a rule; the site would refuse the same module.
  */
@@ -58,9 +61,9 @@ async function main() {
     if (links.length) throw new Error(`${folder}: links are not allowed in a module (${links.join(", ")})`);
   }
 
-  const origin = { repository: args.repository ?? process.env.GITHUB_REPOSITORY ?? "" };
-  const commit = args.commit ?? process.env.GITHUB_SHA;
-  if (commit) origin.commit = commit;
+  const repository = args.repository || process.env.GITHUB_REPOSITORY;
+  const commit = args.commit || process.env.GITHUB_SHA;
+  const origin = repository ? { repository, ...(commit ? { commit } : {}) } : undefined;
   const built = await buildModule({ sourceDir, manifest, outDir, origin, local: true });
   const checked = await checkModule(outDir, { id: manifest.id });
 
