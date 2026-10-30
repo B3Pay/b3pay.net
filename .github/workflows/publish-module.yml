@@ -1,0 +1,154 @@
+# Publishes a repository's module to b3pay.net. A repository calls it from its
+# own workflow (modules/README.md has the snippet):
+#
+#   build    builds the module from the repository's files with this site's
+#            tools, then builds the whole site with it, so a module that would
+#            break the site fails here, in the repository, not on b3pay.net;
+#   publish  (when `publish` is true) commits the built module to the
+#            repository's own `b3pay-site` branch and asks Vercel to rebuild
+#            b3pay.net, which reads that branch.
+#
+# Nothing here writes to b3pay.net: the token it uses is the calling
+# repository's, and it only pushes to that repository's branch.
+name: Publish a module to b3pay.net
+
+on:
+  workflow_call:
+    inputs:
+      manifest:
+        description: The module manifest, relative to the repository root.
+        type: string
+        default: b3pay-module.json
+      site-ref:
+        description: The b3pay.net branch or commit whose tools build and check the module.
+        type: string
+        default: main
+      branch:
+        description: The branch of the calling repository that holds the published module.
+        type: string
+        default: b3pay-site
+      publish:
+        description: Push the module and ask the site to rebuild. Leave false to only check, as on a pull request.
+        type: boolean
+        default: false
+    secrets:
+      deploy-hook:
+        description: The Vercel deploy hook of the b3pay.net project. Without it the module goes live on the site's next deploy.
+        required: false
+
+permissions: {}
+
+jobs:
+  build:
+    name: Build and check the module
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    permissions:
+      contents: read
+    concurrency:
+      group: b3pay-module-build-${{ github.repository }}-${{ github.ref }}
+      cancel-in-progress: true
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          path: source
+          persist-credentials: false
+
+      - name: Check out b3pay.net
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: B3Pay/b3pay.net
+          ref: ${{ inputs.site-ref }}
+          path: site
+          persist-credentials: false
+
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - name: Install the site's tools
+        working-directory: site
+        run: npm ci
+
+      - name: Build the module
+        working-directory: site
+        env:
+          MANIFEST: ${{ inputs.manifest }}
+        run: node scripts/modules/build-module.mjs --source ../source --manifest "../source/$MANIFEST" --out ../module
+
+      - name: Build b3pay.net with the module
+        working-directory: site
+        run: |
+          id="$(node -p 'JSON.parse(require("fs").readFileSync("../module/b3pay-module.json", "utf8")).id')"
+          node scripts/modules/sync.mjs --module "$id=../module"
+          npx astro build
+          node scripts/check-links.mjs dist
+
+      - name: Keep the built module for the publish job
+        if: inputs.publish
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: b3pay-module
+          path: module
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    name: Publish to the ${{ inputs.branch }} branch
+    needs: build
+    if: inputs.publish
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: write
+    concurrency:
+      group: b3pay-module-publish-${{ github.repository }}
+      cancel-in-progress: false
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: b3pay-module
+          path: module
+
+      - name: Commit the module to ${{ inputs.branch }}
+        working-directory: module
+        env:
+          TOKEN: ${{ github.token }}
+          BRANCH: ${{ inputs.branch }}
+          REPOSITORY: ${{ github.repository }}
+          SOURCE_SHA: ${{ github.sha }}
+        run: |
+          set -euo pipefail
+          auth="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$TOKEN" | base64 -w0)"
+          git init -q
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git remote add origin "https://github.com/$REPOSITORY.git"
+          # Continue the branch's history when it has one; the files are replaced whole.
+          if git -c http.extraheader="$auth" fetch -q --depth 1 origin "refs/heads/$BRANCH"; then
+            git reset -q --soft FETCH_HEAD
+          else
+            echo "No $BRANCH branch to continue: this is its first publish."
+          fi
+          git add -A
+          if git rev-parse -q --verify HEAD > /dev/null && git diff --cached --quiet; then
+            echo "The published module is unchanged."
+            exit 0
+          fi
+          git commit -q -m "Publish the b3pay.net module from $SOURCE_SHA"
+          git -c http.extraheader="$auth" push -q origin "HEAD:refs/heads/$BRANCH"
+          echo "Published $(git rev-parse HEAD) to $BRANCH."
+
+      - name: Ask b3pay.net to rebuild
+        env:
+          HOOK: ${{ secrets.deploy-hook }}
+        run: |
+          if [ -z "$HOOK" ]; then
+            echo "No deploy hook given: the module goes live with the site's next deploy."
+            exit 0
+          fi
+          curl --fail --silent --show-error --max-time 30 --retry 3 -X POST "$HOOK" > /dev/null
+          echo "Asked b3pay.net to rebuild."
