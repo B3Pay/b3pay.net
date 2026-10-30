@@ -1,9 +1,11 @@
 # Publishes a repository's module to b3pay.net. A repository calls it from its
 # own workflow (modules/README.md has the snippet):
 #
-#   build    builds the module from the repository's files with this site's
-#            tools, then builds the whole site with it, so a module that would
-#            break the site fails here, in the repository, not on b3pay.net;
+#   build    runs the repository's `prepare` command when it has one (for
+#            pages it generates, such as an API reference), builds the module
+#            from the repository's files with this site's tools, then builds
+#            the whole site with it, so a module that would break the site
+#            fails here, in the repository, not on b3pay.net;
 #   publish  (when `publish` is true) commits the built module to the
 #            repository's own `b3pay-site` branch and asks Vercel to rebuild
 #            b3pay.net, which reads that branch.
@@ -27,6 +29,10 @@ on:
         description: The branch of the calling repository that holds the published module.
         type: string
         default: b3pay-site
+      prepare:
+        description: A shell command run in the repository's checkout before its module is built, for pages it generates, such as an API reference. Node 24 is installed; the command installs anything else it needs.
+        type: string
+        default: ""
       publish:
         description: Push the module and ask the site to rebuild. Leave false to only check, as on a pull request.
         type: boolean
@@ -72,6 +78,13 @@ jobs:
       - name: Install the site's tools
         working-directory: site
         run: npm ci
+
+      - name: Prepare the repository's generated pages
+        if: inputs.prepare != ''
+        working-directory: source
+        env:
+          PREPARE: ${{ inputs.prepare }}
+        run: bash -euo pipefail -c "$PREPARE"
 
       - name: Build the module
         working-directory: site

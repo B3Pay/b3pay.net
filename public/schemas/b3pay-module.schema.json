@@ -279,6 +279,26 @@
           },
           {
             "type": "object",
+            "description": "A folder's pages, in the order of their file names, each labeled with its title: for pages a repository generates, such as an API reference.",
+            "required": [
+              "label",
+              "directory"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "label": {
+                "$ref": "#/$defs/label"
+              },
+              "directory": {
+                "$ref": "#/$defs/page"
+              },
+              "collapsed": {
+                "type": "boolean"
+              }
+            }
+          },
+          {
+            "type": "object",
             "description": "A group of items.",
             "required": [
               "label",

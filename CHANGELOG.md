@@ -6,6 +6,15 @@ The site is not versioned; changes are listed by the date they merged.
 
 ### Added
 
+- A sidebar item can list a folder's pages, `{ "label", "directory" }`, for
+  pages a repository generates, such as an API reference.
+- `publish-module.yml` takes `prepare`, a command a repository runs in its
+  checkout before its module is built, to generate such pages.
+
+## 2026-10-30
+
+### Added
+
 - One site for B3Pay's product pages and every project's documentation, on
   Astro and Starlight: home, Clear Signing, Toolkit, B3Forge, Internet
   Computer, About and Contact, and the docs under `/docs/`, with one header,

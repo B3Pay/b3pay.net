@@ -50,7 +50,12 @@ test("links and the edit URL are https, and group and status come from their lis
   assert.match(problems({ ...valid(), status: "stable" }).join(), /status/);
 });
 
-test("sidebar items are pages, links or groups, three deep at most", () => {
+test("sidebar items are pages, links, folders or groups, three deep at most", () => {
+  assert.deepEqual(problems({ ...valid(), sidebar: [{ label: "Functions", directory: "libs/functions" }, { label: "Types", directory: "libs/types", collapsed: true }] }), []);
+  assert.match(problems({ ...valid(), sidebar: [{ label: "x", directory: "libs/Functions" }] }).join(), /not a folder of pages/);
+  assert.match(problems({ ...valid(), sidebar: [{ label: "x", directory: "libs", page: "libs" }] }).join(), /exactly one/);
+  assert.match(problems({ ...valid(), sidebar: [{ label: "x", directory: "libs", collapsed: "yes" }] }).join(), /collapsed: true or false/);
+  assert.match(problems({ ...valid(), sidebar: [{ label: "x", directory: "libs", sort: "name" }] }).join(), /unknown field "sort"/);
   assert.match(problems({ ...valid(), sidebar: [] }).join(), /non-empty/);
   assert.match(problems({ ...valid(), sidebar: ["Guides/Reads"] }).join(), /not a page path/);
   assert.match(problems({ ...valid(), sidebar: [{ label: "x", page: "a", link: "https://x" }] }).join(), /exactly one/);

@@ -66,9 +66,9 @@ function checkSidebar(items, where, errors, depth = 0) {
       return;
     }
     if (!isString(item.label, 1, 60)) errors.push(`${at}.label: required, at most 60 characters`);
-    const kinds = ["page", "link", "items"].filter((key) => key in item);
+    const kinds = ["page", "link", "items", "directory"].filter((key) => key in item);
     if (kinds.length !== 1) {
-      errors.push(`${at}: needs exactly one of "page", "link" or "items"`);
+      errors.push(`${at}: needs exactly one of "page", "link", "items" or "directory"`);
       return;
     }
     if ("page" in item) {
@@ -78,6 +78,10 @@ function checkSidebar(items, where, errors, depth = 0) {
       unknownKeys(item, ["label", "link"], at, errors);
       if (!https(item.link) && !relativePath(item.link.replace(/\/$/, "")))
         errors.push(`${at}.link: an https URL, or a path inside the module`);
+    } else if ("directory" in item) {
+      unknownKeys(item, ["label", "directory", "collapsed"], at, errors);
+      if (!isPagePath(item.directory)) errors.push(`${at}.directory: "${item.directory}" is not a folder of pages`);
+      if ("collapsed" in item && typeof item.collapsed !== "boolean") errors.push(`${at}.collapsed: true or false`);
     } else {
       unknownKeys(item, ["label", "items", "collapsed"], at, errors);
       if ("collapsed" in item && typeof item.collapsed !== "boolean")

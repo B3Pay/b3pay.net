@@ -28,6 +28,7 @@ import { fetchArchive, unpack } from "./archive.mjs";
 import { buildModule } from "./build.mjs";
 import { checkModule } from "./check.mjs";
 import { GROUPS, checkManifest, checkRegistry } from "./manifest.mjs";
+import { toStarlight } from "./site.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const SELF = "B3Pay/b3pay.net";
@@ -117,17 +118,6 @@ function homeHref(id, home) {
   if (home === "index") return `/docs/${id}/`;
   if (home.endsWith(".html")) return `/docs/${id}/${home.replace(/(^|\/)index\.html$/, "$1")}`;
   return `/docs/${id}/${home}/`;
-}
-
-/** The module's sidebar, in Starlight's terms, with every page and link at its address on the site. */
-function toStarlight(items, id) {
-  const slug = (page) => (page === "index" ? `docs/${id}` : `docs/${id}/${page}`);
-  return items.map((item) => {
-    if (typeof item === "string") return { slug: slug(item) };
-    if ("page" in item) return { label: item.label, slug: slug(item.page) };
-    if ("link" in item) return { label: item.label, link: /^https:/.test(item.link) ? item.link : `/docs/${id}/${item.link}` };
-    return { label: item.label, collapsed: item.collapsed ?? false, items: toStarlight(item.items, id) };
-  });
 }
 
 async function main() {

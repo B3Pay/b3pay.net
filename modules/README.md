@@ -72,6 +72,20 @@ and from which commit, is at [/modules.json](https://b3pay.net/modules.json).
    and calls the deploy hook, and Vercel rebuilds b3pay.net. Without the hook
    the module goes live with the site's next deploy.
 
+   A repository that generates some of its pages, such as an API reference,
+   passes `prepare`: a shell command run in its checkout before the module is
+   built. Node 24 is installed, and the command installs anything else it
+   needs:
+
+   ```yaml
+       with:
+         publish: ${{ github.event_name == 'push' }}
+         prepare: corepack enable && pnpm install --frozen-lockfile && pnpm -C docs run api
+   ```
+
+   The command runs in the build job, which reads the repository and holds no
+   secret.
+
 3. **Add the registry entry** here, once the first publish has created the
    branch:
 
@@ -99,7 +113,8 @@ npx astro dev
 ```
 
 `--module` uses the given folder instead of the registry's source, or adds the
-module if the registry does not list it yet.
+module if the registry does not list it yet. A module with a `prepare`
+command needs it run in the repository first.
 
 ## The manifest
 
@@ -114,7 +129,7 @@ module if the registry does not list it yet.
 | `links`       | no       | `repository`, `package` and `app`, each an https URL. Shown on the card.                                                        |
 | `editUrl`     | no       | An https URL with `{path}`, the page's path in `source.docs`: the "Edit page" link.                                              |
 | `home`        | no       | The page or `.html` file the card opens. Defaults to the `index` page, then `index.html` of the static pages.                    |
-| `sidebar`     | with pages | A list of page paths, `{ "label", "page" }`, `{ "label", "link" }` (https, or a path inside the module) or `{ "label", "items", "collapsed"? }`, three groups deep at most. |
+| `sidebar`     | with pages | A list of page paths, `{ "label", "page" }`, `{ "label", "link" }` (https, or a path inside the module), `{ "label", "directory", "collapsed"? }` or `{ "label", "items", "collapsed"? }`, three groups deep at most. A `directory` lists a folder's pages in the order of their file names, each labeled with its title: for pages a repository generates, such as an API reference. |
 | `source`      | to build | Where the module's files are in the repository: below.                                                                           |
 
 `source`:
