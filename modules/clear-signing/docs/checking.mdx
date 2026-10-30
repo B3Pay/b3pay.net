@@ -1,0 +1,63 @@
+---
+title: How a descriptor is checked
+description: The official linter, tests built from real transactions, and checking the display on a device, before a descriptor goes to the registry.
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+A descriptor is only useful if it is right: a wrong label or a wrong decimal shows a person something false at the moment they decide. Three checks catch most mistakes before a reviewer ever sees the file.
+
+## 1. The linter
+
+python-erc7730, the linter the registry runs, checks a descriptor against the ERC-7730 schema and against the contract's verified ABI on Sourcify: every displayed path must exist in the function it describes. It also warns about strings that a hardware wallet's screen would cut short.
+
+The registry pins the linter's version in its `.github/requirements.txt` and needs Python 3.12; the pinned package does not install on 3.13 or later. From a clone of the registry:
+
+```sh
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r .github/requirements.txt
+erc7730 lint registry/<project>/calldata-<ContractName>.json
+```
+
+Or, with uv:
+
+```sh
+uvx --python 3.12 --from "$(cat .github/requirements.txt)" erc7730 lint registry/<project>/calldata-<ContractName>.json
+```
+
+Fix every error. A warning such as `Missing display format` means a function has no entry yet, which is fine only if users never sign it.
+
+## 2. Tests from real transactions
+
+Each descriptor gets a test file, `testsv2/calldata-<ContractName>.tests.json`, with at least one test for every function in `display.formats`. A test has three parts:
+
+- **`rawTx`**: the full serialized **unsigned** transaction, not only its calldata. Real transactions make the best tests.
+- **`dataProvider`**: the token metadata, and optionally address and ENS names, that the display needs, so the test runs without a network.
+- **`expected`**: what a wallet should show.
+
+The registry's CI renders every test with clear-signing implementations and compares the result with `expected`.
+
+## 3. The display on a device
+
+The linter and the tests check the data. A person checks the screen: Ledger's [ERC-7730 tester](https://app.devicesdk.ledger.com/clear-signing-tools) loads a descriptor onto a device or the Speculos emulator, so you can step through each call with representative values and read what a signer would read.
+
+## How we check the descriptors we write
+
+<Steps>
+
+1. The registry's pinned linter, with no errors.
+
+2. A test for every function, built from a real transaction on the chain the contract is deployed to.
+
+3. The display read through, call by call, in a tester.
+
+4. Each change shown to you before it goes to the registry.
+
+</Steps>
+
+Next: [The registry and attestations](/docs/clear-signing/registry/).
+
+## Sources
+
+Checked on 30 October 2026: ethereum.org's [Clear Signing guide](https://ethereum.org/developers/tutorials/clear-signing/) and Ledger's [Validate & Submit](https://developers.ledger.com/docs/clear-signing/for-dapps/validate-submit) page.

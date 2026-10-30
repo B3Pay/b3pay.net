@@ -1,0 +1,41 @@
+---
+title: Toolkit and MCP server
+description: In development, an open-source TypeScript toolkit and MCP server that turns ERC-7730 descriptors into agent tools that simulate, decode and clear-sign every call before a person confirms it.
+template: splash
+hero:
+  title: Agents that can only send what a person can read
+  tagline: An open-source TypeScript toolkit and MCP server, in development. It turns the ERC-7730 descriptors wallets use into tools an AI agent can call, and puts every write through simulate, decode, clear-sign and confirm before anything is signed.
+  actions:
+    - text: Tell us what you would use it for
+      link: /contact/?topic=toolkit
+      icon: right-arrow
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+<p class="status-line">In development</p>
+
+## Every write takes four steps
+
+<Steps>
+
+1. **Simulate.** The call runs against current chain state first, so the agent and the person see its effects before they are real.
+
+2. **Decode.** The calldata is decoded against the contract's verified ABI.
+
+3. **Clear-sign.** The contract's ERC-7730 descriptor turns the decoded call into the sentence and labeled values a wallet would show.
+
+4. **Confirm.** A person reads that text and approves this one transaction. Without that approval, nothing is signed.
+
+</Steps>
+
+## What it is for
+
+- **Protocols** that want a descriptor drafted from their ABI and Sourcify metadata, and checked with the official ERC-7730 tooling, in their own CI.
+- **Agent builders** who want a typed tool for each described function, so an agent can only propose calls a descriptor explains, served over MCP with the four steps built in.
+
+## Built on what exists
+
+The toolkit wraps the tooling the ecosystem already maintains, such as Ledger's python-erc7730, the Clear Signing libraries and Sourcify's APIs, rather than replacing it, and it uses viem for chain access instead of competing with it.
+
+Want to shape it before it ships? [Tell us what you would use it for](/contact/?topic=toolkit).

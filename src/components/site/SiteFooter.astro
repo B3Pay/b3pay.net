@@ -1,0 +1,81 @@
+---
+/**
+ * The site's footer: every section of the site, then the company line.
+ */
+import { FOOTER } from "./nav";
+
+const year = new Date().getUTCFullYear();
+---
+
+<div class="site-footer not-content print:hidden">
+  <div class="columns">
+    {
+      FOOTER.map((column) => (
+        <nav aria-label={column.label}>
+          <h2>{column.label}</h2>
+          <ul>
+            {column.links.map((link) => (
+              <li>
+                <a href={link.href}>{link.label}</a>
+              </li>
+            ))}
+          </ul>
+        </nav>
+      ))
+    }
+  </div>
+  <p class="company">
+    <img src="/brand/b3pay-mark-dark.svg" alt="" width="20" height="20" class="light:sl-hidden" />
+    <img src="/brand/b3pay-mark-light.svg" alt="" width="20" height="20" class="dark:sl-hidden" />
+    <span>© {year} B3Pay. Code on <a href="https://github.com/B3Pay">GitHub</a>.</span>
+  </p>
+</div>
+
+<style>
+  .site-footer {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--sl-color-hairline);
+    font-size: var(--sl-text-sm);
+  }
+  .columns {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: repeat(auto-fit, minmax(9rem, 1fr));
+  }
+  h2 {
+    margin: 0 0 0.5rem;
+    font-size: var(--sl-text-xs);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--sl-color-gray-3);
+  }
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  li + li {
+    margin-top: 0.35rem;
+  }
+  a {
+    color: var(--sl-color-gray-2);
+    text-decoration: none;
+  }
+  a:hover {
+    color: var(--sl-color-white);
+    text-decoration: underline;
+  }
+  .company {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 2rem 0 1rem;
+    color: var(--sl-color-gray-3);
+  }
+  .company a {
+    color: inherit;
+    text-decoration: underline;
+  }
+</style>

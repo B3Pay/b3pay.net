@@ -1,0 +1,56 @@
+/*
+ * B3Pay design tokens, copied from the design system's `project/tokens.json`
+ * (B3Pay/b3pay-design-system, version 3). Change a value there first, then
+ * here, so the two never drift.
+ *
+ * Dark is the default, as in the design system. The theme follows the
+ * `data-theme` attribute Starlight sets on <html>, so the marketing pages and
+ * the docs share one switch and one stored choice.
+ */
+
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --surface: #121110;
+  --surface-raised: #1c1a18;
+  --line: #2e2b27;
+  --ink: #f1ede6;
+  --ink-muted: #a39c91;
+  --brand: #f0b35a;
+  --brand-hover: #f5c57b;
+  --brand-soft: #3a2c17;
+  --on-brand: #1d1405;
+  --accent: #f0b35a;
+  --on-accent: #1d1405;
+  --danger: #f07a6e;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --surface: #f6f4f0;
+  --surface-raised: #ffffff;
+  --line: #ddd8cf;
+  --ink: #1a1714;
+  --ink-muted: #5f584e;
+  --brand: #a35f00;
+  --brand-hover: #8a5000;
+  --brand-soft: #f6e3c4;
+  --on-brand: #ffffff;
+  --accent: #e8a33d;
+  --on-accent: #1a1714;
+  --danger: #b3261e;
+}
+
+:root {
+  --font-sans: "Schibsted Grotesk Variable", "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Martian Mono Variable", "Martian Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-4: 16px;
+  --space-8: 32px;
+
+  --radius-sm: 4px;
+  --radius-md: 10px;
+  --radius-pill: 999px;
+}

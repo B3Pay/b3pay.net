@@ -1,0 +1,94 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://b3pay.net/schemas/registry.schema.json",
+  "title": "B3Pay site module registry",
+  "description": "modules/registry.json: every module the site serves, in sidebar order within each group. scripts/modules/manifest.mjs enforces the same rules and is authoritative.",
+  "type": "object",
+  "required": [
+    "modules"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "modules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "source"
+        ],
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]{0,38}[a-z0-9]$"
+          },
+          "source": {
+            "oneOf": [
+              {
+                "type": "object",
+                "description": "A module written in this repository.",
+                "required": [
+                  "path"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "path": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "description": "A module the site builds from a repository at a pinned commit, with the repository's manifest or one kept here.",
+                "required": [
+                  "repo",
+                  "commit"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "repo": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9-]+/[A-Za-z0-9._-]+$"
+                  },
+                  "commit": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{40}$"
+                  },
+                  "manifest": {
+                    "type": "string"
+                  }
+                }
+              },
+              {
+                "type": "object",
+                "description": "A module the repository builds and publishes to a branch; `pin` holds it at one commit of that branch.",
+                "required": [
+                  "repo",
+                  "branch"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "repo": {
+                    "type": "string",
+                    "pattern": "^[A-Za-z0-9-]+/[A-Za-z0-9._-]+$"
+                  },
+                  "branch": {
+                    "type": "string"
+                  },
+                  "pin": {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{40}$"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    }
+  }
+}

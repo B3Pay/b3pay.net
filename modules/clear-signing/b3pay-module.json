@@ -1,0 +1,17 @@
+{
+  "$schema": "../../public/schemas/b3pay-module.schema.json",
+  "schema": 1,
+  "id": "clear-signing",
+  "title": "Clear Signing",
+  "description": "ERC-7730 descriptors for your contracts: written, checked against the schema and real calldata, and submitted to the registry wallets read.",
+  "group": "evm",
+  "status": "active",
+  "editUrl": "https://github.com/B3Pay/b3pay.net/edit/main/modules/clear-signing/docs/{path}",
+  "source": { "docs": "docs" },
+  "sidebar": [
+    { "label": "Overview", "page": "index" },
+    { "label": "Anatomy of a descriptor", "page": "descriptors" },
+    { "label": "How a descriptor is checked", "page": "checking" },
+    { "label": "The registry and attestations", "page": "registry" }
+  ]
+}

@@ -1,0 +1,107 @@
+---
+title: Anatomy of a descriptor
+description: The three sections of an ERC-7730 descriptor, how fields point into a call, and the formats a wallet can show, with a schema-checked example.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+A descriptor is one JSON file. A file for a contract's functions is named `calldata-<ContractName>.json`; a file for an EIP-712 typed-data message is named `eip712-<MessageName>.json`. Both have the same three sections.
+
+## An example
+
+This descriptor tells a wallet how to show the two calls of WETH9, the Wrapped Ether contract on Ethereum: wrapping ETH and unwrapping it.
+
+```json title="calldata-WETH9.json"
+{
+  "$schema": "../../specs/erc7730-v2.schema.json",
+  "context": {
+    "$id": "WETH9",
+    "contract": {
+      "deployments": [
+        {
+          "chainId": 1,
+          "address": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+        }
+      ]
+    }
+  },
+  "metadata": {
+    "owner": "Wrapped Ether",
+    "contractName": "WETH9",
+    "info": { "url": "https://ethereum.org" }
+  },
+  "display": {
+    "formats": {
+      "deposit()": {
+        "intent": "Wrap ETH",
+        "fields": [
+          { "path": "@.value", "label": "Amount", "format": "amount" }
+        ]
+      },
+      "withdraw(uint256 wad)": {
+        "intent": "Unwrap WETH",
+        "interpolatedIntent": "Unwrap {wad}",
+        "fields": [
+          {
+            "path": "#.wad",
+            "label": "Amount",
+            "format": "tokenAmount",
+            "params": {
+              "token": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
+            }
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+<Aside type="caution" title="An illustration, not a submission">
+  This example passes the v2 schema (version 2.1.0) and python-erc7730's lint, and its two function signatures hash to
+  WETH9's selectors, `0xd0e30db0` and `0x2e1a7d4d`. It has not been through the checks a submission needs: the
+  comparison with the ABI on Sourcify, and tests built from real transactions. The descriptors in the registry are the
+  reference.
+</Aside>
+
+## context: which contract
+
+`context` binds the file to deployments: a list of `chainId` and `address` pairs. A wallet uses the descriptor only for a transaction sent to one of them. For an upgradeable contract the address is the **proxy's**, the one users send to, while the function signatures come from the **implementation's** ABI.
+
+## metadata: who it belongs to
+
+`metadata` names the owner and the contract, with `info.url` pointing at more about them. It can also hold constants and enums that the display section refers to. Keep the strings short: hardware wallets have small screens, and the linter warns, for instance, about an owner URL longer than 26 characters.
+
+## display: what a person sees
+
+`display.formats` has one entry per function, keyed by its full signature with parameter names, such as `withdraw(uint256 wad)`. Each entry has:
+
+- **`intent`**: a short label for the action, such as "Unwrap WETH".
+- **`interpolatedIntent`** (optional): a sentence with formatted values in it. Placeholders are parameter names in braces, such as `{wad}`.
+- **`fields`**: the values to show, in order, each with a `path`, a `label`, a `format`, and `params` when the format needs them.
+
+### Paths
+
+- `#.name` is a decoded calldata parameter, by its name in the ABI.
+- `@.value` is the ETH sent with the transaction.
+- An array element takes a dot before its brackets: `#.path.[0]` is the first element and `#.path.[-1]` the last. The linter rejects `#.path[0]`.
+
+### Formats
+
+| Format | Shows |
+| --- | --- |
+| `raw` | The value as its type would naturally appear |
+| `amount` | An amount of the chain's own currency, such as ETH |
+| `tokenAmount` | A token amount with its ticker and decimals, from `token` or `tokenPath` |
+| `tokenTicker` | A token's ticker |
+| `addressName` | A trusted name for an address, or the address itself |
+| `date` | A date, from a timestamp or a block height |
+| `duration` | A number of seconds as hours, minutes and seconds |
+| `unit` | A number with a unit symbol after it, such as % or bps, after applying its decimals |
+| `enum` | A human-readable name from an enum in `metadata` |
+| `nftName` | An NFT's name, or its token ID |
+| `calldata` | A call embedded in the call, shown with its own descriptor |
+
+The [schema](https://eips.ethereum.org/assets/eip-7730/erc7730-v2.schema.json) has the parameters each format takes.
+
+Next: [How a descriptor is checked](/docs/clear-signing/checking/).

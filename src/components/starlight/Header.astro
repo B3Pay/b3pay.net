@@ -1,0 +1,210 @@
+---
+/**
+ * Starlight's header with the site's navigation in it, so the marketing pages
+ * and the docs share one bar: the logo, the section links, search, and the
+ * theme switch.
+ *
+ * On a narrow screen the section links move into a menu: Starlight's own
+ * sidebar menu on a docs page (see MobileMenuFooter.astro), and the menu here
+ * on a page without a sidebar.
+ */
+import Search from "@astrojs/starlight/components/Search.astro";
+import SiteTitle from "@astrojs/starlight/components/SiteTitle.astro";
+import SocialIcons from "@astrojs/starlight/components/SocialIcons.astro";
+import ThemeSelect from "@astrojs/starlight/components/ThemeSelect.astro";
+import { Icon } from "@astrojs/starlight/components";
+import { MOBILE, PRIMARY, isCurrent } from "../site/nav";
+
+const { hasSidebar } = Astro.locals.starlightRoute;
+const pathname = Astro.url.pathname;
+---
+
+<div class="header">
+  <div class="title-wrapper sl-flex">
+    <SiteTitle />
+  </div>
+  <nav class="primary sl-hidden md:sl-flex print:hidden" aria-label="Site">
+    {
+      PRIMARY.map((link) => (
+        <a href={link.href} aria-current={isCurrent(pathname, link.href) ? "page" : undefined}>
+          {link.label}
+        </a>
+      ))
+    }
+  </nav>
+  <div class="search sl-flex print:hidden">
+    <Search />
+  </div>
+  <div class="sl-hidden md:sl-flex print:hidden right-group">
+    <div class="sl-flex social-icons">
+      <SocialIcons />
+    </div>
+    <ThemeSelect />
+  </div>
+  {
+    !hasSidebar && (
+      <>
+        <button popovertarget="site-menu" class="menu-button sl-flex md:sl-hidden print:hidden">
+          <Icon name="bars" class="open-menu" />
+          <Icon name="close" class="close-menu" />
+          <span class="sr-only">Menu</span>
+        </button>
+        <nav id="site-menu" popover class="site-menu md:sl-hidden" aria-label="Site">
+          <ul>
+            {MOBILE.map((link) => (
+              <li>
+                <a href={link.href} aria-current={isCurrent(pathname, link.href) ? "page" : undefined}>
+                  {link.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <div class="site-menu-footer">
+            <SocialIcons />
+            <ThemeSelect />
+          </div>
+        </nav>
+      </>
+    )
+  }
+</div>
+
+<style>
+  .header {
+    display: flex;
+    gap: var(--sl-nav-gap);
+    align-items: center;
+    height: 100%;
+  }
+
+  .title-wrapper {
+    flex-shrink: 0;
+    overflow: clip;
+    padding: 0.25rem;
+    margin: -0.25rem;
+    min-width: 0;
+  }
+
+  .primary {
+    gap: 1.25rem;
+    align-items: center;
+    flex-shrink: 0;
+    margin-inline-start: 1rem;
+  }
+
+  .primary a {
+    color: var(--sl-color-gray-2);
+    font-size: var(--sl-text-sm);
+    font-weight: 500;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .primary a:hover,
+  .primary a[aria-current="page"] {
+    color: var(--sl-color-white);
+  }
+
+  .primary a[aria-current="page"] {
+    text-decoration: underline;
+    text-decoration-color: var(--brand);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.45em;
+  }
+
+  .search {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    min-width: 0;
+  }
+
+  @media (min-width: 50rem) {
+    .search {
+      justify-content: center;
+    }
+    .search :global(site-search) {
+      width: 100%;
+      max-width: 22rem;
+    }
+  }
+
+  .right-group,
+  .social-icons {
+    gap: 1rem;
+    align-items: center;
+  }
+
+  .social-icons::after {
+    content: "";
+    height: 2rem;
+    border-inline-end: 1px solid var(--sl-color-gray-5);
+  }
+
+  /* The same round button Starlight shows for its sidebar menu. */
+  .menu-button {
+    flex-shrink: 0;
+    border: 0;
+    border-radius: 50%;
+    width: var(--sl-menu-button-size);
+    height: var(--sl-menu-button-size);
+    padding: 0.5rem;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--sl-color-white);
+    color: var(--sl-color-black);
+    cursor: pointer;
+  }
+
+  :global([data-theme="light"]) .menu-button {
+    background-color: var(--sl-color-black);
+    color: var(--sl-color-white);
+  }
+
+  .menu-button:has(~ :popover-open) .open-menu,
+  .menu-button:not(:has(~ :popover-open)) .close-menu {
+    display: none;
+  }
+
+  .site-menu {
+    position: fixed;
+    inset: var(--sl-nav-height) 0 auto 0;
+    margin: 0;
+    width: 100%;
+    max-height: calc(100dvh - var(--sl-nav-height));
+    overflow-y: auto;
+    border: 0;
+    border-bottom: 1px solid var(--sl-color-hairline-shade);
+    padding: 1rem var(--sl-nav-pad-x) 0;
+    background-color: var(--sl-color-bg-nav);
+    color: var(--sl-color-white);
+  }
+
+  .site-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .site-menu a {
+    display: block;
+    padding: 0.6rem 0;
+    font-size: var(--sl-text-lg);
+    font-weight: 600;
+    color: var(--sl-color-white);
+    text-decoration: none;
+  }
+
+  .site-menu a[aria-current="page"] {
+    color: var(--sl-color-text-accent);
+  }
+
+  .site-menu-footer {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+    padding: 0.75rem 0;
+    border-top: 1px solid var(--sl-color-hairline);
+  }
+</style>

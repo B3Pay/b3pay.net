@@ -1,0 +1,22 @@
+{
+  "$schema": "../../public/schemas/b3pay-module.schema.json",
+  "schema": 1,
+  "id": "b3forge",
+  "title": "B3Forge",
+  "description": "A visual editor that composes canister calls into typed workflows and runs them in the browser. In beta on the Internet Computer; a version for EVM contracts is in development.",
+  "group": "evm",
+  "status": "beta",
+  "links": {
+    "app": "https://forge.b3pay.net"
+  },
+  "editUrl": "https://github.com/B3Pay/b3pay.net/edit/main/modules/b3forge/docs/{path}",
+  "source": {
+    "docs": "docs"
+  },
+  "sidebar": [
+    {
+      "label": "Overview",
+      "page": "index"
+    }
+  ]
+}

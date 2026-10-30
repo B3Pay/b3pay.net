@@ -1,0 +1,27 @@
+{
+  "name": "B3Pay",
+  "short_name": "B3Pay",
+  "description": "B3Pay makes contract calls readable: ERC-7730 Clear Signing descriptors written and tested for your protocol, and tooling so AI agents only send transactions a person can read and approve.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#121110",
+  "theme_color": "#121110",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+---
+title: B3Forge
+description: Visual workflows for contract calls. In beta on the Internet Computer; a version for EVM contracts, with clear-signed steps, is in development.
+template: splash
+hero:
+  title: Workflows for contract calls, every step readable
+  tagline: B3Forge is a visual editor for chaining contract calls into typed workflows that run in the browser. It is in beta on the Internet Computer today. A version for EVM contracts, where every step that writes is clear-signed before you confirm it, is in development.
+  actions:
+    - text: Open B3Forge
+      link: https://forge.b3pay.net
+      icon: external
+    - text: Read the docs
+      link: /docs/b3forge/
+      variant: minimal
+---
+
+import { Card, CardGrid } from "@astrojs/starlight/components";
+
+## Today: in beta on the Internet Computer
+
+<CardGrid>
+  <Card title="A visual graph" icon="puzzle">
+    Place canister calls as nodes and bind one node's output to the next node's input. The bindings are type-checked.
+  </Card>
+  <Card title="Expressions" icon="pencil">
+    Refer to an earlier step's output in an expression, such as `$N0.amount`.
+  </Card>
+  <Card title="Runs in your browser" icon="laptop">
+    Workflows run in the browser with a delegated identity.
+  </Card>
+  <Card title="A community catalog" icon="open-book">
+    Publish your workflows, and fork other people's.
+  </Card>
+</CardGrid>
+
+## Next: B3Forge for EVM
+
+<p class="status-line">In development</p>
+
+Workflows built from any contract with a verified ABI, where each step that writes is simulated, decoded and shown with its ERC-7730 descriptor before you confirm it. Want it for your team? [Tell us what you would automate](/contact/?topic=b3forge).
