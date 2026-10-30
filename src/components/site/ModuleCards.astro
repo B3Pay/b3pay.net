@@ -1,0 +1,137 @@
+---
+/**
+ * Every module the site serves, as cards, grouped as the docs sidebar groups
+ * them. The list comes from src/generated/modules.json, which the module sync
+ * writes, so a module added to the registry appears here with no other change.
+ */
+import { Badge } from "@astrojs/starlight/components";
+import navigation from "../../generated/modules.json";
+
+interface Props {
+  /** Show one group only. */
+  group?: "evm" | "internet-computer";
+  /** Heading level for the group titles; omit to leave the titles out. */
+  headings?: "h2" | "h3";
+}
+
+const GROUPS = [
+  { id: "evm", title: "EVM" },
+  { id: "internet-computer", title: "Internet Computer, maintained" },
+] as const;
+
+const STATUS: Record<string, { text: string; variant: "success" | "caution" | "note" | "default" }> = {
+  active: { text: "Active", variant: "success" },
+  beta: { text: "Beta", variant: "caution" },
+  "in-development": { text: "In development", variant: "note" },
+  maintained: { text: "Maintained", variant: "default" },
+};
+
+const LINK_LABELS: Record<string, string> = { app: "Open the app", repository: "Source", package: "Package" };
+
+const { group, headings } = Astro.props;
+const Heading = headings ?? "h2";
+const groups = GROUPS.filter((g) => !group || g.id === group)
+  .map((g) => ({ ...g, modules: navigation.modules.filter((module) => module.group === g.id) }))
+  .filter((g) => g.modules.length > 0);
+---
+
+<div class="module-groups not-content">
+  {
+    groups.map((g) => (
+      <section aria-label={g.title}>
+        {headings && <Heading class="group-title">{g.title}</Heading>}
+        <ul class="module-cards">
+          {g.modules.map((module) => {
+            const status = STATUS[module.status];
+            const links = Object.entries(module.links as Record<string, string>);
+            return (
+              <li class="module-card">
+                <a class="module-title" href={module.href}>
+                  {module.title}
+                  <span class="sr-only">docs</span>
+                </a>
+                {status && <Badge text={status.text} variant={status.variant} size="small" />}
+                <p>{module.description}</p>
+                {links.length > 0 && (
+                  <p class="module-links">
+                    {links.map(([kind, href]) => (
+                      <a href={href}>{LINK_LABELS[kind] ?? kind}</a>
+                    ))}
+                  </p>
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+    ))
+  }
+</div>
+
+<style>
+  .module-groups {
+    display: grid;
+    gap: 2.5rem;
+    margin-block: 1.5rem;
+  }
+  .group-title {
+    margin: 0 0 1rem;
+    font-size: var(--sl-text-h4);
+    font-weight: 600;
+    color: var(--sl-color-white);
+  }
+  .module-cards {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 17rem), 1fr));
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  .module-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    align-items: flex-start;
+    padding: 1.25rem;
+    border: 1px solid var(--sl-color-hairline);
+    border-radius: var(--radius-md);
+    background-color: var(--surface-raised);
+  }
+  .module-card:hover {
+    border-color: var(--sl-color-gray-4);
+  }
+  .module-title {
+    font-size: var(--sl-text-lg);
+    font-weight: 600;
+    color: var(--sl-color-white);
+    text-decoration: none;
+  }
+  /* The whole card opens the docs; the links below stay their own targets. */
+  .module-title::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+  .module-card p {
+    margin: 0;
+    color: var(--sl-color-gray-2);
+    font-size: var(--sl-text-sm);
+    line-height: 1.55;
+  }
+  .module-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin-top: auto !important;
+    padding-top: 0.5rem;
+  }
+  .module-links a {
+    position: relative;
+    z-index: 1;
+    color: var(--sl-color-text-accent);
+    font-size: var(--sl-text-sm);
+  }
+</style>

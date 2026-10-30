@@ -2,7 +2,8 @@ import type { VercelRequest, VercelResponse } from "@vercel/node";
 import { Resend } from "resend";
 
 /**
- * POST /api/contact
+ * POST /api/contact/ (vercel.json sends every path without its trailing
+ * slash to the one with it, so the form posts there directly).
  *
  * The prototype's form called `setSent(true)` and dropped the submission. This
  * delivers it, or fails loudly — it never reports success it did not achieve.
@@ -17,14 +18,16 @@ import { Resend } from "resend";
  * error, which is the correct behaviour: nothing is silently discarded.
  */
 
+/** Must match the labels in src/components/site/ContactForm.astro (scripts/contact-form.test.mjs checks). */
 const TOPICS = [
-  "Integration question",
-  "Grant / partnership",
-  "Bug report",
+  "Clear Signing descriptors",
+  "Toolkit or MCP server",
+  "B3Forge",
+  "Internet Computer products",
   "Something else",
 ] as const;
 
-const MAX = { name: 120, email: 200, message: 5000 };
+const MAX = { name: 120, email: 200, organization: 120, contracts: 2000, message: 5000 };
 
 /**
  * Origin allowlist. A browser sends `Origin` on every POST, and this endpoint
@@ -54,23 +57,31 @@ function originAllowed(origin: string | undefined): boolean {
 interface Payload {
   name: string;
   email: string;
+  organization: string;
   topic: string;
+  contracts: string;
   message: string;
-  publicIssue: boolean;
 }
 
 function validate(body: unknown): { ok: true; value: Payload } | { ok: false; error: string } {
   if (typeof body !== "object" || body === null) return { ok: false, error: "Expected a JSON object." };
   const b = body as Record<string, unknown>;
 
-  const name = typeof b.name === "string" ? b.name.trim() : "";
-  const email = typeof b.email === "string" ? b.email.trim() : "";
-  const message = typeof b.message === "string" ? b.message.trim() : "";
-  const topic = typeof b.topic === "string" ? b.topic : "";
+  const text = (key: string) => (typeof b[key] === "string" ? (b[key] as string).trim() : "");
+  const name = text("name");
+  const email = text("email");
+  const organization = text("organization");
+  const contracts = text("contracts");
+  const message = text("message");
+  const topic = text("topic");
 
   if (name.length < 1 || name.length > MAX.name) return { ok: false, error: "A name is required." };
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) || email.length > MAX.email)
     return { ok: false, error: "A valid email address is required." };
+  if (organization.length > MAX.organization)
+    return { ok: false, error: `The protocol or company name is longer than ${MAX.organization} characters.` };
+  if (contracts.length > MAX.contracts)
+    return { ok: false, error: `The contracts list is longer than ${MAX.contracts} characters.` };
   if (message.length < 10 || message.length > MAX.message)
     return { ok: false, error: "A message of at least 10 characters is required." };
 
@@ -79,9 +90,10 @@ function validate(body: unknown): { ok: true; value: Payload } | { ok: false; er
     value: {
       name,
       email,
+      organization,
+      contracts,
       message,
-      topic: (TOPICS as readonly string[]).includes(topic) ? topic : TOPICS[3],
-      publicIssue: b.publicIssue === true,
+      topic: (TOPICS as readonly string[]).includes(topic) ? topic : TOPICS[TOPICS.length - 1],
     },
   };
 }
@@ -133,15 +145,16 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
   const parsed = validate(req.body);
   if (!parsed.ok) return res.status(400).json({ error: parsed.error });
-  const { name, email, topic, message, publicIssue } = parsed.value;
+  const { name, email, organization, topic, contracts, message } = parsed.value;
 
-  const subject = oneLine(`[b3pay.net] ${topic} — ${name}`);
+  const subject = oneLine(`[b3pay.net] ${topic} — ${organization || name}`);
   const text = [
-    `Topic:   ${topic}`,
-    `Name:    ${name}`,
-    `Email:   ${email}`,
-    `Public:  ${publicIssue ? "happy to discuss in a public issue" : "no"}`,
+    `Topic:         ${topic}`,
+    `Name:          ${name}`,
+    `Email:         ${email}`,
+    `Organization:  ${organization || "(not given)"}`,
     "",
+    ...(contracts ? ["Contracts:", contracts, ""] : []),
     message,
   ].join("\n");
 

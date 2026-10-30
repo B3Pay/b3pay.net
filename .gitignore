@@ -1,11 +1,16 @@
 .DS_Store
 node_modules/
 dist/
-dist-docs/
 .vercel/
 *.local
 .env
 .env.*
 !.env.example
-.turbo/
-dist-ssr/
+.astro/
+
+# Written by scripts/modules/sync.mjs on every dev, build and typecheck run.
+.modules/
+src/generated/
+/src/content/docs/docs/*/
+/public/docs/
+/public/modules.json

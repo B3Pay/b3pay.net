@@ -2,8 +2,7 @@
  * Reports what the build can actually see before it starts.
  *
  * A CI build that runs from the wrong directory fails several steps later with
- * something unrelated — `npm error No workspaces found: --workspace=apps/web`
- * says nothing about the cause. This says it directly.
+ * something unrelated; this says it directly.
  */
 import { readdirSync, existsSync } from "node:fs";
 import { join } from "node:path";
@@ -17,12 +16,7 @@ const entries = readdirSync(cwd, { withFileTypes: true })
 console.log(`preflight  node ${process.version}  cwd ${cwd}`);
 console.log(`preflight  contents: ${entries.join(" ")}`);
 
-const required = [
-  "package.json",
-  "apps/web/package.json",
-  "apps/docs/package.json",
-  "packages/ui/package.json",
-];
+const required = ["package.json", "astro.config.mjs", "modules/registry.json"];
 const missing = required.filter((f) => !existsSync(join(cwd, f)));
 
 if (missing.length) {
@@ -44,4 +38,4 @@ if (missing.length) {
   process.exit(1);
 }
 
-console.log("preflight  ok — workspace root found");
+console.log("preflight  ok — repository root found");

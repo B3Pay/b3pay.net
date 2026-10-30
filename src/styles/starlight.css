@@ -1,0 +1,92 @@
+/*
+ * Starlight in the B3Pay look: the tokens in tokens.css mapped onto
+ * Starlight's variables. The grey ramp between `ink` and `surface` is the
+ * one IC Reactor's docs already used, so pages moved from there look the same.
+ */
+:root {
+  --sl-font: var(--font-sans);
+  --sl-font-mono: var(--font-mono);
+  --sl-text-code: 0.8125rem;
+  --sl-text-code-sm: 0.75rem;
+  --sl-content-width: 50rem;
+
+  --sl-color-white: var(--ink);
+  --sl-color-gray-1: #e6e1d9;
+  --sl-color-gray-2: #d6d0c6;
+  --sl-color-gray-3: var(--ink-muted);
+  --sl-color-gray-4: #6f685f;
+  --sl-color-gray-5: #3a3631;
+  --sl-color-gray-6: var(--surface-raised);
+  --sl-color-black: var(--surface);
+
+  --sl-color-accent-low: var(--brand-soft);
+  --sl-color-accent: var(--brand);
+  --sl-color-accent-high: var(--brand-hover);
+  --sl-color-text-accent: var(--brand);
+  --sl-color-text-invert: var(--on-brand);
+
+  --sl-color-bg-nav: var(--surface);
+  --sl-color-bg-sidebar: var(--surface);
+  --sl-color-bg-inline-code: var(--surface-raised);
+  --sl-color-hairline-light: #3a3631;
+  --sl-color-hairline: var(--line);
+  --sl-color-hairline-shade: var(--line);
+
+  /* Cards sit on a hairline, not a shadow. */
+  --sl-shadow-sm: none;
+}
+
+:root[data-theme="light"] {
+  --sl-color-white: var(--ink);
+  --sl-color-gray-1: #2a2622;
+  --sl-color-gray-2: #3b3631;
+  --sl-color-gray-3: var(--ink-muted);
+  --sl-color-gray-4: #8a8378;
+  --sl-color-gray-5: #c9c3b8;
+  --sl-color-gray-6: #ece8e1;
+  --sl-color-gray-7: var(--surface);
+  --sl-color-black: var(--surface);
+
+  --sl-color-accent-low: var(--brand-soft);
+  --sl-color-accent: var(--brand);
+  --sl-color-accent-high: var(--brand-hover);
+  --sl-color-text-accent: var(--brand);
+  --sl-color-text-invert: var(--on-brand);
+
+  --sl-color-bg-inline-code: var(--surface-raised);
+  --sl-color-hairline-light: var(--line);
+  --sl-color-hairline: var(--line);
+  --sl-color-hairline-shade: var(--line);
+}
+
+::selection {
+  background-color: var(--brand-soft);
+  color: var(--ink);
+}
+
+/* Buttons take the design system's radius-md; pills are only for status. */
+.sl-link-button {
+  border-radius: var(--radius-md);
+}
+
+/* Martian Mono at 87.5% width, so a line of about 80 characters fits the
+   content column. Inline code keeps the full width. */
+.expressive-code pre {
+  font-stretch: 87.5%;
+}
+
+.sl-markdown-content h1,
+h1#_top {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.sl-markdown-content :is(h2, h3, h4, h5, h6) {
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* The topic list at the top of the sidebar is the product switcher. */
+.starlight-sidebar-topics {
+  margin-bottom: 0.5rem;
+}

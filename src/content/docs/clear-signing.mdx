@@ -1,0 +1,52 @@
+---
+title: Clear Signing for your protocol
+description: We write ERC-7730 descriptors for your contracts, test them against real transactions, submit them to the Clear Signing registry, and keep them current as your contracts change.
+template: splash
+hero:
+  title: Get your protocol clear-signed
+  tagline: Wallets that support ERC-7730 show what a call does instead of raw calldata, once a descriptor for your contract is in a registry they read. We write that descriptor, test it against real transactions, submit it, and keep it current as your contracts change.
+  actions:
+    - text: Start with your contracts
+      link: "#start"
+      icon: right-arrow
+    - text: How a descriptor works
+      link: /docs/clear-signing/
+      variant: minimal
+---
+
+import { Steps } from "@astrojs/starlight/components";
+import ContactForm from "../../components/site/ContactForm.astro";
+
+## What you get
+
+<Steps>
+
+1. **Scope.** We list the contracts and functions your users sign on each chain you are deployed to, including proxies and the implementations behind them.
+
+2. **Descriptors.** We write an ERC-7730 descriptor for each contract from its verified ABI: an intent for each function, and each value labeled and formatted, such as token amounts with their decimals, addresses and dates.
+
+3. **Tests on real calldata.** Every function gets a test built from a real transaction, and every descriptor passes the official linter's schema and ABI checks before anyone else sees it.
+
+4. **Submission.** We open the pull request to the registry and answer its reviewers. You see each change before it goes out.
+
+5. **Upkeep.** When a proxy is upgraded or an ABI changes, a check in your CI flags the descriptors that no longer match, and we update them.
+
+</Steps>
+
+## What we don't claim
+
+- **Being in the registry is not an audit.** The registry's maintainers screen submissions, and inclusion is not an endorsement.
+- **Writing a descriptor does not attest it.** An attestation is a reviewer's signed claim about one exact descriptor, under ERC-8176, which is still a draft. We call a descriptor attested only when an attestation exists for its current content, and we link to it.
+- **Wallets decide.** Each wallet chooses which registries and which reviewers it trusts, so a descriptor that one wallet shows is not a promise about every wallet.
+
+<p class="sourced">Sources, checked 30 October 2026: [ethereum.org's Clear Signing guide](https://ethereum.org/developers/tutorials/clear-signing) and [ERC-8176](https://eips.ethereum.org/EIPS/eip-8176). The details are in [the docs](/docs/clear-signing/registry/).</p>
+
+## Before we start
+
+- The registry needs your contracts verified on [Sourcify](https://sourcify.dev/). If they are not, we help you verify them first.
+- We need public information only: chains, addresses, and the flows your users sign. Never send a private key, a seed phrase or any other secret.
+- We reply with a scope and a quote, based on how many contracts and functions you want covered.
+
+## Start
+
+<ContactForm topic="clear-signing" intake />

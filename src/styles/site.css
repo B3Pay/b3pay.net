@@ -1,0 +1,91 @@
+/*
+ * The marketing pages. They are Starlight splash pages, so they share the
+ * docs' header, search, theme and type; these rules only add what a product
+ * page needs on top: a wider hero, section rhythm, and a few blocks.
+ */
+
+/* The hero: big, left-aligned, no image. */
+[data-has-hero] .hero {
+  padding-block: clamp(2.5rem, 6vw, 5rem) clamp(1.5rem, 4vw, 3rem);
+}
+
+[data-has-hero] .hero h1 {
+  font-size: clamp(2.25rem, 1.4rem + 3.6vw, 4rem);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  max-width: 18ch;
+}
+
+[data-has-hero] .hero .tagline {
+  max-width: 44rem;
+  font-size: clamp(1.05rem, 0.98rem + 0.35vw, 1.25rem);
+  line-height: 1.55;
+  color: var(--sl-color-gray-2);
+}
+
+@media (min-width: 50rem) {
+  [data-has-hero] .hero {
+    text-align: start;
+  }
+  [data-has-hero] .hero .copy {
+    align-items: flex-start;
+  }
+  [data-has-hero] .hero .actions {
+    justify-content: flex-start;
+  }
+}
+
+/* Sections on a splash page. Starlight wraps each heading for its anchor link. */
+:root:not([data-has-sidebar]) .sl-markdown-content > :is(h2, .sl-heading-wrapper.level-h2) {
+  margin-top: 4rem;
+}
+
+:root:not([data-has-sidebar]) .sl-markdown-content h2 {
+  font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.1rem);
+}
+
+.sl-markdown-content .lead {
+  max-width: 44rem;
+  font-size: var(--sl-text-lg);
+  line-height: 1.6;
+  color: var(--sl-color-gray-2);
+}
+
+/* A status line under a hero or a heading: "In development", "Beta". */
+.status-line {
+  display: inline-flex;
+  gap: 0.5rem;
+  align-items: center;
+  font-family: var(--font-mono);
+  font-size: var(--sl-text-xs);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--sl-color-gray-3);
+}
+
+.status-line::before {
+  content: "";
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  background-color: var(--brand);
+}
+
+/* A short claim with its source, for facts the page relies on. */
+.sl-markdown-content .sourced {
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-gray-3);
+}
+
+/* Starlight's cards in the brand's one accent, not its rainbow. */
+.card {
+  --sl-card-border: var(--brand);
+  --sl-card-bg: var(--brand-soft);
+  border-color: var(--sl-color-hairline);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-raised);
+}
+
+.sl-link-card {
+  border-radius: var(--radius-md);
+}

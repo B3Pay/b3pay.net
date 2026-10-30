@@ -1,0 +1,16 @@
+---
+title: Docs
+description: Every B3Pay product's documentation in one place, each published from its own repository.
+template: splash
+hero:
+  title: Docs
+  tagline: Every B3Pay product's documentation, in one place. Each product publishes its docs from its own repository, so they change with its code.
+---
+
+import ModuleCards from "../../../components/site/ModuleCards.astro";
+
+<ModuleCards headings="h2" />
+
+## How these docs are made
+
+Each product's docs live in its own repository and are published here as a module. The site checks every module before it serves it, and [`/modules.json`](/modules.json) lists which commit of each repository is live. To publish a module from a repository, see [the module guide](https://github.com/B3Pay/b3pay.net/blob/main/modules/README.md).
