@@ -1,23 +1,21 @@
 ---
 title: B3Wallet
-description: B3Wallet is a self-custodial wallet canister on the Internet Computer with Bitcoin, Ethereum and Internet Computer accounts and one or more owners.
+description: B3Wallet is a wallet canister on the Internet Computer with Bitcoin, Ethereum and Internet Computer accounts and one or more owners. Its code was last changed in March 2024.
 ---
 
 import { Aside } from "@astrojs/starlight/components";
 
-B3Wallet is a wallet that lives in a canister you control on the Internet Computer. One canister holds accounts on Bitcoin, Ethereum and the Internet Computer, and can have one owner or several. There is no registration and no backup phrase: control of the canister is control of the funds.
+B3Wallet is a wallet that lives in a canister on the Internet Computer. One canister holds accounts on Bitcoin, Ethereum and the Internet Computer, and can have one owner or several. There is no registration and no backup phrase: whoever controls the canister controls its funds.
 
-<Aside type="caution">
-  B3Wallet's code was last changed in March 2024. Read [the repository](https://github.com/B3Pay/B3Wallet) and try it on
-  a local replica before you hold funds in it.
+<Aside type="danger" title="Do not hold funds in it">
+  B3Wallet's code was last changed in March 2024. Its approvals and its custody have gaps that are not fixed. It is here
+  for its code and its design, not for real funds.
 </Aside>
 
 ## Owners and signers
 
-- **One owner**: the `b3_basic_wallet` canister.
-- **Several signers**: the `b3wallet` canister. Once a second signer is added, a transaction needs approval from more than half of them: 2 of 2, 2 of 3, 3 of 4.
-
-Signers can be added and removed, and several people can each add the same canister to their own view of the wallet.
+- **One owner**: the `b3wallet_basic` canister.
+- **Several signers**: the `b3wallet` canister. Each signer has a role, and a signer can request an operation, such as a transfer or a new signer, for the others to approve. A requested operation runs once more than half of the signers allowed to approve it confirm it. Not every method of the canister goes through these approvals.
 
 ## Accounts
 

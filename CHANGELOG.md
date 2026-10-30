@@ -18,6 +18,9 @@ The site is not versioned; changes are listed by the date they merged.
   the page has it already. Meant's pages are found with the rest of the docs.
 - `publish-module.yml`'s publish job is named "Publish the module", so a
   skipped one no longer shows its name's expression unevaluated.
+- The B3Wallet page no longer says that a transaction needs the approval of
+  more than half of its signers: in its code, not every method goes through
+  those approvals. It now says not to hold funds in it.
 
 ## 2026-10-30
 
