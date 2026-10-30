@@ -1,0 +1,38 @@
+---
+title: Explore canisters
+description: Look up an Internet Computer canister, read its methods from its Candid interface, call one from a form, and share a link to the call.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+## The catalog
+
+**Canisters**, in B3Forge's navigation, opens the explorer: the canisters B3Forge has indexed, with a search and categories. Each card has the canister's description and ID, links to its website and docs when it has them, and a button that starts a Forge prompt with that canister.
+
+To open a canister that isn't in the catalog, paste its ID into the search.
+
+## A canister's page
+
+A canister's page reads its Candid interface and lists its methods, with how many are queries and how many are update calls. **Dashboard** opens the canister on the Internet Computer dashboard.
+
+- Pick a method to see its arguments as a form, and call it from there. **Expand** opens the method on its own page.
+- **Use in a workflow** hands Forge a prompt that starts with this canister and method.
+- The box at the top asks Forge what to do with the canister. Under it, a few of the canister's queries are one-click ideas.
+
+If B3Forge can't get the Candid interface, the page says so, and neither you nor Forge can see the methods. Usually the canister has no Wasm module installed, doesn't make its Candid interface available, or the ID is wrong.
+
+## A method's page
+
+A method's page turns the method's Candid into a form. **Query** sends a query, and **Call** sends an update call. The result appears below the form.
+
+**Share** copies a link to the method with the arguments you entered, so whoever opens it gets the form filled in. Turn on **Require login** before you share it, and the link asks whoever opens it to sign in before they can call. Signed out, a call goes out as the anonymous identity.
+
+<Aside type="caution" title="Call sends right away">
+  On a canister's or a method's page, and in the playground, **Call** sends the update call with your identity as soon
+  as you press it. There is no second approval like the one a workflow run asks for. A shared link can fill in every
+  argument, so read each field, above all amounts and accounts, before you press **Call**.
+</Aside>
+
+## The Candid playground
+
+**Playground**, in the navigation, is an editor for Candid. Write a `.did` file, or fetch one from a canister by its ID, and see its methods as forms you can call. The playground keeps your workspaces in this browser. With an account, Forge can draft a `.did` from a description: see [Build with Forge](build-with-forge.mdx#forge-in-the-playground).

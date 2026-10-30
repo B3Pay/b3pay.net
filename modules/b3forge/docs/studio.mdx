@@ -1,0 +1,67 @@
+---
+title: Edit in the studio
+description: The studio is B3Forge's workflow editor. Its four kinds of node, how values flow between them, branches on errors, trying a step, and saving.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+The studio is where you build and edit a workflow. A workflow is a graph of nodes on a canvas. A run starts at the first node and follows the connections, and each node's result is there for the nodes after it. Opening the studio needs a B3Forge account (see [Get started](getting-started.md)).
+
+To start a workflow, ask Forge (see [Build with Forge](build-with-forge.mdx)), or choose **Start from a blank canvas** in your library or the Community. On an empty canvas, **or add a trigger manually** starts without Forge.
+
+## Nodes
+
+| Node              | What it does                                                                                                                                                                       |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Trigger**       | Holds the values a run starts with. On the workflow's [run page](run.mdx), they become a form the person running it can fill in.                                                  |
+| **Canister Call** | Calls one method of a canister, with arguments built from fixed values and earlier results.                                                                                       |
+| **Variables**     | Puts values together: fixed values, earlier results, or parts of them. It does no arithmetic and no comparisons; those are Utility nodes.                                         |
+| **Utility**       | Arithmetic, guards and list helpers that run in your browser without a network call. The full list is in [Utility nodes](reference/utility-nodes.md).                             |
+
+Add a node with the **+** at the end of a node, or with **Insert node** on a connection. The drawer that opens lists the kinds of node, has a search, and has **Ask AI to pick a node**.
+
+## Values between nodes
+
+Click a node to open its inspector. **Input** shows the node's arguments as a form, and **Output** shows its last result.
+
+Each field of the form holds a fixed value or a binding to an earlier result:
+
+- The list beside a field offers only the earlier values whose type fits it, and **Use literal value** switches back to a fixed value.
+- The values of earlier nodes are listed by node, with **Runtime Context** for the caller and the workflow's ID. Drag one onto a field, or copy its expression.
+- A binding is an expression such as `$N1.Ok.balance`. [Expressions](reference/expressions.md) explains how to write one.
+
+The **Validation** tab of the studio's activity panel lists what doesn't check out yet, such as a binding whose type doesn't fit.
+
+## Branches on errors
+
+Every node has a success path. A Canister Call whose method returns a result type (`Ok` or `Err`) has a second path, taken when the call returns `Err`. A Utility node that can fail, such as a guard, has one too, taken when it fails. If a node returns `Err` and has no error path, the run ends there.
+
+A connection can lead back to an earlier node, so a workflow can loop. Every run has a step limit, and an update call is never repeated without your approval: see [Run a workflow](run.mdx) and [Limits of the beta](limits.md).
+
+## Trying it out
+
+- **Run**, at the top of the studio, runs the whole workflow in your browser.
+- **Execute Step**, in a node's inspector, runs that node. It uses the outputs the studio remembers from earlier runs, and first runs any earlier node it needs whose output isn't remembered.
+- **Reset Memory**, under **Tools**, clears the remembered outputs.
+
+Every update call asks for your approval first, in the studio too.
+
+The **Timeline** tab shows each node's outcome from the last run, and **Logs** shows what happened in the studio.
+
+## Saving
+
+**Save** stores the workflow in B3Forge's canister. The first time, it asks for a name, an optional description and optional labels; **AI Fill** writes them from the graph, and **Save to Canister** saves. A saved workflow is a draft until you publish it: see [Save, share and fork](share.mdx).
+
+<Aside type="caution" title="Keep secrets out of workflows">
+  A workflow is stored in B3Forge's canister, and a published one can be read by anyone. Never put a private key, a
+  seed phrase or any other secret in a node.
+</Aside>
+
+## Tools
+
+**Tools**, on the canvas, also has:
+
+- **Export JSON**: the workflow as JSON, to keep or to share as a file.
+- **Import JSON**: a studio snapshot or a plain workflow, from a file or pasted. It replaces what is on the canvas.
+- **Rearrange**: lays the nodes out again.
+- **Clear All**: removes every node from the canvas. It can't be undone.

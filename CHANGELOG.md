@@ -4,16 +4,13 @@ The site is not versioned; changes are listed by the date they merged.
 
 ## Unreleased
 
-### Changed
+### Added
 
-- IC Reactor's and Meant's docs come from the `b3pay-site` branches that
-  B3Pay/ic-reactor and B3Pay/Meant publish, instead of pinned commits built
-  with manifests kept here (`modules/hosted/ic-reactor.json` and
-  `modules/hosted/meant.json`, removed). IC Reactor's now include the API
-  reference TypeDoc writes, with its functions, interfaces and type aliases
-  in the sidebar, and `/docs/ic-reactor/llms.txt`. Meant's are its current
-  site, for `@meantjs` 0.5.0, and the site's build no longer runs Meant's
-  `website/build.mjs`.
+- B3Forge user guides: getting started, building with Forge, the studio,
+  running a workflow and approving its update calls, saving, sharing and
+  forking, the canister explorer, a reference for expressions and utility
+  nodes, and the limits of the beta. They describe only what the beta at
+  forge.b3pay.net does, checked against B3Forge's code at commit `d0b26c8`.
 
 ## 2026-10-31
 
@@ -26,6 +23,14 @@ The site is not versioned; changes are listed by the date they merged.
 
 ### Changed
 
+- IC Reactor's and Meant's docs come from the `b3pay-site` branches that
+  B3Pay/ic-reactor and B3Pay/Meant publish, instead of pinned commits built
+  with manifests kept here (`modules/hosted/ic-reactor.json` and
+  `modules/hosted/meant.json`, removed). IC Reactor's now include the API
+  reference TypeDoc writes, with its functions, interfaces and type aliases
+  in the sidebar, and `/docs/ic-reactor/llms.txt`. Meant's are its current
+  site, for `@meantjs` 0.5.0, and the site's build no longer runs Meant's
+  `website/build.mjs`.
 - Static module pages are in the site search: the site marks each page's
   `<main>`, or its `<body>`, with `data-pagefind-body`, unless an element of
   the page has it already. Meant's pages are found with the rest of the docs.

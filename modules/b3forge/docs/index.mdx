@@ -1,54 +1,35 @@
 ---
 title: B3Forge
-description: B3Forge composes canister calls into typed workflows in a visual editor and runs them in the browser. What it does in beta, how expressions work, and its limits.
+description: B3Forge turns a description into a typed workflow of canister calls and runs it in your browser. What the beta does, how it works and where to start.
 ---
 
 import { Aside, LinkButton } from "@astrojs/starlight/components";
 
-B3Forge is a visual workflow editor and a browser execution engine. You compose canister calls into a typed workflow in a node graph, and the workflow runs in your browser with a delegated identity: no backend executes it and no data leaves your device. It is in beta on the Internet Computer.
+B3Forge builds workflows of Internet Computer canister calls. You say what should happen in your own words. Forge reads each canister's Candid interface, wires the calls into a typed workflow and checks every binding between them. You review the workflow in the studio, then run it in your browser with your Internet Identity. B3Forge is in beta.
 
 <LinkButton href="https://forge.b3pay.net" icon="external">Open B3Forge</LinkButton>
+
+## How it works
+
+1. **You ask.** Describe the outcome you want. The studio opens with your prompt filled in, and nothing is sent until you press send.
+2. **Forge plans.** It searches its canister catalog, fetches the Candid interfaces it needs, and lays out nodes with typed bindings between them.
+3. **The types are checked.** The engine that runs workflows, written in Rust and compiled to WebAssembly, checks every binding. When the check fails, Forge revises the graph and checks it again.
+4. **You review it and run it.** The draft opens in the studio. The workflow runs in your browser and signs with your identity, and each update call shows you its exact arguments and waits for your approval before it is sent.
+
+No B3Pay server runs your workflows. B3Forge's own canister stores them and lists the ones you share. What you ask Forge goes to B3Pay's AI service, which counts it against a daily limit.
+
+## Where to start
+
+- [Get started](getting-started.md): sign in, activate Forge AI, and what works without an account.
+- [Build with Forge](build-with-forge.mdx): describe a workflow and let Forge draft it.
+- [Edit in the studio](studio.mdx): nodes, bindings, branches and saving.
+- [Run a workflow](run.mdx): what runs where, and the approval before each update call.
+- [Save, share and fork](share.mdx): your library, publishing, and other people's workflows.
+- [Explore canisters](canisters.mdx): read a canister's methods and call one.
+- [Expressions](reference/expressions.md) and [utility nodes](reference/utility-nodes.md): the reference.
+- [Limits of the beta](limits.md).
 
 <Aside type="note" title="B3Forge for EVM is in development">
   A version for EVM contracts, where any contract with a verified ABI can be a step and each step that writes is
   clear-signed before you confirm it, is in development. These docs describe the beta on the Internet Computer.
 </Aside>
-
-## Nodes
-
-A workflow is a graph of three kinds of node:
-
-- **Variables** define typed input values where the workflow starts, and compose values from literals and earlier outputs.
-- **CanisterCall** calls a canister method, query or update. It follows one edge when the call succeeds and another when the method returns a top-level `Err`.
-- **Utility** runs arithmetic, guards and list operations in the browser, with no network call: `add`, `sub`, `mul`, `div`, `scale_bps`, `rescale` between token decimals, and guards such as `guard_gte` that branch when a condition fails.
-
-The node inspector offers each field only the upstream values whose type fits it. A Rust compatibility engine, compiled to WebAssembly, enforces the same rule.
-
-## Expressions
-
-A node's arguments are Candid expressions that refer to earlier nodes' outputs:
-
-```text
-(record {
-  owner  = $N0.recipient_account.owner;
-  amount = $N1.Ok.amount : nat;
-  memo   = opt $N2.memo
-})
-```
-
-- `$N0` is the first node's return value.
-- `.Ok` and `.Err` follow a variant's branches.
-- `: nat` is an explicit, checked cast.
-- `opt` wraps a value in an option.
-
-The browser resolves the expressions, encodes the call's arguments and decodes its results with the same Rust semantics as the on-chain runtime.
-
-## Sharing
-
-Workflows are stored and shared through the beta's backend canister: publish a workflow to the community catalog, and others can fork it into a private copy. The backend stores, shares and indexes workflows; it never runs them.
-
-## Limits of the beta
-
-- Variables nodes compose values but do not compute: arithmetic and comparisons belong in Utility nodes.
-- A call can branch only on a top-level `Err` result.
-- Every node is declared up front, and a call that fails at the network level stops the workflow, with no retry.

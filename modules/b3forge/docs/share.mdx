@@ -1,0 +1,51 @@
+---
+title: Save, share and fork
+description: Your library of workflows, publishing one to the Community with a share link, who can run it, and forking someone else's.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+## Your library
+
+**My library**, in the account menu, lists the workflows you saved, in three views: **Drafts**, **Published** and **Favorites**. You can search them and filter them by label. A workflow you save starts as a draft, and B3Forge shows a draft only to you.
+
+## A workflow's settings
+
+**Workflow settings**, in the studio or on a workflow's card in your library, has four tabs:
+
+- **Preview** runs the saved workflow, the same way its run page does.
+- **General** holds the name, the description and the labels. Labels are used in search and to group workflows in the Community. **AI Fill** writes all three from the graph.
+- **Sharing & Access** publishes the workflow and sets who can run it.
+- **Danger Zone** deletes it.
+
+## Publish to the Community
+
+In **Sharing & Access**, turn on **Community visibility**. The workflow has to be saved from the studio first. Once it is published:
+
+- the Community lists it, with your display name;
+- it has a run page: **Copy Share Link** copies its address, and **Open Public Page** opens it.
+
+Turn **Community visibility** off to make it a draft again. Its run page and share link stop working.
+
+**Require login to run** asks every visitor to sign in before they can run the workflow, so its calls are made with their own identity, never anonymously.
+
+<Aside type="caution" title="Published means readable">
+  Anyone can open a published workflow and read every step of it, with or without **Require login to run**. Keep
+  secrets out of workflows.
+</Aside>
+
+## Other people's workflows
+
+The **Community** lists every published workflow. Search it by name, filter it by label, and press **Load more** for more.
+
+On a workflow's run page or its card:
+
+- **Fork** makes your own private copy and opens it in the studio. Its **New Name** starts as "Fork of …", and you can change it. Forking needs a B3Forge account.
+- **Remix with Forge** asks Forge for a variation of the workflow (see [Build with Forge](build-with-forge.mdx)).
+- The star adds it to your favorites. In the Community, the **Favorites** filter shows the ones you starred.
+
+On your own workflow's run page, **Edit in studio** takes the place of **Fork**.
+
+## Delete a workflow
+
+**Danger Zone → Delete this workflow** removes the workflow and its saved document for good. It can't be undone.
