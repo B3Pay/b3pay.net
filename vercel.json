@@ -1,15 +1,214 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "installCommand": "npm ci",
-  "rewrites": [
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "trailingSlash": true,
+  "redirects": [
     {
-      "source": "/((?!api/).*)",
-      "destination": "/index.html"
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "docs.b3pay.net"
+        }
+      ],
+      "destination": "https://b3pay.net/docs/",
+      "permanent": true
+    },
+    {
+      "source": "/ic-reactor/",
+      "has": [
+        {
+          "type": "host",
+          "value": "docs.b3pay.net"
+        }
+      ],
+      "destination": "https://b3pay.net/docs/ic-reactor/",
+      "permanent": true
+    },
+    {
+      "source": "/ic-reactor/why/",
+      "has": [
+        {
+          "type": "host",
+          "value": "docs.b3pay.net"
+        }
+      ],
+      "destination": "https://b3pay.net/docs/ic-reactor/",
+      "permanent": true
+    },
+    {
+      "source": "/ic-reactor/install/",
+      "has": [
+        {
+          "type": "host",
+          "value": "docs.b3pay.net"
+        }
+      ],
+      "destination": "https://b3pay.net/docs/ic-reactor/guides/getting-started/",
+      "permanent": true
+    },
+    {
+      "source": "/ic-reactor/quickstart/",
+      "has": [
+        {
+          "type": "host",
+          "value": "docs.b3pay.net"
+        }
+      ],
+      "destination": "https://b3pay.net/docs/ic-reactor/guides/getting-started/",
+      "permanent": true
+    },
+    {
+      "source": "/ic-reactor/vite/",
+      "has": [
+        {
+          "type": "host",
+          "value": "docs.b3pay.net"
+        }
+      ],
+      "destination": "https://b3pay.net/docs/ic-reactor/guides/vite-plugin/",
+      "permanent": true
+    },
+    {
+      "source": "/ic-reactor/:page*/",
+      "has": [
+        {
+          "type": "host",
+          "value": "docs.b3pay.net"
+        }
+      ],
+      "destination": "https://b3pay.net/docs/ic-reactor/migrating-from-3/",
+      "permanent": true
+    },
+    {
+      "source": "/b3forge/:page*/",
+      "has": [
+        {
+          "type": "host",
+          "value": "docs.b3pay.net"
+        }
+      ],
+      "destination": "https://b3pay.net/docs/b3forge/",
+      "permanent": true
+    },
+    {
+      "source": "/b3wallet/:page*/",
+      "has": [
+        {
+          "type": "host",
+          "value": "docs.b3pay.net"
+        }
+      ],
+      "destination": "https://b3pay.net/docs/b3wallet/",
+      "permanent": true
+    },
+    {
+      "source": "/b3note/run-locally/",
+      "has": [
+        {
+          "type": "host",
+          "value": "docs.b3pay.net"
+        }
+      ],
+      "destination": "https://b3pay.net/docs/b3note/development/",
+      "permanent": true
+    },
+    {
+      "source": "/b3note/:page*/",
+      "has": [
+        {
+          "type": "host",
+          "value": "docs.b3pay.net"
+        }
+      ],
+      "destination": "https://b3pay.net/docs/b3note/",
+      "permanent": true
+    },
+    {
+      "source": "/robots.txt",
+      "has": [
+        {
+          "type": "host",
+          "value": "docs.b3pay.net"
+        }
+      ],
+      "destination": "https://b3pay.net/robots.txt",
+      "permanent": true
+    },
+    {
+      "source": "/sitemap.xml",
+      "has": [
+        {
+          "type": "host",
+          "value": "docs.b3pay.net"
+        }
+      ],
+      "destination": "https://b3pay.net/sitemap-index.xml",
+      "permanent": true
+    },
+    {
+      "source": "/:path*/",
+      "has": [
+        {
+          "type": "host",
+          "value": "docs.b3pay.net"
+        }
+      ],
+      "destination": "https://b3pay.net/docs/",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [
+        {
+          "type": "host",
+          "value": "docs.b3pay.net"
+        }
+      ],
+      "destination": "https://b3pay.net/docs/",
+      "permanent": true
+    },
+    {
+      "source": "/products/",
+      "destination": "/",
+      "permanent": true
+    },
+    {
+      "source": "/products/b3forge/",
+      "destination": "/forge/",
+      "permanent": true
+    },
+    {
+      "source": "/products/b3wallet/",
+      "destination": "/docs/b3wallet/",
+      "permanent": true
+    },
+    {
+      "source": "/products/ic-reactor/",
+      "destination": "/docs/ic-reactor/",
+      "permanent": true
+    },
+    {
+      "source": "/products/b3note/",
+      "destination": "/docs/b3note/",
+      "permanent": true
+    },
+    {
+      "source": "/developers/",
+      "destination": "/docs/",
+      "permanent": true
+    },
+    {
+      "source": "/blog/",
+      "destination": "https://blog.b3pay.net/",
+      "permanent": false
     }
   ],
   "headers": [
     {
-      "source": "/assets/(.*)",
+      "source": "/_astro/(.*)",
       "headers": [
         {
           "key": "Cache-Control",
