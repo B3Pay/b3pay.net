@@ -1,0 +1,42 @@
+---
+title: The registry and attestations
+description: How a descriptor is submitted to the Clear Signing registry, what inclusion does and does not mean, and how ERC-8176 attestations tie a reviewer to one exact descriptor.
+---
+
+## The registry
+
+The registry is a GitHub repository, [ethereum/clear-signing-erc7730-registry](https://github.com/ethereum/clear-signing-erc7730-registry), hosted by the Ethereum Foundation. Each project has a folder under `registry/` holding its descriptors, their tests in `testsv2/`, and reviewers' attestations in `sigs/`. Standard token and NFT descriptors live under `ercs/`. Wallets choose which registries to read; once a descriptor is in one a wallet uses, that wallet can show it at signing time.
+
+### Submitting
+
+1. Fork the repository.
+2. Add your descriptor and its test file under `registry/<your-project>/`.
+3. Set `$schema` to the relative path `"../../specs/erc7730-v2.schema.json"`. CI rejects a URL there.
+4. Run the linter locally.
+5. Open a pull request. A pull request may change only one folder under `registry/`.
+
+CI checks the schema, the function selectors, the contract's verification on Sourcify and its ABI, and renders your tests against clear-signing implementations. Maintainers then screen the submission.
+
+**Inclusion is not an audit and not an endorsement.** The registry says so itself, and so do we.
+
+## Attestations
+
+[ERC-8176](https://eips.ethereum.org/EIPS/eip-8176) (status: Draft, created 26 February 2026) defines how a reviewer attests a descriptor, using one permissionless schema on the [Ethereum Attestation Service](https://attest.org). The attestation does not name a file; it names a **hash** of the descriptor's content:
+
+1. Resolve every `includes` reference, recursively, until none is left.
+2. Serialize the result with RFC 8785, the JSON Canonicalization Scheme.
+3. Hash those bytes with Keccak-256.
+
+A reviewer signs a claim, on-chain or as an off-chain EIP-712 message, that they reviewed the descriptor with that hash. A wallet recomputes the hash, compares it, and checks the attestation's signature, expiry and revocation against its own list of reviewers it trusts.
+
+### What that means for a protocol
+
+- **An attestation covers one version.** Any change to the descriptor, even a new function or a corrected label, changes its hash, and earlier attestations no longer match it. Plan a fresh review with each change.
+- **Writing a descriptor does not attest it.** Only a reviewer's attestation does, and a descriptor with several independent attestations carries more weight.
+- **We call a descriptor attested only when an attestation exists for its current hash**, and we link to it.
+
+Reviewers can be found through [clearsigning.org](https://clearsigning.org).
+
+## Sources
+
+Checked on 30 October 2026: ethereum.org's [Clear Signing guide](https://ethereum.org/developers/tutorials/clear-signing/), [ERC-8176](https://eips.ethereum.org/EIPS/eip-8176), and the registry's README.

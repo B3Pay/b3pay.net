@@ -1,0 +1,304 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://b3pay.net/schemas/b3pay-module.schema.json",
+  "title": "B3Pay site module",
+  "description": "b3pay-module.json: a module of the b3pay.net site, version 1. scripts/modules/manifest.mjs enforces the same rules and is authoritative. A manifest in a repository may carry `source` (how to build the module); a built module carries `origin` (where it was built from) instead.",
+  "type": "object",
+  "required": [
+    "schema",
+    "id",
+    "title",
+    "description",
+    "group",
+    "status"
+  ],
+  "additionalProperties": false,
+  "not": {
+    "required": [
+      "source",
+      "origin"
+    ]
+  },
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "schema": {
+      "const": 1
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]{0,38}[a-z0-9]$",
+      "description": "The module's address: its pages are served under /docs/<id>/. Must match the registry."
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 40
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 240
+    },
+    "group": {
+      "enum": [
+        "evm",
+        "internet-computer"
+      ]
+    },
+    "status": {
+      "enum": [
+        "active",
+        "beta",
+        "in-development",
+        "maintained"
+      ]
+    },
+    "links": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "repository": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "package": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        },
+        "app": {
+          "type": "string",
+          "format": "uri",
+          "pattern": "^https://"
+        }
+      }
+    },
+    "editUrl": {
+      "type": "string",
+      "pattern": "^https://.*\\{path\\}",
+      "description": "Where \"Edit page\" goes; {path} is the page's file in the docs folder."
+    },
+    "home": {
+      "type": "string",
+      "description": "The module's first page: a page path, or an .html file of its static pages. Defaults to the index page, then static/index.html."
+    },
+    "sidebar": {
+      "$ref": "#/$defs/sidebar"
+    },
+    "source": {
+      "type": "object",
+      "description": "How to build the module from its repository.",
+      "additionalProperties": false,
+      "properties": {
+        "docs": {
+          "$ref": "#/$defs/relative",
+          "description": "The folder of pages (.md, .mdx) and their images."
+        },
+        "include": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Globs of files to take from `docs`; default all."
+        },
+        "exclude": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Globs of files to leave out."
+        },
+        "rename": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/$defs/relative"
+          },
+          "description": "File to file, inside `docs`."
+        },
+        "linkBase": {
+          "type": "string",
+          "pattern": "^/.+/$",
+          "description": "Where the pages were served before; links that start with it are pointed at /docs/<id>/."
+        },
+        "static": {
+          "type": "object",
+          "description": "Static pages, served as they are: copied from `dir`, or built by `command`.",
+          "additionalProperties": false,
+          "oneOf": [
+            {
+              "required": [
+                "dir"
+              ]
+            },
+            {
+              "required": [
+                "command"
+              ]
+            }
+          ],
+          "properties": {
+            "dir": {
+              "$ref": "#/$defs/relative"
+            },
+            "command": {
+              "type": "array",
+              "prefixItems": [
+                {
+                  "const": "node"
+                }
+              ],
+              "items": {
+                "type": "string"
+              },
+              "minItems": 3,
+              "description": "[\"node\", \"<script>\", ...arguments], with \"{out}\" once where the pages go."
+            },
+            "edits": {
+              "type": "array",
+              "description": "Changes to JSON files before `command` runs; only for a module built from another repository.",
+              "items": {
+                "type": "object",
+                "required": [
+                  "file",
+                  "replace"
+                ],
+                "additionalProperties": false,
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "pattern": "\\.json$"
+                  },
+                  "replace": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": [
+                        "pointer",
+                        "from",
+                        "to"
+                      ],
+                      "additionalProperties": false,
+                      "properties": {
+                        "pointer": {
+                          "type": "string",
+                          "pattern": "^/"
+                        },
+                        "from": {},
+                        "to": {}
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "origin": {
+      "type": "object",
+      "description": "Where a built module came from.",
+      "required": [
+        "repository"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "repository": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9-]+/[A-Za-z0-9._-]+$"
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "path": {
+          "$ref": "#/$defs/relative"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "page": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*(/[a-z0-9][a-z0-9-]*)*$"
+    },
+    "relative": {
+      "type": "string",
+      "pattern": "^(?!/)(?!.*\\\\)(?!(.*/)?\\.\\.?(/|$))[^/]+(/[^/]+)*$"
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 60
+    },
+    "sidebar": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/page",
+            "description": "A page, labeled with its title."
+          },
+          {
+            "type": "object",
+            "description": "A page, with its own label.",
+            "required": [
+              "label",
+              "page"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "label": {
+                "$ref": "#/$defs/label"
+              },
+              "page": {
+                "$ref": "#/$defs/page"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "A link: an https URL, or a path to one of the module's static files.",
+            "required": [
+              "label",
+              "link"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "label": {
+                "$ref": "#/$defs/label"
+              },
+              "link": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "description": "A group of items.",
+            "required": [
+              "label",
+              "items"
+            ],
+            "additionalProperties": false,
+            "properties": {
+              "label": {
+                "$ref": "#/$defs/label"
+              },
+              "items": {
+                "$ref": "#/$defs/sidebar"
+              },
+              "collapsed": {
+                "type": "boolean"
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,54 @@
+---
+title: B3Forge
+description: B3Forge composes canister calls into typed workflows in a visual editor and runs them in the browser. What it does in beta, how expressions work, and its limits.
+---
+
+import { Aside, LinkButton } from "@astrojs/starlight/components";
+
+B3Forge is a visual workflow editor and a browser execution engine. You compose canister calls into a typed workflow in a node graph, and the workflow runs in your browser with a delegated identity: no backend executes it and no data leaves your device. It is in beta on the Internet Computer.
+
+<LinkButton href="https://forge.b3pay.net" icon="external">Open B3Forge</LinkButton>
+
+<Aside type="note" title="B3Forge for EVM is in development">
+  A version for EVM contracts, where any contract with a verified ABI can be a step and each step that writes is
+  clear-signed before you confirm it, is in development. These docs describe the beta on the Internet Computer.
+</Aside>
+
+## Nodes
+
+A workflow is a graph of three kinds of node:
+
+- **Variables** define typed input values where the workflow starts, and compose values from literals and earlier outputs.
+- **CanisterCall** calls a canister method, query or update. It follows one edge when the call succeeds and another when the method returns a top-level `Err`.
+- **Utility** runs arithmetic, guards and list operations in the browser, with no network call: `add`, `sub`, `mul`, `div`, `scale_bps`, `rescale` between token decimals, and guards such as `guard_gte` that branch when a condition fails.
+
+The node inspector offers each field only the upstream values whose type fits it. A Rust compatibility engine, compiled to WebAssembly, enforces the same rule.
+
+## Expressions
+
+A node's arguments are Candid expressions that refer to earlier nodes' outputs:
+
+```text
+(record {
+  owner  = $N0.recipient_account.owner;
+  amount = $N1.Ok.amount : nat;
+  memo   = opt $N2.memo
+})
+```
+
+- `$N0` is the first node's return value.
+- `.Ok` and `.Err` follow a variant's branches.
+- `: nat` is an explicit, checked cast.
+- `opt` wraps a value in an option.
+
+The browser resolves the expressions, encodes the call's arguments and decodes its results with the same Rust semantics as the on-chain runtime.
+
+## Sharing
+
+Workflows are stored and shared through the beta's backend canister: publish a workflow to the community catalog, and others can fork it into a private copy. The backend stores, shares and indexes workflows; it never runs them.
+
+## Limits of the beta
+
+- Variables nodes compose values but do not compute: arithmetic and comparisons belong in Utility nodes.
+- A call can branch only on a top-level `Err` result.
+- Every node is declared up front, and a call that fails at the network level stops the workflow, with no retry.

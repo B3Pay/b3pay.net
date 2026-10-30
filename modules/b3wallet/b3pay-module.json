@@ -1,0 +1,22 @@
+{
+  "$schema": "../../public/schemas/b3pay-module.schema.json",
+  "schema": 1,
+  "id": "b3wallet",
+  "title": "B3Wallet",
+  "description": "A self-custodial wallet canister for Bitcoin, Ethereum and Internet Computer accounts, with one owner or several signers.",
+  "group": "internet-computer",
+  "status": "maintained",
+  "links": {
+    "repository": "https://github.com/B3Pay/B3Wallet"
+  },
+  "editUrl": "https://github.com/B3Pay/b3pay.net/edit/main/modules/b3wallet/docs/{path}",
+  "source": {
+    "docs": "docs"
+  },
+  "sidebar": [
+    {
+      "label": "Overview",
+      "page": "index"
+    }
+  ]
+}

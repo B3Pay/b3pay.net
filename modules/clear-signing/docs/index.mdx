@@ -1,0 +1,41 @@
+---
+title: Clear Signing
+description: What ERC-7730 Clear Signing is, the pieces that launched on 12 May 2026, and the steps that get a protocol's contracts clear-signed.
+---
+
+import { Steps } from "@astrojs/starlight/components";
+
+When someone signs a contract call, their wallet can only show what it knows how to decode. Without help, that is a function selector and a string of hex, and the person signs blind. ERC-7730 fixes that with a standard JSON file, a **descriptor**, that tells a wallet how to show a call as an intent with labeled, formatted values: "Unwrap WETH, Amount 1.5 WETH" instead of `0x2e1a7d4d…`.
+
+## The pieces
+
+On 12 May 2026 an Ethereum working group of wallet developers, security firms and the Ethereum Foundation's Trillion Dollar Security initiative launched Clear Signing as four pieces:
+
+- **ERC-7730**, the descriptor format.
+- **A registry** of descriptors, [ethereum/clear-signing-erc7730-registry](https://github.com/ethereum/clear-signing-erc7730-registry), hosted by the Ethereum Foundation as a neutral steward, which anyone can mirror.
+- **Attestations** under [ERC-8176](https://eips.ethereum.org/EIPS/eip-8176), a draft standard built on the Ethereum Attestation Service, in which an independent reviewer signs a claim about one exact descriptor.
+- **Libraries** in TypeScript and Rust for wallets and for descriptor authors, listed on [clearsigning.org](https://clearsigning.org).
+
+A descriptor travels beside a transaction rather than inside it, so contracts that are already deployed can be clear-signed without changing them. Each wallet decides which registries and which reviewers it trusts.
+
+## How a protocol gets clear-signed
+
+<Steps>
+
+1. **Verify the contracts on Sourcify.** The registry checks descriptors against verified ABIs, so a contract that is not verified on [Sourcify](https://sourcify.dev) comes first.
+
+2. **Write a descriptor for each contract.** See [Anatomy of a descriptor](/docs/clear-signing/descriptors/).
+
+3. **Check it.** The official linter checks the schema and the ABI, and a test for each function, built from a real transaction, checks what a wallet will show. See [How a descriptor is checked](/docs/clear-signing/checking/).
+
+4. **Submit it to the registry.** After it is merged, reviewers can attest it. See [The registry and attestations](/docs/clear-signing/registry/).
+
+5. **Keep it current.** A new function, a changed ABI or an upgraded proxy can leave a descriptor describing a contract that no longer exists.
+
+</Steps>
+
+B3Pay does all five for protocols: see [Clear Signing for your protocol](/clear-signing/).
+
+## Sources
+
+Checked on 30 October 2026: the Ethereum Foundation's [announcement](https://blog.ethereum.org/2026/05/12/clear-signing-announcement), Sourcify's [launch post](https://docs.sourcify.dev/blog/clear-signing-launch/), ethereum.org's [Clear Signing guide](https://ethereum.org/developers/tutorials/clear-signing/), and [ERC-8176](https://eips.ethereum.org/EIPS/eip-8176). Clear Signing is new and moving: check these before you rely on a detail here.
