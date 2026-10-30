@@ -13,9 +13,9 @@
  * For each module: get its files (from this repository, from a repository at
  * a pinned commit, or from the branch a repository publishes to), build it if
  * it is a source, check it, then copy its pages to src/content/docs/docs/<id>/
- * and its static files to public/docs/<id>/. Last, write
- * src/generated/modules.json (the navigation) and public/modules.json (what
- * is live, and from which commit).
+ * and its static files to public/docs/<id>/, its static pages marked for the
+ * site search. Last, write src/generated/modules.json (the navigation) and
+ * public/modules.json (what is live, and from which commit).
  *
  * One problem in one module fails the whole run, so the build fails and the
  * last good deploy stays live.
@@ -27,8 +27,9 @@ import { fileURLToPath } from "node:url";
 import { fetchArchive, unpack } from "./archive.mjs";
 import { buildModule } from "./build.mjs";
 import { checkModule } from "./check.mjs";
+import { listFiles } from "./files.mjs";
 import { GROUPS, checkManifest, checkRegistry } from "./manifest.mjs";
-import { toStarlight } from "./site.mjs";
+import { indexForSearch, toStarlight } from "./site.mjs";
 
 const ROOT = resolve(dirname(fileURLToPath(import.meta.url)), "../..");
 const SELF = "B3Pay/b3pay.net";
@@ -157,7 +158,12 @@ async function main() {
   }
   for (const { entry, dir } of prepared) {
     if (existsSync(join(dir, "docs"))) await cp(join(dir, "docs"), join(CONTENT, entry.id), { recursive: true });
-    if (existsSync(join(dir, "static"))) await cp(join(dir, "static"), join(PUBLIC, entry.id), { recursive: true });
+    if (existsSync(join(dir, "static"))) {
+      const target = join(PUBLIC, entry.id);
+      await cp(join(dir, "static"), target, { recursive: true });
+      for (const file of (await listFiles(target)).files.filter((file) => file.endsWith(".html")))
+        await writeFile(join(target, file), indexForSearch(await readFile(join(target, file), "utf8")));
+    }
   }
   await mkdir(WORK, { recursive: true });
   await writeFile(STATE, `${JSON.stringify(prepared.map(({ entry }) => entry.id))}\n`);

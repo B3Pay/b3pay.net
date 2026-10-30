@@ -11,6 +11,12 @@ The site is not versioned; changes are listed by the date they merged.
 - `publish-module.yml` takes `prepare`, a command a repository runs in its
   checkout before its module is built, to generate such pages.
 
+### Changed
+
+- Static module pages are in the site search: the site marks each page's
+  `<main>`, or its `<body>`, with `data-pagefind-body`. Meant's pages are
+  found with the rest of the docs.
+
 ## 2026-10-30
 
 ### Added
