@@ -15,9 +15,9 @@ The site is not versioned; changes are listed by the date they merged.
   repository, from another repository at a pinned commit, or from the
   `b3pay-site` branch a repository publishes to with the reusable
   `publish-module.yml` workflow. Every module is checked on every build:
-  manifest, page content rules, file types, size, and that it only claims its
-  own addresses. Guide: `modules/README.md`. JSON schemas at
-  `https://b3pay.net/schemas/`.
+  manifest, page content rules (allowlists, applied to each page as the build
+  reads it), file types, size, and that it only claims its own addresses.
+  Guide: `modules/README.md`. JSON schemas at `https://b3pay.net/schemas/`.
 - Docs for Clear Signing (what a descriptor is, how one is checked, the
   registry and attestations), B3Forge, B3Wallet, IC Reactor, Meant and B3Note.
 - `npm test`, `npm run check:links` and `npm run check:redirects`, and CI that

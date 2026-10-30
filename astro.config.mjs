@@ -8,6 +8,10 @@
  * into src/content/docs/docs/<id>/ and writes src/generated/modules.json. The
  * docs sidebar is built from that file: one topic per module, each with the
  * sidebar its manifest gives.
+ *
+ * Module pages are checked by reading them as this build does, with the
+ * Markdown features in scripts/modules/markdown.mjs (FEATURES). A `markdown`
+ * setting added here needs the same change there.
  */
 import { existsSync, readFileSync } from "node:fs";
 import starlight from "@astrojs/starlight";

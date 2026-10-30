@@ -138,18 +138,34 @@ are right.
 ## What a page may contain
 
 A module's pages run through the same Starlight build as the rest of the site,
-so the rules keep one module from reaching into another's pages or the site's:
+so the rules keep one module from reaching into another's pages or the site's.
+The check reads a page the way the build does, with Astro's frontmatter reader
+and Sätteri, the parser Astro renders Markdown and MDX with, and allows only
+what the rules name:
 
-- **Frontmatter**: `title` (required), `description`, `sidebar`,
-  `tableOfContents`, `template` (`doc` or `splash`), `hero`, `editUrl`,
-  `lastUpdated`, `prev`, `next`, `pagefind` and `draft`. Not `slug`, which
-  would let a page claim any address, nor `head` or `banner`, which write raw
-  HTML. A page without a title takes its first `# Heading`.
-- **Imports**: components from `@astrojs/starlight/components`, and images by
-  a relative path. Nothing else.
-- **No scripts**: no `<script>`, `<iframe>`, `<object>`, `<embed>`, `<style>`,
-  `<link>`, `<meta>`, `<base>` or `<form>`; no `on…` event handlers; no
-  `javascript:` links; no spread attributes; expressions only as plain values.
+- **Frontmatter**: `title` (required), `description`, `sidebar` (`label`,
+  `order`, `hidden`, `badge`), `tableOfContents`, `template` (`doc` or
+  `splash`), `hero` (`title`, `tagline`, an `image` file, and `actions` of
+  `text`, `link`, `variant` and an icon name), `editUrl` (`false` or an https
+  URL), `lastUpdated`, `prev`, `next`, `pagefind` and `draft`. Not `slug`,
+  which would let a page claim any address, nor `head` or `banner`, which
+  write raw HTML. Starlight writes a hero's title and tagline as HTML, so
+  they, and the title of a page with a hero, may not contain `<`. A page
+  without a title takes its first `# Heading`.
+- **Imports**: components by name from `@astrojs/starlight/components`, and
+  images by a relative path. Nothing else.
+- **Components**: the ones the page imports, with plain values. No spread
+  attributes, `on…` handlers, `style`, or `set:html` and other directives,
+  and no `<` in a value: Starlight writes some values, such as a card's
+  title, as HTML. Show markup in a code block instead.
+- **HTML**: tags that format text, such as `<b>`, `<br>`, `<kbd>`,
+  `<details>`, lists and tables, with only attributes that describe them,
+  such as `title`, `align` and `colspan`. No scripts, frames, forms, styles,
+  links or images: links and images are written in Markdown.
+- **Addresses**: links, images, `href` and the other address props are paths,
+  or `http`, `https`, `mailto` and `tel` URLs.
+- **Expressions**: plain values, such as `{"text"}` or `{[1, 2]}`, and
+  comments. A page runs no code.
 - **Names**: lowercase letters, digits and dashes for pages; no file or folder
   starting with `_`; no links (symlinks) anywhere a module is read from.
 - **Links** to other pages of the module, written as relative `.md` links,
@@ -158,7 +174,10 @@ so the rules keep one module from reaching into another's pages or the site's:
 
 Static pages are served as they are, so their links are checked after the
 build instead (`npm run check:links`). Their files are pages, styles, scripts,
-data, images and fonts; hidden files are left out.
+data, images and fonts; hidden files are left out. Their scripts run on
+b3pay.net as the site's own do, and none of the rules above reach them, so
+only add a module with static pages from a repository you would take code
+from.
 
 A module holds at most 5,000 files and 100 MB.
 

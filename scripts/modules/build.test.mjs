@@ -101,7 +101,7 @@ test("checkModule refuses what breaks the rules, every problem at once", async (
   await symlink("/etc/passwd", join(dir, "docs/passwd.md"));
   const { errors } = await checkModule(dir, { id: "example" });
   const all = errors.join("\n");
-  assert.match(all, /docs\/index\.md:\d+: scripts, frames, forms and event handlers are not allowed/);
+  assert.match(all, /docs\/index\.md:5: the HTML at "<script>alert\(1\)<\/script>" is not allowed/);
   assert.match(all, /docs\/Upper\.md: a page's path is lowercase/);
   assert.match(all, /docs\/_partial\.md: names are letters/);
   assert.match(all, /static\/tool\.exe: not a file type the site serves/);

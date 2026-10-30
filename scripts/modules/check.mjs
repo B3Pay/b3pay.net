@@ -8,7 +8,7 @@ import { existsSync } from "node:fs";
 import { join, posix } from "node:path";
 import { listFiles, pagePathOf } from "./files.mjs";
 import { checkManifest, isPagePath } from "./manifest.mjs";
-import { checkPage, parse, splitFrontmatter } from "./markdown.mjs";
+import { checkPage, parse, readPage } from "./markdown.mjs";
 
 const PAGE = /\.mdx?$/;
 const DOC_ASSET = /\.(png|jpe?g|gif|svg|webp|avif)$/i;
@@ -78,22 +78,23 @@ export async function checkModule(dir, { id }) {
     }
     pages.set(page, file);
 
-    let data;
-    let body;
+    const mdx = file.endsWith(".mdx");
+    let read;
     try {
-      ({ data, body } = splitFrontmatter(await readFile(join(dir, "docs", file), "utf8")));
+      read = readPage(await readFile(join(dir, "docs", file), "utf8"), { mdx });
     } catch (error) {
       errors.push(`${at}: ${error.message}`);
       continue;
     }
     let tree;
     try {
-      tree = parse(body, { mdx: file.endsWith(".mdx") });
+      tree = parse(read.body, { mdx });
     } catch (error) {
       errors.push(`${at}: does not parse (${error.message})`);
       continue;
     }
-    errors.push(...checkPage({ data, tree, where: at }));
+    const { data } = read;
+    errors.push(...checkPage({ data, tree, where: at, line: read.line }));
     const image = data.hero?.image ?? {};
     for (const key of ["file", "dark", "light"]) {
       if (typeof image[key] !== "string") continue;

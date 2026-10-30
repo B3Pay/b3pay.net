@@ -15,7 +15,7 @@ import { copyFile, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { dirname, join, posix } from "node:path";
 import { listFiles, matchesAny, pagePathOf, pageUrl } from "./files.mjs";
-import { deriveTitle, joinFrontmatter, parse, rewriteLinks, splitFrontmatter } from "./markdown.mjs";
+import { deriveTitle, joinFrontmatter, parse, readPage, rewriteLinks } from "./markdown.mjs";
 
 const PAGE = /\.mdx?$/;
 export const SCHEMA_URL = "https://b3pay.net/schemas/b3pay-module.schema.json";
@@ -122,7 +122,7 @@ export async function buildModule({ sourceDir, manifest, outDir, origin, local =
       }
       const mdx = file.endsWith(".mdx");
       const raw = await readFile(join(docsDir, file), "utf8");
-      let { data, body } = splitFrontmatter(raw);
+      let { data, body } = readPage(raw, { mdx });
 
       // The module's links to itself, written for wherever its pages were
       // served before, point at /docs/<id>/ here.

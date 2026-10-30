@@ -1,15 +1,21 @@
 /**
- * What the site does to a module's Markdown and MDX pages: read the
- * frontmatter, check the page against the content rules, and rewrite the
- * module's own links to the address the site serves it at.
+ * What the site does to a module's Markdown and MDX pages: read them, check
+ * them against the content rules, and rewrite the module's own links to the
+ * addresses the site serves them at.
  *
- * Pages are parsed with the same micromark grammar MDX uses, so "outside a
- * code block" and "a JSX attribute" mean what the compiler will mean.
+ * A page is read the way the site's build reads it, so that a check cannot
+ * pass something the build then renders differently: the frontmatter with
+ * Astro's own reader, and the body with Sätteri, the parser Astro 7 renders
+ * Markdown and MDX with, given the features this site's build turns on.
+ * The rules are allowlists: what they do not name is refused.
  */
-import { fromMarkdown } from "mdast-util-from-markdown";
-import { mdxFromMarkdown } from "mdast-util-mdx";
-import { mdxjs } from "micromark-extension-mdxjs";
+import { parseFrontmatter } from "@astrojs/internal-helpers/frontmatter";
+import { parse as parseScript } from "acorn";
+import { markdownToMdast, mdxToMdast } from "satteri";
 import YAML from "yaml";
+
+/** Sätteri's features in the site's build: Astro's defaults (GFM, smart punctuation), and the directives Starlight's asides use. */
+export const FEATURES = { gfm: true, smartPunctuation: true, directive: true };
 
 /** What a page may import. Anything else is code the site's build would run. */
 export const ALLOWED_IMPORTS = ["@astrojs/starlight/components"];
@@ -31,33 +37,73 @@ export const ALLOWED_FRONTMATTER = [
   "draft",
 ];
 
-const FORBIDDEN_TAGS = ["script", "iframe", "object", "embed", "style", "link", "meta", "base", "form", "frame", "frameset"];
-const FORBIDDEN_HTML = new RegExp(`<\\s*(${FORBIDDEN_TAGS.join("|")})\\b`, "i");
-const EVENT_HANDLER = /\son[a-z]+\s*=/i;
-const SCRIPT_URL = /^\s*(javascript|vbscript|data:text\/html)/i;
+/**
+ * The HTML a page may write, as raw HTML in Markdown or as tags in MDX:
+ * elements that format text, with attributes that only describe it. Links
+ * and images are written in Markdown, where their addresses are checked.
+ */
+export const HTML_TAGS = new Set(
+  "abbr b blockquote br caption code dd del details div dl dt em figcaption figure h1 h2 h3 h4 h5 h6 hr i ins kbd li mark ol p pre q s samp small span strong sub summary sup table tbody td tfoot th thead tr u ul var wbr".split(" "),
+);
+export const HTML_ATTRIBUTES = new Set("align colspan dir height lang open reversed rowspan scope span start title valign width".split(" "));
 
-export function splitFrontmatter(source) {
-  const match = /^---\r?\n([\s\S]*?)\r?\n?---[ \t]*(?:\r?\n|$)/.exec(source);
-  if (!match) return { data: {}, body: source };
-  const data = YAML.parse(match[1]) ?? {};
-  if (typeof data !== "object" || Array.isArray(data)) throw new Error("the frontmatter is not a mapping");
-  return { data, body: source.slice(match[0].length) };
+/** The schemes a link may use. Anything else, `javascript:` first, is refused. */
+const SCHEMES = ["http", "https", "mailto", "tel"];
+/** Component props that hold an address. */
+const URL_PROP = /(?:href|src|srcset|url|link|action|poster|cite|background|ping)$/i;
+/** A component prop, or a key of an object passed as one. No `set:html`-style directives, no `on…` handlers, no styles. */
+const PROP_NAME = /^[A-Za-z][A-Za-z0-9-]*$/;
+const FORBIDDEN_PROP = /^(on.*|style|srcdoc)$/i;
+
+// Raw HTML, read with the HTML tokenizer's own whitespace rather than JavaScript's \s.
+const SPACE = "[\\t\\n\\f\\r ]";
+const ATTRIBUTE_NAME = "[^\\t\\n\\f\\r /\"'<=>]+";
+const ATTRIBUTE_VALUE = `(?:"[^"]*"|'[^']*'|[^\\t\\n\\f\\r "'=<>\`]+)`;
+const ATTRIBUTE = `${SPACE}+(${ATTRIBUTE_NAME})(?:${SPACE}*=${SPACE}*${ATTRIBUTE_VALUE})?`;
+const START_TAG = new RegExp(`^<([A-Za-z][A-Za-z0-9]*)((?:${ATTRIBUTE})*)${SPACE}*\\/?>`);
+const END_TAG = new RegExp(`^<\\/([A-Za-z][A-Za-z0-9]*)${SPACE}*>`);
+/** A comment that ends where it seems to: no `--` inside, so no `--!>` either. */
+const COMMENT = /^<!--(?!-?>)(?:(?!--)[\s\S])*-->/;
+
+const JS = { ecmaVersion: "latest", sourceType: "module" };
+
+/**
+ * A page's frontmatter and the body the site renders, read as Astro reads
+ * them: the frontmatter blanked out where it was, and a Markdown page's body
+ * trimmed. `line` counts the lines before the body, for messages.
+ */
+export function readPage(source, { mdx }) {
+  const { frontmatter: data, content } = parseFrontmatter(source, { frontmatter: "empty-with-spaces" });
+  if (mdx) return { data, body: content, line: 0 };
+  const start = content.length - content.trimStart().length;
+  return { data, body: content.trim(), line: content.slice(0, start).split("\n").length - 1 };
 }
 
 export function joinFrontmatter(data, body) {
-  return `---\n${YAML.stringify(data, { lineWidth: 0 }).trimEnd()}\n---\n\n${body.replace(/^\s+/, "")}`;
+  return `---\n${YAML.stringify(data, { lineWidth: 0 }).trimEnd()}\n---\n\n${body.replace(/^(?:[ \t]*\r?\n)+/, "").trimEnd()}\n`;
 }
 
+/** The page's syntax tree, as the site's build parses it. Throws when the page does not parse. */
 export function parse(body, { mdx }) {
-  return mdx
-    ? fromMarkdown(body, { extensions: [mdxjs()], mdastExtensions: [mdxFromMarkdown()] })
-    : fromMarkdown(body);
+  return (mdx ? mdxToMdast : markdownToMdast)(body, { features: FEATURES });
 }
 
 function walk(node, visit) {
   visit(node);
   for (const child of node.children ?? []) walk(child, visit);
 }
+
+const isRecord = (value) => value !== null && typeof value === "object" && !Array.isArray(value) && !(value instanceof Date);
+const onlyKeys = (value, keys) => Object.keys(value).every((key) => keys.includes(key));
+
+/** An address a page may use: a path on the site, or an http, https, mailto or tel URL. */
+export function isSafeUrl(url) {
+  // Browsers drop tabs and newlines inside a URL, and spaces and control characters around it.
+  const scheme = /^([a-z][a-z0-9+.-]*):/i.exec(url.replace(/[\u0000-\u0020\u007f]/g, ""));
+  return !scheme || SCHEMES.includes(scheme[1].toLowerCase());
+}
+
+const isScriptUrl = (value) => /^(javascript|vbscript):/i.test(value.replace(/[\u0000-\u0020\u007f]/g, ""));
 
 /** A literal the page could have typed: strings, numbers, booleans, arrays and objects of them. */
 function isPlainValue(node) {
@@ -81,24 +127,194 @@ function isPlainValue(node) {
   }
 }
 
-function checkExpression(estree, at, errors) {
-  const body = estree?.body ?? [];
-  if (body.length === 0) return; // a comment, {/* ... */}
-  if (body.length === 1 && body[0].type === "ExpressionStatement" && isPlainValue(body[0].expression)) return;
-  errors.push(`${at}: an expression must be a plain value; a page runs no code`);
+/** True when an MDX expression is only a comment, `{/* … *\/}`. */
+function isComment(source) {
+  try {
+    return parseScript(source, JS).body.length === 0;
+  } catch {
+    return false;
+  }
 }
 
-function checkImport(statement, at, errors) {
+/** The plain value an MDX expression holds, or `undefined` when it holds code. */
+function plainValue(source) {
+  try {
+    const { body } = parseScript(`(${source}\n)`, JS);
+    if (body.length === 1 && body[0].type === "ExpressionStatement" && isPlainValue(body[0].expression)) return body[0].expression;
+  } catch {
+    // Not JavaScript; the build would fail on it too.
+  }
+  return undefined;
+}
+
+/** What a plain value holds: `[key, string]` for each string, under the prop or object key it is in, and `[key]` for each object key. */
+function contentsOf(name, node, out = []) {
+  switch (node.type) {
+    case "Literal":
+      if (typeof node.value === "string") out.push([name, node.value]);
+      break;
+    case "TemplateLiteral":
+      for (const quasi of node.quasis) out.push([name, quasi.value.cooked ?? quasi.value.raw]);
+      break;
+    case "ArrayExpression":
+      for (const element of node.elements) contentsOf(name, element, out);
+      break;
+    case "ObjectExpression":
+      for (const property of node.properties) {
+        const key = property.key.name ?? String(property.key.value);
+        out.push([key]);
+        contentsOf(key, property.value, out);
+      }
+      break;
+  }
+  return out;
+}
+
+/** The first piece of raw HTML that is not text, a comment or an allowed tag; `undefined` when there is none. */
+function unsafeHtml(html) {
+  let rest = html;
+  for (;;) {
+    const at = rest.search(/<[A-Za-z!/?]/); // anything else after "<" is text to the browser
+    if (at === -1) return undefined;
+    rest = rest.slice(at);
+    let token = COMMENT.exec(rest);
+    if (!token) {
+      token = END_TAG.exec(rest) ?? START_TAG.exec(rest);
+      if (!token || !HTML_TAGS.has(token[1].toLowerCase())) return rest;
+      for (const [, name] of (token[2] ?? "").matchAll(new RegExp(ATTRIBUTE, "g")))
+        if (!HTML_ATTRIBUTES.has(name.toLowerCase())) return rest;
+    }
+    rest = rest.slice(token[0].length);
+  }
+}
+
+const snippet = (text) => JSON.stringify(text.length > 40 ? `${text.slice(0, 40)}…` : text);
+
+function checkImport(statement, at, components, errors) {
   if (statement.type !== "ImportDeclaration") {
     errors.push(`${at}: only imports are allowed, not "${statement.type}"`);
     return;
   }
   const from = statement.source.value;
-  if (ALLOWED_IMPORTS.includes(from)) return;
+  if (statement.attributes?.length) {
+    errors.push(`${at}: may not import "${from}" with attributes`);
+    return;
+  }
+  if (ALLOWED_IMPORTS.includes(from) && statement.specifiers.every((specifier) => specifier.type === "ImportSpecifier")) {
+    for (const specifier of statement.specifiers) components.add(specifier.local.name);
+    return;
+  }
   const image = (from.startsWith("./") || from.startsWith("../")) && IMAGE.test(from);
   const defaultOnly = statement.specifiers.length === 1 && statement.specifiers[0].type === "ImportDefaultSpecifier";
   if (image && defaultOnly) return;
-  errors.push(`${at}: may not import "${from}" (allowed: ${ALLOWED_IMPORTS.join(", ")}, or an image beside the page)`);
+  errors.push(`${at}: may not import "${from}" (allowed: components by name from ${ALLOWED_IMPORTS.join(", ")}, or an image beside the page)`);
+}
+
+/** A prop of one of Starlight's components: a plain value, no handlers, no HTML, and safe addresses. */
+function checkProp({ name, value }, at, errors) {
+  if (!PROP_NAME.test(name) || FORBIDDEN_PROP.test(name)) {
+    errors.push(`${at}: the attribute "${name}" is not allowed`);
+    return;
+  }
+  if (value === null || value === undefined) return; // a boolean attribute
+  let contents;
+  if (typeof value === "string") contents = [[name, value]];
+  else {
+    const expression = plainValue(value.value);
+    if (!expression) {
+      errors.push(`${at} ${name}=: an expression must be a plain value; a page runs no code`);
+      return;
+    }
+    contents = contentsOf(name, expression);
+  }
+  for (const [key, string] of contents) {
+    if (string === undefined) {
+      if (!PROP_NAME.test(key) || FORBIDDEN_PROP.test(key)) errors.push(`${at} ${name}=: the key "${key}" is not allowed`);
+      continue;
+    }
+    if (string.includes("<")) errors.push(`${at} ${name}=: may not contain "<", which a component can render as HTML (show markup in a code block)`);
+    const urls = /srcset$/i.test(key) ? string.split(",").map((candidate) => candidate.trim().split(/\s+/)[0]) : [string];
+    if (URL_PROP.test(key) ? !urls.every(isSafeUrl) : isScriptUrl(string))
+      errors.push(`${at} ${name}=: ${snippet(string)} is not an address a page may use (a path, or http, https, mailto or tel)`);
+  }
+}
+
+function checkElement(node, at, components, errors) {
+  if (node.name === null) return; // a fragment, <>…</>
+  // MDX reads a lowercase name as an HTML tag and anything else as a component.
+  const component = /^[A-Z]/.test(node.name) && components.has(node.name);
+  if (!component && !HTML_TAGS.has(node.name)) {
+    errors.push(
+      /^[A-Z]/.test(node.name)
+        ? `${at}: <${node.name}> is not a component the page imports from ${ALLOWED_IMPORTS.join(", ")}`
+        : `${at}: <${node.name}> is not allowed in a page`,
+    );
+    return;
+  }
+  for (const attribute of node.attributes) {
+    if (attribute.type !== "mdxJsxAttribute") errors.push(`${at}: spread attributes run code; write each attribute out`);
+    else if (component) checkProp(attribute, `${at} <${node.name}>`, errors);
+    else if (!HTML_ATTRIBUTES.has(attribute.name.toLowerCase()) || (attribute.value !== null && typeof attribute.value === "object"))
+      errors.push(`${at}: <${node.name} ${attribute.name}> is not allowed; HTML tags take ${[...HTML_ATTRIBUTES].join(", ")} as plain text`);
+  }
+}
+
+function checkFrontmatter(data, where, errors) {
+  for (const key of Object.keys(data))
+    if (!ALLOWED_FRONTMATTER.includes(key)) errors.push(`${where}: frontmatter field "${key}" is not allowed in a module`);
+  if (typeof data.title !== "string" || data.title.trim() === "") errors.push(`${where}: needs a title`);
+  if ("template" in data && !["doc", "splash"].includes(data.template)) errors.push(`${where}: template is "doc" or "splash"`);
+  if ("editUrl" in data && typeof data.editUrl !== "boolean" && !(typeof data.editUrl === "string" && /^https:\/\//i.test(data.editUrl)))
+    errors.push(`${where}: editUrl is false, or an https URL`);
+
+  for (const key of ["prev", "next"]) {
+    const value = data[key];
+    if (value === undefined || typeof value === "boolean" || typeof value === "string") continue;
+    if (!isRecord(value) || !onlyKeys(value, ["link", "label"]))
+      errors.push(`${where}: ${key} is true, false, a label, or { link, label }`);
+    else if ("link" in value && !(typeof value.link === "string" && isSafeUrl(value.link)))
+      errors.push(`${where}: ${key}.link is a path, or an http or https URL`);
+  }
+
+  if ("sidebar" in data) {
+    const { sidebar } = data;
+    if (!isRecord(sidebar) || !onlyKeys(sidebar, ["label", "order", "hidden", "badge"]))
+      errors.push(`${where}: sidebar takes label, order, hidden and badge`);
+    else if ("badge" in sidebar && typeof sidebar.badge !== "string" && !(isRecord(sidebar.badge) && onlyKeys(sidebar.badge, ["text", "variant"])))
+      errors.push(`${where}: sidebar.badge is a text, or { text, variant }`);
+  }
+
+  if (!("hero" in data)) return;
+  const { hero } = data;
+  if (!isRecord(hero) || !onlyKeys(hero, ["title", "tagline", "image", "actions"])) {
+    errors.push(`${where}: hero takes title, tagline, image and actions`);
+    return;
+  }
+  // Starlight writes the hero's title and tagline into the page as HTML, and
+  // the page's title as the hero's when the hero has none.
+  const texts = { "hero.title": hero.title, "hero.tagline": hero.tagline };
+  if (!("title" in hero)) texts["the title, which is the hero's here,"] = data.title;
+  for (const [field, value] of Object.entries(texts))
+    if (value !== undefined && (typeof value !== "string" || value.includes("<")))
+      errors.push(`${where}: ${field} is text without "<", as Starlight renders it as HTML`);
+  const { image } = hero;
+  if (image !== undefined) {
+    const files = isRecord(image) && (onlyKeys(image, ["alt", "file"]) ? ["file"] : onlyKeys(image, ["alt", "dark", "light"]) ? ["dark", "light"] : null);
+    if (!files || !files.every((key) => typeof image[key] === "string"))
+      errors.push(`${where}: hero.image takes "file", or "dark" and "light"; raw HTML is not allowed`);
+  }
+  if (hero.actions === undefined) return;
+  if (!Array.isArray(hero.actions)) {
+    errors.push(`${where}: hero.actions is a list`);
+    return;
+  }
+  hero.actions.forEach((action, index) => {
+    const at = `${where}: hero.actions[${index}]`;
+    if (!isRecord(action) || !onlyKeys(action, ["text", "link", "variant", "icon"])) errors.push(`${at} takes text, link, variant and icon`);
+    else if (typeof action.link !== "string" || !isSafeUrl(action.link)) errors.push(`${at}.link is a path, or an http or https URL`);
+    else if ("icon" in action && (typeof action.icon !== "string" || action.icon.includes("<")))
+      errors.push(`${at}.icon is the name of one of Starlight's icons`);
+  });
 }
 
 /**
@@ -107,49 +323,47 @@ function checkImport(statement, at, errors) {
  *
  * @returns {string[]} problems, each prefixed with `where` and a line number
  */
-export function checkPage({ data, tree, where }) {
+export function checkPage({ data, tree, where, line = 0 }) {
   const errors = [];
-  for (const key of Object.keys(data))
-    if (!ALLOWED_FRONTMATTER.includes(key)) errors.push(`${where}: frontmatter field "${key}" is not allowed in a module`);
-  if (typeof data.title !== "string" || data.title.trim() === "") errors.push(`${where}: needs a title`);
-  if ("template" in data && !["doc", "splash"].includes(data.template)) errors.push(`${where}: template is "doc" or "splash"`);
-  if (data.hero?.image && !("file" in data.hero.image || ("dark" in data.hero.image && "light" in data.hero.image)))
-    errors.push(`${where}: hero.image takes "file", or "dark" and "light"; raw HTML is not allowed`);
+  checkFrontmatter(data, where, errors);
+  const at = (node) => `${where}:${node.position ? node.position.start.line + line : "?"}`;
+
+  // MDX hoists imports, so a page may use a component above its import.
+  const components = new Set();
+  for (const node of tree.children)
+    if (node.type === "mdxjsEsm") {
+      let program;
+      try {
+        program = parseScript(node.value, JS);
+      } catch (error) {
+        errors.push(`${at(node)}: does not parse (${error.message})`);
+        continue;
+      }
+      for (const statement of program.body) checkImport(statement, at(node), components, errors);
+    }
 
   walk(tree, (node) => {
-    const at = `${where}:${node.position?.start.line ?? "?"}`;
     switch (node.type) {
-      case "html":
-        if (FORBIDDEN_HTML.test(node.value) || EVENT_HANDLER.test(node.value) || /\b(href|src)\s*=\s*["']?\s*javascript:/i.test(node.value))
-          errors.push(`${at}: scripts, frames, forms and event handlers are not allowed in a page`);
-        break;
-      case "mdxjsEsm":
-        for (const statement of node.data?.estree?.body ?? []) checkImport(statement, at, errors);
-        break;
-      case "mdxFlowExpression":
-      case "mdxTextExpression":
-        checkExpression(node.data?.estree, at, errors);
-        break;
-      case "mdxJsxFlowElement":
-      case "mdxJsxTextElement": {
-        if (node.name && FORBIDDEN_TAGS.includes(node.name.toLowerCase()))
-          errors.push(`${at}: <${node.name}> is not allowed in a page`);
-        for (const attribute of node.attributes) {
-          if (attribute.type === "mdxJsxExpressionAttribute") {
-            errors.push(`${at}: spread attributes run code; write each attribute out`);
-            continue;
-          }
-          if (/^on/i.test(attribute.name)) errors.push(`${at}: event handler "${attribute.name}" is not allowed`);
-          const value = attribute.value;
-          if (typeof value === "string" && SCRIPT_URL.test(value)) errors.push(`${at}: "${attribute.name}" may not be a script URL`);
-          if (value && typeof value === "object") checkExpression(value.data?.estree, `${at} ${attribute.name}=`, errors);
-        }
+      case "html": {
+        const unsafe = unsafeHtml(node.value);
+        if (unsafe !== undefined)
+          errors.push(
+            `${at(node)}: the HTML at ${snippet(unsafe)} is not allowed; a page's HTML is tags that format text, such as <b>, <br> and <details>, with no scripts, styles, links or images`,
+          );
         break;
       }
+      case "mdxFlowExpression":
+      case "mdxTextExpression":
+        if (!isComment(node.value) && !plainValue(node.value)) errors.push(`${at(node)}: an expression must be a plain value; a page runs no code`);
+        break;
+      case "mdxJsxFlowElement":
+      case "mdxJsxTextElement":
+        checkElement(node, at(node), components, errors);
+        break;
       case "link":
       case "image":
       case "definition":
-        if (SCRIPT_URL.test(node.url)) errors.push(`${at}: links may not be script URLs`);
+        if (!isSafeUrl(node.url)) errors.push(`${at(node)}: ${snippet(node.url)} is not an address a page may link to (a path, or http, https, mailto or tel)`);
         break;
     }
   });
