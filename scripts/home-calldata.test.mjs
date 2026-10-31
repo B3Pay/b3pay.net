@@ -5,9 +5,9 @@
  * calldata written out by hand, every address's checksum, and every sentence
  * against the arguments it describes.
  *
- * Keccak-256 is written out below. Node's own `keccak-256` digest is missing
- * from some of the releases the site allows: 24.22 has it, 24.15 and 22 throw
- * "Digest method not supported".
+ * Keccak-256 is written out below, because Node's own `keccak-256` digest is
+ * missing from some releases. Node 24.15 and 22 throw "Digest method not
+ * supported"; 24.22 has the digest.
  */
 import { test } from "node:test";
 import assert from "node:assert/strict";
