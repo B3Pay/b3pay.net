@@ -4,6 +4,16 @@ The site is not versioned; changes are listed by the date they merged.
 
 ## Unreleased
 
+### Changed
+
+- B3Note's docs come from the `b3pay-site` branch that B3Pay/B3Note
+  publishes, instead of a pinned commit built with a manifest kept here
+  (`modules/hosted/b3note.json`, removed). Its pages are unchanged. Every
+  repository's docs on the site now come from the repository itself or from
+  this one.
+
+## 2026-10-31
+
 ### Added
 
 - B3Forge user guides: getting started, building with Forge, the studio,
@@ -11,11 +21,6 @@ The site is not versioned; changes are listed by the date they merged.
   forking, the canister explorer, a reference for expressions and utility
   nodes, and the limits of the beta. They describe only what the beta at
   forge.b3pay.net does, checked against B3Forge's code at commit `d0b26c8`.
-
-## 2026-10-31
-
-### Added
-
 - A sidebar item can list a folder's pages, `{ "label", "directory" }`, for
   pages a repository generates, such as an API reference.
 - `publish-module.yml` takes `prepare`, a command a repository runs in its
