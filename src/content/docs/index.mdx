@@ -14,43 +14,20 @@ hero:
       variant: minimal
 ---
 
-import { Card, CardGrid } from "@astrojs/starlight/components";
-import ModuleCards from "../../components/site/ModuleCards.astro";
+import Anatomy from "../../components/home/Anatomy.astro";
+import Closing from "../../components/home/Closing.astro";
+import InternetComputer from "../../components/home/InternetComputer.astro";
+import Offer from "../../components/home/Offer.astro";
+import TwoReaders from "../../components/home/TwoReaders.astro";
 
-## Blind signing is the gap
+{/* The hero is src/components/home/HomeHero.astro, through the Hero override; each section below is its own component in the same folder. */}
 
-When a wallet can't read a contract call, it shows the person signing a string of hex and asks them to trust it. ERC-7730 closes that gap: a JSON descriptor tells a wallet how to turn a call into a sentence, with every value labeled and formatted. Since 12 May 2026 the standard has a registry hosted by the Ethereum Foundation and a framework for independent reviewers to attest descriptors. A wallet that supports it can show your users what they are signing, but only once a descriptor for your contract is in a registry it reads.
+<Anatomy />
 
-<p class="sourced">Sources, checked 30 October 2026: the [Ethereum Foundation's announcement](https://blog.ethereum.org/2026/05/12/clear-signing-announcement) and [ethereum.org's Clear Signing guide](https://ethereum.org/developers/tutorials/clear-signing).</p>
+<TwoReaders />
 
-## What we do
+<Offer />
 
-<CardGrid>
-  <Card title="Clear Signing, done for you" icon="approve-check">
-    We write the descriptors for your contracts, test them against real transactions, submit them to the registry, and
-    keep them current when your ABI or a proxy's implementation changes. [How it works](/clear-signing/)
-  </Card>
-  <Card title="Toolkit and MCP server" icon="laptop">
-    In development: open-source TypeScript tools that draft and check descriptors from ABIs, and an MCP server that has
-    an agent simulate, decode and clear-sign each call, then wait for a person to confirm it. [What it will
-    do](/toolkit/)
-  </Card>
-  <Card title="B3Forge" icon="puzzle">
-    Visual workflows for contract calls. In beta on the Internet Computer today; a version for EVM contracts, with every
-    write step clear-signed, is in development. [About B3Forge](/forge/)
-  </Card>
-</CardGrid>
+<InternetComputer />
 
-## One descriptor, two readers
-
-The descriptor we write so a wallet can show a person what a call does is the same file our toolkit turns into an agent's tool for that call, with the same readable text as its consent message. An agent working through it can only propose calls the descriptor explains, and a person reads each one before it is signed.
-
-## Internet Computer, maintained
-
-B3Pay started on the Internet Computer. These products are maintained, and their docs are here with everything else.
-
-<ModuleCards group="internet-computer" />
-
-## Talk to us
-
-Tell us which contracts your users sign: [start with the intake form](/clear-signing/#start), or [write to us](/contact/) about anything else.
+<Closing />

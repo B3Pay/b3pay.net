@@ -1,0 +1,444 @@
+---
+/**
+ * FIG. 01: how a descriptor reads the hero's call. The format stays pinned
+ * while three beats scroll past it, and the lines each beat explains light
+ * up: the intent, the spender, the amount. The lines are printed from the
+ * object the hero reads (./descriptor.ts), so the two cannot drift apart.
+ *
+ * Below 64rem there is no room to pin it, so each beat shows its own lines
+ * instead. Without JavaScript nothing is dimmed; the script only marks the
+ * beat at the middle of the screen.
+ */
+import Section from "./Section.astro";
+import { APPROVE, HERO } from "./calldata";
+import { formatLines, type Line } from "./descriptor";
+
+const lines = formatLines();
+const [intent, spender, amount] = HERO.readable;
+
+const escape = (text: string) => text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+/** One line as HTML: JSON keys and strings in their own spans, so they can be set apart. */
+function lineHtml(line: Line, indent = line.indent) {
+  const html = escape(line.text).replace(/("(?:[^"\\]|\\.)*")(:?)/g, (_, string: string, colon: string) =>
+    colon ? `<span class="key">${string}</span>:` : `<span class="string">${string}</span>`,
+  );
+  return `<span class="ln" data-b="${line.beat}" style="--indent: ${indent}">${html}</span>`;
+}
+
+// The whole format, for the pinned figure. Written as HTML here because inside
+// <pre> every space of a template would show.
+const codeHtml = lines.map((line) => lineHtml(line)).join("");
+
+/**
+ * The lines of one beat, moved left as far as they go, with a gap marked
+ * wherever lines between them are left out.
+ */
+function excerptHtml(beat: Line["beat"]) {
+  const base = Math.min(...lines.filter((line) => line.beat === beat).map((line) => line.indent));
+  return lines
+    .map((line, i) => {
+      if (line.beat !== beat) return "";
+      const gap = i > 0 && lines[i - 1]!.beat !== beat && lines.slice(0, i).some((l) => l.beat === beat);
+      return (gap ? `<span class="ln gap">…</span>` : "") + lineHtml(line, line.indent - base);
+    })
+    .join("");
+}
+
+const BEATS = [
+  { n: 1, name: "Intent" },
+  { n: 2, name: "Spender" },
+  { n: 3, name: "Amount" },
+] as const;
+---
+
+<Section id="descriptor" fig="FIG. 01" eyebrow="ERC-7730" title="One JSON file turns calldata into a sentence">
+  <Fragment slot="lead">
+    <p>
+      A wallet that can't read a contract call shows hex and asks for trust. ERC-7730 closes that gap: a JSON
+      descriptor tells the wallet how to show each call to your contract, with every value labeled and formatted. Since
+      12 May 2026 the standard has a registry hosted by the Ethereum Foundation, and a framework for independent
+      reviewers to attest descriptors. A wallet that supports it can show your users what they are signing once a
+      descriptor for your contract is in a registry it reads.
+    </p>
+    <p class="sourced">
+      Sources, checked 30 October 2026: the <a href="https://blog.ethereum.org/2026/05/12/clear-signing-announcement"
+        >Ethereum Foundation's announcement</a
+      > and <a href="https://ethereum.org/developers/tutorials/clear-signing">ethereum.org's Clear Signing guide</a>.
+    </p>
+  </Fragment>
+
+  <div class="anatomy">
+    <figure class="descriptor rise" data-pagefind-ignore>
+      <div class="file">
+        <span class="file-name">display.formats</span>
+        <span>USDC · Ethereum</span>
+      </div>
+      <pre class="code"><code set:html={codeHtml} /></pre>
+      <figcaption>
+        An illustration: the format for USDC's <code>approve</code>, from a descriptor written for this page. We have not
+        submitted it, and no one has attested it.
+      </figcaption>
+    </figure>
+
+    <ol class="beats">
+      {
+        BEATS.map((beat) => (
+          <li class="beat" data-n={beat.n}>
+            <h3 class="beat-name">
+              <span class="n" aria-hidden="true">
+                {String(beat.n).padStart(2, "0")}
+              </span>
+              {beat.name}
+            </h3>
+            <div class="shows" aria-hidden="true">
+              {beat.n === 1 && <span class="shows-intent">{intent.value}</span>}
+              {beat.n === 2 && (
+                <>
+                  <span class="shows-label">{spender.label}</span>
+                  <span class="shows-value">{spender.value}</span>
+                  {"detail" in spender && <span class="shows-detail">{spender.detail}</span>}
+                </>
+              )}
+              {beat.n === 3 && (
+                <>
+                  <span class="shows-label">{amount.label}</span>
+                  <span class="shows-value">{amount.value}</span>
+                </>
+              )}
+            </div>
+            {beat.n === 1 && (
+              <p>
+                A format is keyed by the function's signature, with its parameter names. A wallet drops the names, hashes
+                what is left, and uses the format for calls that start with the same four bytes:{" "}
+                <code>0x{APPROVE.selector}</code> here. Its <code>intent</code> says in plain words what the call does.
+              </p>
+            )}
+            {beat.n === 2 && (
+              <p>
+                <code>#.spender</code> points at the call's <code>spender</code> argument. <code>addressName</code> tells
+                the wallet to show a trusted name for it, looked up only in the sources listed: names saved in the wallet,
+                or ENS. With no trusted name, it shows the checksummed address. <code>types</code> says what kind of
+                address to expect, so the wallet can check it.
+              </p>
+            )}
+            {beat.n === 3 && (
+              <p>
+                <code>tokenAmount</code> finds the token at <code>@.to</code>, the contract the call is sent to, and
+                writes the value in whole USDC with its ticker. At or above the <code>threshold</code>, 2<sup>255</sup>,
+                it writes the message in place of the number, so 2<sup>256</sup> − 1 reads as "{amount.value}", not as
+                a 78-digit number.
+              </p>
+            )}
+            <pre class="code excerpt" aria-hidden="true" data-pagefind-ignore><code set:html={excerptHtml(beat.n)} /></pre>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  <p class="spec rise">
+    Checked against <a href="https://eips.ethereum.org/EIPS/eip-7730">ERC-7730</a>, still a draft, on 31 October 2026.
+    <a class="more" href="/docs/clear-signing/descriptors/">The anatomy of a descriptor, in full</a>
+  </p>
+</Section>
+
+<style>
+  .anatomy {
+    display: grid;
+    gap: 2.5rem;
+    margin-top: 3rem;
+  }
+
+  @media (min-width: 64rem) {
+    .anatomy {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 4rem;
+      align-items: start;
+    }
+  }
+
+  /* ── The descriptor ──────────────────────────────────────────────── */
+
+  .descriptor {
+    display: none;
+    margin: 0;
+  }
+
+  @media (min-width: 64rem) {
+    .descriptor {
+      position: sticky;
+      top: calc(var(--sl-nav-height) + 2.5rem);
+      display: block;
+    }
+  }
+
+  .file {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 0.7rem 1rem;
+    border: 1px solid var(--line);
+    border-bottom: 0;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    background-color: var(--surface-raised);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--ink-muted);
+  }
+
+  .file-name {
+    color: var(--ink);
+  }
+
+  .code {
+    margin: 0;
+    padding: 0.9rem 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 0 0 var(--radius-md) var(--radius-md);
+    background-color: var(--surface);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    line-height: 1.75;
+    color: var(--ink-muted);
+  }
+
+  .code code {
+    display: block;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: inherit;
+  }
+
+  /* Indented by the line's depth; a line too long for the column wraps under itself. */
+  .code :global(.ln) {
+    display: block;
+    padding-inline: calc((var(--indent) * 2 + 3) * 1ch) 1rem;
+    border-inline-start: 2px solid transparent;
+    text-indent: -2ch;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    transition:
+      opacity 300ms ease,
+      background-color 300ms ease,
+      border-color 300ms ease;
+  }
+
+  .code :global(.key) {
+    color: var(--ink);
+  }
+
+  .code :global(.string) {
+    color: var(--sl-color-text-accent);
+  }
+
+  .descriptor figcaption {
+    margin-top: 0.85rem;
+    font-size: var(--sl-text-xs);
+    line-height: 1.55;
+    color: var(--sl-color-gray-3);
+  }
+
+  /* Lit by the beat in the middle of the screen (data-beat, set by the script). */
+  .anatomy[data-beat] .descriptor :global(.ln) {
+    opacity: 0.35;
+  }
+
+  .anatomy[data-beat="1"] .descriptor :global(.ln[data-b="1"]),
+  .anatomy[data-beat="2"] .descriptor :global(.ln[data-b="2"]),
+  .anatomy[data-beat="3"] .descriptor :global(.ln[data-b="3"]) {
+    opacity: 1;
+    border-inline-start-color: var(--brand);
+    background-color: color-mix(in srgb, var(--brand-soft) 60%, transparent);
+  }
+
+  /* ── The beats ───────────────────────────────────────────────────── */
+
+  .beats {
+    display: grid;
+    gap: 3.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (min-width: 64rem) {
+    .beats {
+      gap: 0;
+    }
+    /* Each beat holds the stage for a while; the last lets the descriptor go. */
+    .beat {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 62vh;
+    }
+    .beat:first-child {
+      justify-content: flex-start;
+      min-height: 48vh;
+    }
+    .excerpt {
+      display: none;
+    }
+  }
+
+  .beat {
+    transition: opacity 300ms ease;
+  }
+
+  .anatomy[data-beat] .beat:not(.on) {
+    opacity: 0.4;
+  }
+
+  .beat-name {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    margin: 0 0 1rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--sl-color-white);
+  }
+
+  .beat-name .n {
+    font-family: var(--font-mono);
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: var(--brand);
+  }
+
+  .beat p {
+    margin: 0;
+    max-width: 34rem;
+    font-size: var(--sl-text-base);
+    line-height: 1.65;
+    color: var(--sl-color-gray-2);
+  }
+
+  .beat p code,
+  .descriptor figcaption code {
+    font-size: 0.88em;
+  }
+
+  /* What the lines make: the row as the hero's request shows it. */
+  .shows {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.85rem;
+    align-items: baseline;
+    margin-bottom: 1.1rem;
+    padding: 0.9rem 1.1rem;
+    border: 1px solid var(--line);
+    border-inline-start: 2px solid var(--brand);
+    border-radius: var(--radius-md);
+    background-color: var(--surface-raised);
+  }
+
+  .shows-intent {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+  }
+
+  .shows-label {
+    min-width: 5.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .shows-value {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .shows-detail {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--ink-muted);
+  }
+
+  .excerpt {
+    margin-top: 1.1rem;
+    border-radius: var(--radius-md);
+    font-size: 0.72rem;
+  }
+
+  .excerpt :global(.gap) {
+    padding-inline-start: 1rem;
+    text-indent: 0;
+    color: var(--sl-color-gray-4);
+  }
+
+  .spec {
+    margin: 2.5rem 0 0;
+    font-size: var(--sl-text-sm);
+    line-height: 1.6;
+    color: var(--sl-color-gray-3);
+  }
+
+  .spec a {
+    color: var(--sl-color-text-accent);
+  }
+
+  .spec .more {
+    display: inline-block;
+    margin-inline-start: 0.5rem;
+    font-weight: 600;
+  }
+
+  .spec .more::after {
+    content: " →";
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .code :global(.ln),
+    .beat {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  // Marks the beat that holds the middle of the screen, which lights the lines it explains.
+  for (const anatomy of document.querySelectorAll<HTMLElement>(".anatomy")) {
+    const beats = [...anatomy.querySelectorAll<HTMLElement>(".beat")];
+    let pending = 0;
+    const update = () => {
+      pending = 0;
+      const middle = window.innerHeight / 2;
+      let current = 0;
+      beats.forEach((beat, i) => {
+        if (beat.getBoundingClientRect().top <= middle) current = i + 1;
+      });
+      if (current) anatomy.dataset.beat = String(current);
+      else delete anatomy.dataset.beat;
+      beats.forEach((beat, i) => beat.classList.toggle("on", i + 1 === current));
+    };
+    const onScroll = () => {
+      if (!pending) pending = requestAnimationFrame(update);
+    };
+    // Listens only while the section is on screen.
+    new IntersectionObserver((entries) => {
+      if (entries.some((entry) => entry.isIntersecting)) {
+        window.addEventListener("scroll", onScroll, { passive: true });
+        window.addEventListener("resize", onScroll, { passive: true });
+        update();
+      } else {
+        window.removeEventListener("scroll", onScroll);
+        window.removeEventListener("resize", onScroll);
+      }
+    }).observe(anatomy);
+  }
+</script>

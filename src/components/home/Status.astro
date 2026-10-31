@@ -1,0 +1,76 @@
+---
+/**
+ * A state as a shape and a word, after the design system's StatusPill, so it
+ * never depends on color alone: `done` is brand-soft with an amber dot,
+ * `beta` an outline with a half-filled ring, `drafting` a dashed grey
+ * outline with no mark, and `needs-you` an amber outline with a ringed dot.
+ */
+interface Props {
+  state: "done" | "beta" | "drafting" | "needs-you";
+}
+
+const { state } = Astro.props;
+---
+
+<span class:list={["status", state]}>
+  {state !== "drafting" && <span class="mark" aria-hidden="true" />}
+  <slot />
+</span>
+
+<style>
+  .status {
+    display: inline-flex;
+    flex-shrink: 0;
+    gap: 0.45rem;
+    align-items: center;
+    height: 1.5rem;
+    padding: 0 0.65rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .mark {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+  }
+
+  .done {
+    border-color: transparent;
+    background-color: var(--brand-soft);
+  }
+
+  .done .mark {
+    background-color: var(--brand);
+  }
+
+  .beta {
+    border-color: var(--ink-muted);
+  }
+
+  .beta .mark {
+    background: linear-gradient(90deg, var(--ink-muted) 50%, transparent 50%);
+    box-shadow: inset 0 0 0 1.5px var(--ink-muted);
+  }
+
+  .drafting {
+    border-style: dashed;
+    border-color: var(--ink-muted);
+  }
+
+  .needs-you {
+    border-color: var(--brand);
+  }
+
+  .needs-you .mark {
+    background-color: var(--brand);
+    box-shadow:
+      0 0 0 2px var(--surface-raised),
+      0 0 0 3px var(--brand);
+  }
+</style>

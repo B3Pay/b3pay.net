@@ -11,6 +11,32 @@
   overflow-x: clip;
 }
 
+/* The home page's sections (src/components/home): what is marked `rise` moves
+   into place as it scrolls in, where the browser can tie an animation to
+   scrolling. Elsewhere, and with reduced motion, it is simply there.
+
+   The timeline is set by a second, more specific rule, here and in the home
+   components: in one rule, the build's CSS minifier folds animation-timeline
+   into the animation shorthand, which browsers reject, and nothing moves. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .rise {
+      animation: home-rise linear both;
+    }
+    :root .rise {
+      animation-timeline: view();
+      animation-range: entry 0% entry 90%;
+    }
+  }
+}
+
+@keyframes home-rise {
+  from {
+    opacity: 0;
+    translate: 0 2rem;
+  }
+}
+
 /* The hero: big, left-aligned, no image. */
 [data-has-hero] .hero {
   padding-block: clamp(2.5rem, 6vw, 5rem) clamp(1.5rem, 4vw, 3rem);
