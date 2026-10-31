@@ -1,0 +1,69 @@
+---
+title: Build with Forge
+description: Describe a workflow in your own words. Forge finds the canisters, reads their Candid, wires the calls and checks every binding before you review it.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+Forge is the AI in B3Forge. You describe an outcome, and Forge drafts a workflow: it picks the canisters and methods, reads their Candid interfaces, binds each call's arguments to earlier results, and checks that every binding has the right type. You review the draft in the studio before anything runs.
+
+Forge needs a B3Forge account (see [Get started](getting-started.md)). Each request counts against your daily limit, and the line under the prompt box says how many requests are left today and when the limit resets.
+
+## Where to ask
+
+- The prompt box on B3Forge's home page, or one of the ideas under it.
+- The command box: <kbd>⌘</kbd> <kbd>K</kbd> or <kbd>Ctrl</kbd> <kbd>K</kbd>.
+- A new workflow in the studio, which opens on **What should Forge build?**
+- **Use in a workflow** on a canister's page or on one of its methods, which starts the prompt with that canister.
+- **Remix with Forge** on a shared workflow's page, which asks for a variation of it.
+
+Each of these opens the studio with your prompt filled in. Nothing is sent until you press send. If you aren't signed in, B3Forge asks you to sign in first, and your prompt comes with you.
+
+## Writing a prompt
+
+Say what should happen, and name the tokens, canisters and accounts involved. For example:
+
+- Check my ICP balance and format it for display.
+- Fetch the ICP ledger's symbol, decimals, fee and my balance.
+- Transfer a small amount of ICP to a recipient principal.
+
+If you paste a canister ID into the home page's box instead, B3Forge opens that canister in the [explorer](canisters.mdx).
+
+## What Forge does
+
+While Forge works, a log shows each step it takes:
+
+- **Planning** the steps the request needs.
+- **Searching the canister catalog** for canisters that fit.
+- **Fetching** a canister's methods, or one method's signature, from its Candid interface.
+- **Validating** the workflow. The engine that runs workflows checks every binding against the types in the Candid. If the check fails, Forge revises the workflow and validates it again, and the log shows each attempt and the issues it found.
+
+When validation passes, the log shows **Workflow ready** with the nodes Forge made, and the workflow appears on the canvas.
+
+## When it doesn't work
+
+- The error says what went wrong. **Retry** appears when sending the same prompt again can help.
+- **Use workflow anyway** appears when Forge got as far as a workflow that didn't pass validation. It puts that workflow on the canvas so you can fix it by hand.
+- **Show raw output** shows what the model returned.
+- **or add a trigger manually** starts an empty workflow without Forge.
+
+<Aside type="caution" title="Review what Forge built">
+  Validation checks that the types fit, not that the workflow does what you meant. Forge can pick the wrong canister,
+  method or amount, so read each node before you run the workflow. A workflow Forge built runs like any other: in your
+  browser, with each update call waiting for your approval. See [Run a workflow](run.mdx).
+</Aside>
+
+## Forge in the studio
+
+Forge also helps one step at a time:
+
+- **Canister picker.** In a Canister Call node, describe the call, such as "transfer ICP tokens to a recipient principal". Forge picks the canister and the method and suggests the arguments.
+- **Ask AI to pick a node.** In the drawer that adds a node, say what should happen next. Forge looks at the nodes before it and proposes the node to add.
+- **Types from words.** In a Variables node, describe a value, such as "a transfer with recipient principal and amount nat". Forge writes the Candid type, and **Apply type** uses it.
+- **AI Fill.** When you save a workflow, and in its settings, Forge writes a name, a description and labels from the graph.
+
+## Forge in the playground
+
+In the [Candid playground](https://forge.b3pay.net/playground), Forge drafts a `.did` file from a description of a service. Choose **Fast** for a quick draft or **Think** for a harder one. As you edit, Forge suggests completions as ghost text.
+
+The playground's **Profile** view checks a profile, which says what a canister's values and calls mean, against its Candid. **Draft with AI** proposes annotations for what the checks find missing. Each one is checked against the Candid first, and nothing is added until you click **Add**. Profiles are described in the [Meant docs](/docs/meant/).

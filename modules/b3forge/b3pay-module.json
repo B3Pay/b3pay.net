@@ -3,7 +3,7 @@
   "schema": 1,
   "id": "b3forge",
   "title": "B3Forge",
-  "description": "A visual editor that composes canister calls into typed workflows and runs them in the browser. In beta on the Internet Computer; a version for EVM contracts is in development.",
+  "description": "Describe what should happen, and Forge builds a typed workflow of canister calls that runs in your browser. In beta on the Internet Computer; a version for EVM contracts is in development.",
   "group": "evm",
   "status": "beta",
   "links": {
@@ -17,6 +17,25 @@
     {
       "label": "Overview",
       "page": "index"
+    },
+    {
+      "label": "Guides",
+      "items": [
+        "getting-started",
+        "build-with-forge",
+        "studio",
+        "run",
+        "share",
+        "canisters"
+      ]
+    },
+    {
+      "label": "Reference",
+      "items": [
+        "reference/expressions",
+        "reference/utility-nodes",
+        "limits"
+      ]
     }
   ]
 }

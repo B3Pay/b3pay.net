@@ -1,0 +1,49 @@
+---
+title: Run a workflow
+description: A workflow runs in your browser and signs with your identity. What its run page shows, and the approval each update call waits for.
+---
+
+import { Aside } from "@astrojs/starlight/components";
+
+A workflow runs in your browser. B3Forge's engine, compiled to WebAssembly, follows the graph, and your browser sends each canister call itself, signed with your Internet Identity. No B3Pay server runs the workflow or relays its calls.
+
+## On a workflow's run page
+
+A published workflow has a run page, which its share link and its card in the Community open. Under its name it says **Runs in your browser**, **Signs with your identity** and **Update calls ask first**.
+
+1. If the workflow starts with a trigger, its values appear as a form. They start as the author left them; change what you need.
+2. Open **Review Permissions**. It lists every canister call in the workflow, and marks each one as a query, which only reads, or an update call, which can change state or move tokens. Each entry links to the method's page.
+3. Choose **I've reviewed — allow execution**. A workflow with update calls doesn't run until you do.
+4. Press **Run Workflow**, or **Submit & Run** when there is a form.
+
+If the author turned on **Require login to run**, the page asks you to sign in first. Otherwise you can run it signed out, as the anonymous identity: a call that depends on who is calling answers as it would for anyone.
+
+When the run ends, the page shows the last result, how many nodes ran, failed or were skipped, and each node's outcome under **Node details**. A node is skipped when the run never reached it.
+
+## The approval before each update call
+
+Right before each update call is sent, the run stops and shows **Confirm update call**:
+
+- the canister, by name if it is in B3Forge's catalog, and its ID;
+- the method, and its kind of call;
+- the step, with the label the workflow's author wrote, which B3Forge doesn't check against what the call does;
+- the arguments, decoded from the exact bytes that will be sent. When the method's signature isn't known, record fields show as numeric IDs, and bytes that can't be decoded show as hex.
+
+For ICRC token calls (`icrc1_transfer`, `icrc2_approve` and `icrc2_transfer_from`), the dialog names the action, such as **Confirm token transfer** or **Confirm spending approval**, and sums it up: the amount, in the token's own units when B3Forge knows its decimals; the recipient or the spender; the fee; and, for an approval, when it expires. An approval that never expires, or one for an effectively unlimited amount, is flagged.
+
+**Approve & send** sends that one call. **Cancel run** stops the run, and so does closing the dialog. Queries only read, so they run without asking.
+
+<Aside type="caution" title="Read the arguments, not the labels">
+  Anyone can publish a workflow, and the labels on its steps are theirs. Before you approve, check the canister, the
+  method, the amount and the recipient in the dialog itself.
+</Aside>
+
+## Loops and repeats
+
+A workflow can loop, and B3Forge stops a run that loops too long: see [Limits of the beta](limits.md). An update call made again in the same run asks again, and the dialog says which repeat it is. One step can make at most 10 update calls in a run.
+
+In the studio, while you build, the dialog can also offer **Also approve identical calls** for the rest of that run: the same canister, method and arguments. It is never offered for ICRC transfers and approvals, or when the arguments can't be decoded, and a run page never offers it.
+
+## Running in the studio
+
+The studio runs workflows the same way, with the same approvals: see [Edit in the studio](studio.mdx#trying-it-out).
