@@ -14,7 +14,7 @@ comes from:
 | `{ "path": "modules/clear-signing" }`                              | Written in this repository.                                                                                                                                              |
 | `{ "repo": "B3Pay/x", "branch": "b3pay-site" }`                    | **Published by the repository itself**: its workflow builds and checks the module, then commits it to its `b3pay-site` branch. The site reads that branch on every build. |
 | `{ "repo": "B3Pay/x", "branch": "b3pay-site", "pin": "<commit>" }` | The same, held at one commit of that branch: a rollback, or a freeze while something is fixed.                                                                          |
-| `{ "repo": "B3Pay/x", "commit": "<commit>", "manifest": "…" }`     | Built here from the repository at a pinned commit, with a manifest kept in [`hosted/`](hosted). The way in for a repository that has not adopted the workflow yet.      |
+| `{ "repo": "B3Pay/x", "commit": "<commit>", "manifest": "…" }`     | Built here from the repository at a pinned commit, with a manifest kept in `modules/hosted/`. The way in for a repository that has not adopted the workflow yet.       |
 
 `npm run build` brings every module in (`scripts/modules/sync.mjs`), checks
 each one, and **fails on the first problem in any of them**. A failed build

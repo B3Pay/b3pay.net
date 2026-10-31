@@ -5,13 +5,6 @@
     { "id": "b3forge", "source": { "path": "modules/b3forge" } },
     { "id": "ic-reactor", "source": { "repo": "B3Pay/ic-reactor", "branch": "b3pay-site" } },
     { "id": "meant", "source": { "repo": "B3Pay/Meant", "branch": "b3pay-site" } },
-    {
-      "id": "b3note",
-      "source": {
-        "repo": "B3Pay/B3Note",
-        "commit": "7225d27c3d72ed9cb56b0ef861890141d8a7ebe8",
-        "manifest": "modules/hosted/b3note.json"
-      }
-    }
+    { "id": "b3note", "source": { "repo": "B3Pay/B3Note", "branch": "b3pay-site" } }
   ]
 }
