@@ -11,6 +11,24 @@ The site is not versioned; changes are listed by the date they merged.
   (`modules/hosted/b3note.json`, removed). Its pages are unchanged. Every
   repository's docs on the site now come from the repository itself or from
   this one.
+- A new home page, with the old one's motion back, told as the EVM story.
+  The hero is a wallet's signature request that turns real calldata,
+  approving Uniswap's Permit2 to spend unlimited USDC, into what an ERC-7730
+  descriptor makes of it, in under five seconds, over a wall of calldata
+  that turns into sentences under the pointer. Below it, the descriptor
+  stays pinned while the field each part formats lights up; one descriptor
+  is read by a wallet and by an agent; the Clear Signing service leads what
+  we do; the Internet Computer products follow; and a closing band decodes
+  as it scrolls in. The scroll effects are CSS scroll-driven animations
+  where browsers have them. Without JavaScript, and with reduced motion, the
+  page shows its finished state.
+- The descriptor the home page shows is an illustration, printed from the
+  same object the hero reads. It passes python-erc7730 1.0.12's lint against
+  the `approve` ABI Sourcify lists for USDC's implementation; it has not been
+  tested against a transaction, submitted or attested, and the page says so.
+  `scripts/home-calldata.test.mjs` checks each selector against Keccak-256
+  of its signature, the hero's calldata byte for byte, every address's
+  checksum, and every sentence against the arguments it describes.
 
 ## 2026-10-31
 
