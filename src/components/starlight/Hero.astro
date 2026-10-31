@@ -1,0 +1,15 @@
+---
+/**
+ * Starlight's hero on every splash page except the home page, which has its
+ * own: a signature request that decodes itself from calldata into what a
+ * person reads (../home/HomeHero.astro). Both read the page's `hero`
+ * frontmatter for the title, tagline and actions.
+ */
+import Default from "@astrojs/starlight/components/Hero.astro";
+import HomeHero from "../home/HomeHero.astro";
+
+// Starlight gives the home page (src/content/docs/index.mdx) the id "".
+const isHome = Astro.locals.starlightRoute.id === "";
+---
+
+{isHome ? <HomeHero /> : <Default />}

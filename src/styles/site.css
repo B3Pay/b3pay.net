@@ -4,6 +4,13 @@
  * page needs on top: a wider hero, section rhythm, and a few blocks.
  */
 
+/* A splash page's main column clips what bleeds past the page's edges, such as
+   the home page's full-width backdrop. `clip`, not `hidden`, so it is not a
+   scroll container and sticky elements inside still stick. */
+:root:not([data-has-sidebar]) .main-pane {
+  overflow-x: clip;
+}
+
 /* The hero: big, left-aligned, no image. */
 [data-has-hero] .hero {
   padding-block: clamp(2.5rem, 6vw, 5rem) clamp(1.5rem, 4vw, 3rem);
