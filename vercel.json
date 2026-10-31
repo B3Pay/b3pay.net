@@ -204,6 +204,11 @@
       "source": "/blog/",
       "destination": "https://blog.b3pay.net/",
       "permanent": false
+    },
+    {
+      "source": "/docs/b3wallet/:page*/",
+      "destination": "/docs/",
+      "permanent": false
     }
   ],
   "headers": [

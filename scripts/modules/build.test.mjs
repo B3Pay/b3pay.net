@@ -110,6 +110,22 @@ test("checkModule refuses what breaks the rules, every problem at once", async (
   assert.match(all, /the sidebar names "missing", which is not a page/);
 });
 
+test("a sidebar folder lists every page below it, and must have one", async () => {
+  const bundle = (sidebar) =>
+    repository({
+      "b3pay-module.json": JSON.stringify({ ...manifest(undefined, { sidebar, home: "index" }), source: undefined }),
+      "docs/index.md": "---\ntitle: Home\n---\n",
+      "docs/libs/index.md": "---\ntitle: API\n---\n",
+      "docs/libs/functions/create-client.md": "---\ntitle: createClient\n---\n",
+      "docs/library.md": "---\ntitle: Not in libs\n---\n",
+    });
+  const listed = await checkModule(await bundle(["index", { label: "API", directory: "libs" }]), { id: "example" });
+  assert.deepEqual(listed.errors, []);
+  assert.deepEqual(listed.warnings, ["module example: pages not in the sidebar: library"]);
+  const empty = await checkModule(await bundle(["index", "library", { label: "API", directory: "libs/classes" }]), { id: "example" });
+  assert.match(empty.errors.join("\n"), /the sidebar lists the folder "libs\/classes", which has no pages/);
+});
+
 test("checkModule refuses a module whose manifest names another id", async () => {
   const dir = await repository({
     "b3pay-module.json": JSON.stringify({ ...manifest(undefined, { id: "other", home: "index.html" }), source: undefined }),

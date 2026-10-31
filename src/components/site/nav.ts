@@ -47,7 +47,6 @@ export const FOOTER: { label: string; links: NavLink[] }[] = [
       { label: "IC Reactor", href: "/docs/ic-reactor/" },
       { label: "Meant", href: "/docs/meant/" },
       { label: "B3Note", href: "/docs/b3note/" },
-      { label: "B3Wallet", href: "/docs/b3wallet/" },
     ],
   },
   {

@@ -17,16 +17,20 @@ const NAME = /^[a-z0-9][a-z0-9._-]*$/i;
 
 export const LIMITS = { files: 5000, bytes: 100 * 1024 * 1024 };
 
-/** Pages a sidebar names, and relative links it makes. */
-function sidebarTargets(items, pages = [], links = []) {
+/** Pages a sidebar names, relative links it makes, and folders whose pages it lists. */
+function sidebarTargets(items, pages = [], links = [], directories = []) {
   for (const item of items ?? []) {
     if (typeof item === "string") pages.push(item);
     else if ("page" in item) pages.push(item.page);
     else if ("link" in item) links.push(item.link);
-    else sidebarTargets(item.items, pages, links);
+    else if ("directory" in item) directories.push(item.directory);
+    else sidebarTargets(item.items, pages, links, directories);
   }
-  return { pages, links };
+  return { pages, links, directories };
 }
+
+/** A folder's pages: its index and every page below it, as Starlight lists them. */
+const inside = (page, directory) => page === directory || page.startsWith(`${directory}/`);
 
 /**
  * @returns {Promise<{ errors: string[], warnings: string[], manifest: object | null, pages: string[] }>}
@@ -137,8 +141,11 @@ export async function checkModule(dir, { id }) {
       if (!pages.has(path) && !staticFiles.has(path) && !staticFiles.has(`${path}/index.html`))
         errors.push(`${where}: the sidebar links "${link}", which is not in the module`);
     }
+    for (const directory of targets.directories)
+      if (![...pages.keys()].some((page) => inside(page, directory)))
+        errors.push(`${where}: the sidebar lists the folder "${directory}", which has no pages`);
     const listed = new Set(targets.pages);
-    const unlisted = [...pages.keys()].filter((page) => !listed.has(page));
+    const unlisted = [...pages.keys()].filter((page) => !listed.has(page) && !targets.directories.some((directory) => inside(page, directory)));
     if (unlisted.length) warnings.push(`${where}: pages not in the sidebar: ${unlisted.join(", ")}`);
   }
 

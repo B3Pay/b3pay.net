@@ -6,6 +6,31 @@ The site is not versioned; changes are listed by the date they merged.
 
 ### Added
 
+- A sidebar item can list a folder's pages, `{ "label", "directory" }`, for
+  pages a repository generates, such as an API reference.
+- `publish-module.yml` takes `prepare`, a command a repository runs in its
+  checkout before its module is built, to generate such pages.
+
+### Changed
+
+- Static module pages are in the site search: the site marks each page's
+  `<main>`, or its `<body>`, with `data-pagefind-body`, unless an element of
+  the page has it already. Meant's pages are found with the rest of the docs.
+- `publish-module.yml`'s publish job is named "Publish the module", so a
+  skipped one no longer shows its name's expression unevaluated.
+
+### Removed
+
+- B3Wallet is off the site: its docs page, its card on the home page,
+  `/docs/` and `/internet-computer/`, and its link in the menu. Its old addresses, on
+  docs.b3pay.net and here, lead to `/docs/`; the last step is a temporary
+  redirect, so `/docs/b3wallet/` can serve a page again. The B3Wallet
+  repository is unchanged.
+
+## 2026-10-30
+
+### Added
+
 - One site for B3Pay's product pages and every project's documentation, on
   Astro and Starlight: home, Clear Signing, Toolkit, B3Forge, Internet
   Computer, About and Contact, and the docs under `/docs/`, with one header,
