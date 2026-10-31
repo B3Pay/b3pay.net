@@ -4,6 +4,16 @@ The site is not versioned; changes are listed by the date they merged.
 
 ## Unreleased
 
+### Changed
+
+- IC Reactor's docs come from the `b3pay-site` branch that B3Pay/ic-reactor
+  publishes, instead of a pinned commit built with a manifest kept here
+  (`modules/hosted/ic-reactor.json`, removed). They now include the API
+  reference TypeDoc writes, with its functions, interfaces and type aliases
+  in the sidebar, and `/docs/ic-reactor/llms.txt`.
+
+## 2026-10-31
+
 ### Added
 
 - A sidebar item can list a folder's pages, `{ "label", "directory" }`, for

@@ -23,7 +23,7 @@ test("a complete source manifest passes", () => {
 });
 
 test("the manifests in this repository pass", () => {
-  for (const file of ["clear-signing/b3pay-module.json", "b3forge/b3pay-module.json", "hosted/ic-reactor.json", "hosted/meant.json", "hosted/b3note.json"]) {
+  for (const file of ["clear-signing/b3pay-module.json", "b3forge/b3pay-module.json", "hosted/meant.json", "hosted/b3note.json"]) {
     const manifest = JSON.parse(readFileSync(new URL(`../../modules/${file}`, import.meta.url), "utf8"));
     assert.deepEqual(problems(manifest), [], file);
   }
