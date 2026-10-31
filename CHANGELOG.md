@@ -6,11 +6,14 @@ The site is not versioned; changes are listed by the date they merged.
 
 ### Changed
 
-- IC Reactor's docs come from the `b3pay-site` branch that B3Pay/ic-reactor
-  publishes, instead of a pinned commit built with a manifest kept here
-  (`modules/hosted/ic-reactor.json`, removed). They now include the API
+- IC Reactor's and Meant's docs come from the `b3pay-site` branches that
+  B3Pay/ic-reactor and B3Pay/Meant publish, instead of pinned commits built
+  with manifests kept here (`modules/hosted/ic-reactor.json` and
+  `modules/hosted/meant.json`, removed). IC Reactor's now include the API
   reference TypeDoc writes, with its functions, interfaces and type aliases
-  in the sidebar, and `/docs/ic-reactor/llms.txt`.
+  in the sidebar, and `/docs/ic-reactor/llms.txt`. Meant's are its current
+  site, for `@meantjs` 0.5.0, and the site's build no longer runs Meant's
+  `website/build.mjs`.
 
 ## 2026-10-31
 

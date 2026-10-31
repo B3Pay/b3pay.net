@@ -4,14 +4,7 @@
     { "id": "clear-signing", "source": { "path": "modules/clear-signing" } },
     { "id": "b3forge", "source": { "path": "modules/b3forge" } },
     { "id": "ic-reactor", "source": { "repo": "B3Pay/ic-reactor", "branch": "b3pay-site" } },
-    {
-      "id": "meant",
-      "source": {
-        "repo": "B3Pay/Meant",
-        "commit": "6ab04693a66193437d5186a0d1407a0f1dfebbdb",
-        "manifest": "modules/hosted/meant.json"
-      }
-    },
+    { "id": "meant", "source": { "repo": "B3Pay/Meant", "branch": "b3pay-site" } },
     {
       "id": "b3note",
       "source": {
