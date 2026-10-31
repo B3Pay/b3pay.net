@@ -8,7 +8,8 @@ docs each repository publishes. Built with [Astro](https://astro.build) and
 ```
 src/content/docs/   the site's own pages: home, Clear Signing, Toolkit, B3Forge,
                     Internet Computer, About, Contact, and /docs/
-src/components/     the header, footer, cards and form, and Starlight overrides
+src/components/     the header, footer, cards and form, Starlight overrides, and
+                    the home page's hero and sections (home/)
 src/styles/         design tokens (from B3Pay/b3pay-design-system) and site CSS
 modules/            the docs modules: the registry, the modules written here,
                     and manifests for repositories built here (modules/README.md)
@@ -27,7 +28,8 @@ npm ci
 npm run dev              # sync the modules, then the dev server
 npm run build            # sync the modules, then build dist/
 npm run preview          # serve dist/ the way Vercel does, on localhost:4180
-npm test                 # module rules, archive safety, the checkers themselves
+npm test                 # module rules, archive safety, the checkers themselves,
+                         # and the home page's calldata against its sentences
 npm run typecheck        # astro check, and the API function
 npm run check:links      # every link in dist/ reaches a page, a file or the API
 npm run check:redirects  # every old address ends where it should

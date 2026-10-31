@@ -1,0 +1,853 @@
+---
+/**
+ * The home page's hero. On the left, the headline and the two actions. On the
+ * right, a wallet's signature request that plays the page's argument in under
+ * five seconds: the calldata a wallet receives, the same call decoded with
+ * its ABI alone, then formatted by its ERC-7730 descriptor, waiting for a
+ * person. The four steps under the actions light up with it.
+ *
+ * The HTML is the finished request, so the page reads the same without
+ * JavaScript; with reduced motion nothing plays. Behind everything, the calls
+ * of BACKDROP as calldata, which turn into sentences under the pointer.
+ * Every byte comes from ./calldata.ts, which scripts/home-calldata.test.mjs
+ * checks.
+ */
+import { LinkButton } from "@astrojs/starlight/components";
+import { HERO } from "./calldata";
+import { wall } from "./wall";
+
+const { data } = Astro.locals.starlightRoute.entry;
+const { title = data.title, tagline, actions = [] } = data.hero ?? {};
+
+const STEPS = ["Calldata", "Decode", "Clear-sign", "Confirm"];
+const PILL = ["Blind signing", "Decoding", "Clear-signed", "Waiting for you"];
+
+const rows = wall([-38, 6, -64, 22, -12, 40, -50, 14, -26, 30, -70, 2, 18, -44, 34, -8, 10, -58, 26, -20, 44, -32]);
+---
+
+<div class="home-hero" data-step="4">
+  <script is:inline>
+    // Runs as the hero is parsed, before the request is drawn: when the
+    // request is going to play, show its first step, so the finished request
+    // never flashes. If the player has not taken over within three seconds,
+    // the finished request comes back.
+    (() => {
+      const hero = document.currentScript.parentElement;
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      hero.dataset.step = "1";
+      setTimeout(() => hero.hasAttribute("data-player") || (hero.dataset.step = "4"), 3000);
+    })();
+  </script>
+
+  <div class="backdrop" aria-hidden="true" data-pagefind-ignore data-lens="off">
+    <div class="glow"></div>
+    <div class="layer bd-hex">
+      {
+        rows.map((row, i) => (
+          <div class="line" style={`--i: ${i}; --indent: ${row.indent}`}>
+            {row.calls.map((call) => (
+              <span style={`width: ${call.width}ch`}>{call.hex}</span>
+            ))}
+          </div>
+        ))
+      }
+    </div>
+    <div class="layer bd-words">
+      {
+        rows.map((row, i) => (
+          <div class="line" style={`--i: ${i}; --indent: ${row.indent}`}>
+            {row.calls.map((call) => (
+              <span style={`width: ${call.width}ch`}>
+                <em>{call.verb}</em> {call.rest}
+              </span>
+            ))}
+          </div>
+        ))
+      }
+    </div>
+  </div>
+
+  <div class="copy">
+    <p class="eyebrow"><span class="dot"></span>ERC-7730 Clear Signing for EVM protocols</p>
+    <h1 id="_top" data-page-title set:html={title} />
+    {tagline && <p class="tagline" set:html={tagline} />}
+    {
+      actions.length > 0 && (
+        <div class="actions">
+          {actions.map(({ attrs: { class: className, ...attrs } = {}, icon, link: href, text, variant }) => (
+            <LinkButton {href} {variant} icon={icon?.name} class:list={[className]} {...attrs}>
+              {text}
+              {icon?.html && <Fragment set:html={icon.html} />}
+            </LinkButton>
+          ))}
+        </div>
+      )
+    }
+    <ol class="steps" aria-label="How a contract call becomes something you can read">
+      {
+        STEPS.map((step, i) => (
+          <li data-n={i + 1}>
+            <span class="n" aria-hidden="true">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            {step}
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+
+  <figure class="request">
+    <div class="card" aria-hidden="true" data-pagefind-ignore>
+      <div class="head">
+        <div>
+          <p class="title">Signature request</p>
+          <p class="sub">{HERO.network} · {HERO.to.name}</p>
+        </div>
+        <span class="pill">
+          <span class="mark"></span>
+          {PILL.map((text, i) => <span data-n={i + 1}>{text}</span>)}
+        </span>
+      </div>
+      <dl class="rows">
+        {
+          HERO.readable.map((readable, i) => {
+            const decoded = HERO.decoded[i]!;
+            return (
+              <div class:list={["row", { intent: i === 0 }]} data-mode="readable">
+                <dt data-decoded={decoded.label} data-readable={readable.label}>
+                  {readable.label}
+                </dt>
+                <dd>
+                  <span class="value" data-decoded={decoded.value} data-readable={readable.value}>
+                    {readable.value}
+                  </span>
+                  {"detail" in readable && <span class="detail">{readable.detail}</span>}
+                </dd>
+              </div>
+            );
+          })
+        }
+      </dl>
+      <div class="data">
+        <p class="label">Data</p>
+        <p class="calldata">{HERO.parts.map((part) => <span>{part}</span>)}</p>
+      </div>
+      <div class="confirm">
+        <span class="button">Reject</span>
+        <span class="button primary">Approve</span>
+      </div>
+    </div>
+    <figcaption>
+      <span class="sr-only">
+        A wallet's signature request, shown three ways. Without a descriptor, a wallet can show only its calldata.
+        Decoded with the contract's ABI alone, it is approve, with a spender address and a 78-digit value. With an
+        ERC-7730 descriptor, it reads: Approve USDC. Spender: Permit2. Amount: Unlimited USDC.
+      </span>
+      <span aria-hidden="true">Real calldata: approving Uniswap's Permit2 to spend unlimited USDC.</span>
+      <button type="button" class="replay" hidden>Replay</button>
+    </figcaption>
+  </figure>
+</div>
+
+<style>
+  .home-hero {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    gap: 2.75rem;
+    align-items: center;
+    padding-block: clamp(1.5rem, 5vw, 4rem) clamp(2.5rem, 6vw, 5rem);
+  }
+
+  @media (min-width: 64rem) {
+    .home-hero {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+      gap: 3.5rem;
+      min-height: min(calc(100svh - var(--sl-nav-height) - 1.5rem), 50rem);
+    }
+  }
+
+  /* ── The copy ─────────────────────────────────────────────────────── */
+
+  .eyebrow {
+    display: inline-flex;
+    gap: 0.6rem;
+    align-items: center;
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--sl-color-gray-2);
+  }
+
+  .dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background-color: var(--accent);
+    box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+
+  h1 {
+    margin: 1.4rem 0 0;
+    max-width: 13ch;
+    font-size: clamp(2.6rem, 1.3rem + 4.4vw, 5rem);
+    font-weight: 700;
+    line-height: 1.02;
+    letter-spacing: -0.035em;
+    color: var(--sl-color-white);
+    text-wrap: balance;
+  }
+
+  .tagline {
+    margin: 1.5rem 0 0;
+    max-width: 36rem;
+    font-size: clamp(1.05rem, 0.98rem + 0.3vw, 1.2rem);
+    line-height: 1.55;
+    color: var(--sl-color-gray-2);
+    text-wrap: pretty;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    align-items: center;
+    margin-top: 2.25rem;
+  }
+
+  /* The four steps, lit by the request as it plays (data-step on the hero). */
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    margin: 2.75rem 0 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--sl-color-hairline);
+  }
+
+  .steps li {
+    position: relative;
+    display: grid;
+    gap: 0.3rem;
+    padding: 0.85rem 0.75rem 0 0;
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+    color: var(--sl-color-gray-3);
+    transition: color 300ms ease;
+  }
+
+  .steps li + li {
+    padding-inline-start: 0.75rem;
+    border-inline-start: 1px solid var(--sl-color-hairline);
+  }
+
+  .steps .n {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+  }
+
+  .steps li::before {
+    content: "";
+    position: absolute;
+    inset: -1px 0 auto;
+    height: 2px;
+    background-color: var(--brand);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 400ms ease;
+  }
+
+  .home-hero[data-step="1"] .steps li:nth-child(-n + 1),
+  .home-hero[data-step="2"] .steps li:nth-child(-n + 2),
+  .home-hero[data-step="3"] .steps li:nth-child(-n + 3),
+  .home-hero[data-step="4"] .steps li {
+    color: var(--sl-color-white);
+  }
+
+  .home-hero[data-step="1"] .steps li:nth-child(1)::before,
+  .home-hero[data-step="2"] .steps li:nth-child(2)::before,
+  .home-hero[data-step="3"] .steps li:nth-child(3)::before,
+  .home-hero[data-step="4"] .steps li:nth-child(4)::before {
+    transform: none;
+  }
+
+  .home-hero[data-step="1"] .steps li:nth-child(1) .n,
+  .home-hero[data-step="2"] .steps li:nth-child(2) .n,
+  .home-hero[data-step="3"] .steps li:nth-child(3) .n,
+  .home-hero[data-step="4"] .steps li:nth-child(4) .n {
+    color: var(--brand);
+  }
+
+  /* Two rows of two, each step with its own rule to light. */
+  @media (max-width: 30rem) {
+    .steps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      row-gap: 1rem;
+      border-top: 0;
+    }
+    .steps li {
+      border-top: 1px solid var(--sl-color-hairline);
+    }
+    .steps li:nth-child(3) {
+      border-inline-start: 0;
+      padding-inline-start: 0;
+    }
+  }
+
+  /* ── The request ──────────────────────────────────────────────────── */
+
+  .request {
+    margin: 0;
+    width: 100%;
+    max-width: 32rem;
+    justify-self: center;
+  }
+
+  .card {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background-color: var(--surface-raised);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--brand) 6%, transparent),
+      0 30px 80px -40px color-mix(in srgb, var(--brand) 35%, transparent);
+  }
+
+  .head {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .sub {
+    margin: 0.15rem 0 0;
+    font-size: var(--sl-text-xs);
+    color: var(--ink-muted);
+  }
+
+  /* Status: a shape and a word, as the design system's StatusPill. */
+  .pill {
+    display: inline-flex;
+    flex-shrink: 0;
+    gap: 0.45rem;
+    align-items: center;
+    height: 1.6rem;
+    padding: 0 0.7rem;
+    border: 1px solid var(--brand);
+    border-radius: var(--radius-pill);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .mark {
+    width: 0.5rem;
+    height: 0.5rem;
+    border-radius: 50%;
+    background-color: var(--brand);
+    box-shadow:
+      0 0 0 2px var(--surface-raised),
+      0 0 0 3px var(--brand);
+  }
+
+  .home-hero[data-step="1"] .pill {
+    border-color: var(--ink-muted);
+  }
+  .home-hero[data-step="1"] .mark {
+    background-color: transparent;
+    box-shadow: inset 0 0 0 1.5px var(--ink-muted);
+  }
+  .home-hero[data-step="2"] .pill {
+    border-color: var(--ink-muted);
+  }
+  .home-hero[data-step="2"] .mark {
+    background: linear-gradient(90deg, var(--ink-muted) 50%, transparent 50%);
+    box-shadow: inset 0 0 0 1.5px var(--ink-muted);
+  }
+  .home-hero[data-step="3"] .pill {
+    border-color: transparent;
+    background-color: var(--brand-soft);
+  }
+  .home-hero[data-step="3"] .mark {
+    box-shadow: none;
+  }
+
+  .rows {
+    margin: 0;
+    padding: 0.5rem 0;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: 6.5rem minmax(0, 1fr);
+    gap: 1rem;
+    align-items: center;
+    min-height: 2.75rem;
+    margin: 0;
+    padding: 0.35rem 1.25rem;
+    border-inline-start: 2px solid transparent;
+    transition:
+      background-color 250ms ease,
+      border-color 250ms ease;
+  }
+
+  .row.intent {
+    grid-template-columns: minmax(0, 1fr);
+    min-height: 3.5rem;
+  }
+
+  .row.intent dt {
+    display: none;
+  }
+
+  .row dt {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .row dd {
+    display: flex;
+    gap: 0.6rem;
+    align-items: baseline;
+    min-width: 0;
+    margin: 0;
+  }
+
+  .value {
+    overflow: hidden;
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .intent .value {
+    font-size: clamp(1.4rem, 1.2rem + 0.8vw, 1.75rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+  }
+
+  .detail {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--ink-muted);
+    white-space: nowrap;
+  }
+
+  /* Decoded with the ABI alone: parameter names and raw values, cut off. */
+  .row[data-mode="decoded"] dt {
+    font-family: var(--font-mono);
+    font-weight: 400;
+    letter-spacing: 0;
+    text-transform: none;
+  }
+
+  .row[data-mode="decoded"] .value {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 400;
+    letter-spacing: 0;
+    mask-image: linear-gradient(90deg, #000 80%, transparent);
+  }
+
+  .row[data-mode="decoded"] .detail,
+  .row[data-mode="blank"] .detail {
+    display: none;
+  }
+
+  /* Not decoded yet: a dashed placeholder, the design system's draft. */
+  .row[data-mode="blank"] dd::before {
+    content: "";
+    width: 60%;
+    height: 0.75rem;
+    border: 1px dashed color-mix(in srgb, var(--ink-muted) 55%, transparent);
+    border-radius: var(--radius-sm);
+  }
+
+  .row.on {
+    border-inline-start-color: var(--brand);
+    background-color: color-mix(in srgb, var(--brand-soft) 55%, transparent);
+  }
+
+  .data {
+    padding: 0.85rem 1.25rem 1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .label {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .calldata {
+    margin: 0.4rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-stretch: 87.5%;
+    line-height: 1.7;
+    color: var(--ink-muted);
+    word-break: break-all;
+    transition: color 300ms ease;
+  }
+
+  .calldata span {
+    border-radius: 2px;
+    transition:
+      background-color 250ms ease,
+      color 250ms ease;
+  }
+
+  .calldata span + span {
+    margin-inline-start: 0.5ch;
+  }
+
+  .calldata span.on {
+    background-color: var(--brand-soft);
+    color: var(--ink);
+    box-shadow: 0 2px 0 var(--brand);
+  }
+
+  /* At the first step the calldata is all there is, so it is the loudest thing. */
+  .home-hero[data-step="1"] .calldata,
+  .home-hero[data-step="2"] .calldata {
+    color: var(--ink);
+  }
+
+  .confirm {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    padding: 0 1.25rem 1.25rem;
+    transition: opacity 300ms ease;
+  }
+
+  .button {
+    display: grid;
+    place-items: center;
+    height: 2.5rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .button.primary {
+    border-color: var(--brand);
+    background-color: var(--brand);
+    color: var(--on-brand);
+  }
+
+  .home-hero:not([data-step="4"]) .confirm {
+    opacity: 0.25;
+  }
+
+  .home-hero[data-step="4"][data-played] .button.primary {
+    animation: home-ask 1.6s ease-out 1;
+  }
+
+  @keyframes home-ask {
+    from {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--brand) 55%, transparent);
+    }
+    to {
+      box-shadow: 0 0 0 0.9rem transparent;
+    }
+  }
+
+  figcaption {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.75rem;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-top: 0.85rem;
+    font-size: var(--sl-text-xs);
+    color: var(--sl-color-gray-3);
+  }
+
+  .replay {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-weight: 600;
+    color: var(--sl-color-text-accent);
+    cursor: pointer;
+  }
+
+  .replay:hover {
+    text-decoration: underline;
+  }
+
+  /* The pill shows the word for the step the request is at. */
+  .home-hero:not([data-step="1"]) .pill [data-n="1"],
+  .home-hero:not([data-step="2"]) .pill [data-n="2"],
+  .home-hero:not([data-step="3"]) .pill [data-n="3"],
+  .home-hero:not([data-step="4"]) .pill [data-n="4"] {
+    display: none;
+  }
+
+  /* At the first step nothing is decoded: every row is a placeholder, even
+     before the player has emptied them (the inline script sets the step). */
+  .home-hero[data-step="1"] .row dt,
+  .home-hero[data-step="1"] .row .value,
+  .home-hero[data-step="1"] .row .detail {
+    display: none;
+  }
+
+  .home-hero[data-step="1"] .row dd::before {
+    content: "";
+    width: 60%;
+    height: 0.75rem;
+    border: 1px dashed color-mix(in srgb, var(--ink-muted) 55%, transparent);
+    border-radius: var(--radius-sm);
+  }
+
+  /* ── The backdrop: calldata, and sentences under the pointer ──────── */
+
+  .backdrop {
+    position: absolute;
+    z-index: -1;
+    inset-block: -1.5rem -2rem;
+    left: 50%;
+    width: 100vw;
+    overflow: hidden;
+    pointer-events: none;
+    translate: -50% 0;
+    background-image: linear-gradient(90deg, color-mix(in srgb, var(--ink) 4%, transparent) 1px, transparent 1px);
+    background-size: calc(100% / 12) 100%;
+    mask-image: linear-gradient(to bottom, #000 70%, transparent);
+    --mx: -999px;
+    --my: -999px;
+    --r: 11rem;
+  }
+
+  @media (max-width: 48rem) {
+    .backdrop {
+      background-size: calc(100% / 6) 100%;
+    }
+  }
+
+  .glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(42rem 28rem at 78% 38%, color-mix(in srgb, var(--brand) 13%, transparent), transparent 70%);
+  }
+
+  .layer {
+    position: absolute;
+    inset: 0;
+    padding-top: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 2.25;
+    white-space: nowrap;
+  }
+
+  .line {
+    margin-inline-start: calc(var(--indent) * 1ch);
+  }
+
+  .line span {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+  }
+
+  .layer.bd-hex {
+    color: color-mix(in srgb, var(--ink) 8%, transparent);
+    /* Out of the lens, and quieter behind the headline. */
+    mask-image:
+      radial-gradient(circle var(--r) at var(--mx) var(--my), transparent 45%, #000 100%),
+      linear-gradient(90deg, #000 0, rgb(0 0 0 / 0.4) 18%, rgb(0 0 0 / 0.4) 48%, #000 62%);
+    mask-composite: intersect;
+  }
+
+  /* One column: the copy spans the page, so the calldata stays quiet across it. */
+  @media (max-width: 63.99rem) {
+    .layer.bd-hex {
+      mask-image:
+        radial-gradient(circle var(--r) at var(--mx) var(--my), transparent 45%, #000 100%),
+        linear-gradient(rgb(0 0 0 / 0.45), rgb(0 0 0 / 0.45));
+    }
+  }
+
+  .layer.bd-words {
+    color: color-mix(in srgb, var(--ink) 75%, transparent);
+    opacity: 0;
+    mask-image: radial-gradient(circle var(--r) at var(--mx) var(--my), #000 40%, transparent 100%);
+    transition: opacity 250ms ease;
+  }
+
+  .layer.bd-words em {
+    font-style: normal;
+    color: var(--brand);
+  }
+
+  .backdrop[data-lens="on"] .layer.bd-words {
+    opacity: 1;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .home-hero *,
+    .home-hero *::before {
+      transition: none !important;
+      animation: none !important;
+    }
+  }
+</style>
+
+<script>
+  const hero = document.querySelector<HTMLElement>(".home-hero");
+  if (hero) setUp(hero);
+
+  function setUp(hero: HTMLElement) {
+    const rows = [...hero.querySelectorAll<HTMLElement>(".row")];
+    const parts = [...hero.querySelectorAll<HTMLElement>(".calldata span")];
+    const replay = hero.querySelector<HTMLButtonElement>(".replay");
+    const card = hero.querySelector<HTMLElement>(".request");
+    const backdrop = hero.querySelector<HTMLElement>(".backdrop");
+    if (!replay || !card || !backdrop) return;
+    hero.dataset.player = "";
+
+    const HEX = "0123456789abcdef";
+    let timers: number[] = [];
+    const frames = new Set<number>();
+
+    const stop = () => {
+      timers.forEach((t) => clearTimeout(t));
+      timers = [];
+      frames.forEach((f) => cancelAnimationFrame(f));
+      frames.clear();
+    };
+    const at = (ms: number, run: () => void) => timers.push(window.setTimeout(run, ms));
+    const step = (n: number) => (hero.dataset.step = String(n));
+    const focus = (index: number) => {
+      parts.forEach((part, i) => part.classList.toggle("on", i === index));
+      rows.forEach((row, i) => row.classList.toggle("on", i === index));
+    };
+
+    /** Writes `to` into `element` over `ms`, the letters not yet settled cycling through hex digits. */
+    const scramble = (element: HTMLElement, to: string, ms: number) => {
+      const from = element.textContent ?? "";
+      const start = performance.now();
+      const frame = (now: number) => {
+        const progress = Math.min(1, (now - start) / ms);
+        const settled = Math.floor(to.length * progress);
+        const length = Math.round(from.length + (to.length - from.length) * progress);
+        let text = to.slice(0, settled);
+        for (let i = settled; i < length; i++) text += HEX[Math.floor(Math.random() * 16)];
+        element.textContent = text;
+        if (progress < 1) frames.add(requestAnimationFrame(frame));
+      };
+      frames.add(requestAnimationFrame(frame));
+    };
+
+    const show = (row: HTMLElement, mode: "decoded" | "readable", ms: number) => {
+      row.dataset.mode = mode;
+      const label = row.querySelector<HTMLElement>("dt");
+      const value = row.querySelector<HTMLElement>(".value");
+      if (label) label.textContent = label.dataset[mode] ?? "";
+      if (value) scramble(value, value.dataset[mode] ?? "", ms);
+    };
+
+    const blank = () => {
+      for (const row of rows) {
+        row.dataset.mode = "blank";
+        const label = row.querySelector<HTMLElement>("dt");
+        const value = row.querySelector<HTMLElement>(".value");
+        if (label) label.textContent = "";
+        if (value) value.textContent = "";
+      }
+      focus(-1);
+      step(1);
+    };
+
+    const play = () => {
+      stop();
+      replay.hidden = true;
+      blank();
+      hero.dataset.played = "";
+      rows.forEach((row, i) => at(1000 + i * 450, () => (focus(i), show(row, "decoded", 380))));
+      at(1000, () => step(2));
+      rows.forEach((row, i) => at(2700 + i * 450, () => (focus(i), show(row, "readable", 420))));
+      at(2700, () => step(3));
+      at(4300, () => {
+        focus(-1);
+        step(4);
+        replay.textContent = "Replay";
+        replay.hidden = false;
+      });
+    };
+
+    replay.addEventListener("click", play);
+
+    // With reduced motion nothing plays by itself: the finished request
+    // stays, and plays only when asked.
+    if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      replay.textContent = "Play";
+      replay.hidden = false;
+      return;
+    }
+
+    // Hold the first step until the request is on screen, then play it once.
+    blank();
+    const watch = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        watch.disconnect();
+        play();
+      },
+      { threshold: 0.5 },
+    );
+    watch.observe(card);
+
+    // The lens: under a mouse or a pen, the calldata turns into sentences.
+    let x = 0;
+    let y = 0;
+    let pending = 0;
+    const move = () => {
+      pending = 0;
+      const box = backdrop.getBoundingClientRect();
+      const inside = x >= box.left && x <= box.right && y >= box.top && y <= box.bottom;
+      backdrop.style.setProperty("--mx", `${x - box.left}px`);
+      backdrop.style.setProperty("--my", `${y - box.top}px`);
+      backdrop.dataset.lens = inside ? "on" : "off";
+    };
+    window.addEventListener(
+      "pointermove",
+      (event) => {
+        if (event.pointerType === "touch") return;
+        x = event.clientX;
+        y = event.clientY;
+        if (!pending) pending = requestAnimationFrame(move);
+      },
+      { passive: true },
+    );
+    document.documentElement.addEventListener("pointerleave", () => (backdrop.dataset.lens = "off"));
+  }
+</script>

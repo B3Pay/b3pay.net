@@ -1,0 +1,115 @@
+---
+/**
+ * A section of the home page: an eyebrow, a rule and a figure number, then
+ * the title, the lead and whatever the section shows. Elements marked `rise`
+ * (here and inside) move into place as they scroll in, where the browser can
+ * tie an animation to scrolling (site.css); elsewhere they are simply there.
+ */
+interface Props {
+  id: string;
+  /** "FIG. 01": the section's number, set small beside the rule. */
+  fig: string;
+  eyebrow: string;
+  title: string;
+}
+
+const { id, fig, eyebrow, title } = Astro.props;
+
+// A hyphenated word, such as "clear-signed", stays on one line.
+const parts = title.split(/(\S+-\S+)/);
+---
+
+<section class="home-section not-content" id={id} aria-labelledby={`${id}-title`}>
+  <div class="eyebrow-row rise">
+    <span class="eyebrow">{eyebrow}</span>
+    <span class="rule" aria-hidden="true"></span>
+    <span class="fig" aria-hidden="true">{fig}</span>
+  </div>
+  <h2 id={`${id}-title`} class="rise">
+    {parts.map((part, i) => (i % 2 ? <span class="word">{part}</span> : part))}
+  </h2>
+  {
+    Astro.slots.has("lead") && (
+      <div class="lead rise">
+        <slot name="lead" />
+      </div>
+    )
+  }
+  <slot />
+</section>
+
+<style>
+  .home-section {
+    margin-top: clamp(5rem, 4rem + 6vw, 9rem);
+  }
+
+  .eyebrow-row {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 1.25rem;
+  }
+
+  .eyebrow {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--sl-color-text-accent);
+    white-space: nowrap;
+  }
+
+  .rule {
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(90deg, var(--brand), var(--sl-color-hairline) 40%);
+  }
+
+  .fig {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    color: var(--sl-color-gray-4);
+    white-space: nowrap;
+  }
+
+  h2 {
+    max-width: 22ch;
+    margin: 0;
+    font-size: clamp(2rem, 1.35rem + 2.6vw, 3.4rem);
+    font-weight: 700;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    color: var(--sl-color-white);
+    text-wrap: balance;
+  }
+
+  .word {
+    white-space: nowrap;
+  }
+
+  .lead {
+    max-width: 44rem;
+    margin-top: 1.25rem;
+    font-size: clamp(1.02rem, 0.98rem + 0.2vw, 1.12rem);
+    line-height: 1.6;
+    color: var(--sl-color-gray-2);
+  }
+
+  .lead :global(p) {
+    margin: 0;
+  }
+
+  .lead :global(p + p) {
+    margin-top: 0.9rem;
+  }
+
+  .lead :global(a) {
+    color: var(--sl-color-text-accent);
+  }
+
+  .lead :global(.sourced) {
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+  }
+</style>

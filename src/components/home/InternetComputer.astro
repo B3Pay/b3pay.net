@@ -1,0 +1,20 @@
+---
+/**
+ * FIG. 04: the Internet Computer products, as the module cards the docs list
+ * them with (src/generated/modules.json), so a module added there shows here.
+ */
+import ModuleCards from "../site/ModuleCards.astro";
+import Section from "./Section.astro";
+---
+
+<Section id="internet-computer" fig="FIG. 04" eyebrow="Internet Computer" title="Where B3Pay started, still maintained">
+  <Fragment slot="lead">
+    <p>
+      B3Pay started on the Internet Computer. These products are maintained, and their docs are here with everything
+      else. <a href="/internet-computer/">All of them</a>
+    </p>
+  </Fragment>
+  <div class="rise">
+    <ModuleCards group="internet-computer" />
+  </div>
+</Section>

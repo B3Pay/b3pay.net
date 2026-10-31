@@ -1,0 +1,261 @@
+---
+/**
+ * FIG. 03: what we do. The Clear Signing service is the big card, with its
+ * five steps on a line that fills as the card scrolls in; the toolkit and
+ * B3Forge sit beside it with their state.
+ */
+import { LinkButton } from "@astrojs/starlight/components";
+import Section from "./Section.astro";
+import Status from "./Status.astro";
+
+const STEPS = ["Scope", "Descriptors", "Tests on real calldata", "Submission", "Upkeep"];
+---
+
+<Section id="offer" fig="FIG. 03" eyebrow="What we do" title="Your protocol clear-signed, from ABI to registry">
+  <div class="offer">
+    <article class="service rise">
+      <p class="kicker">Clear Signing, done for you</p>
+      <h3>Written, tested, submitted and kept current</h3>
+      <p>
+        We write the descriptors for your contracts, test them against real transactions, submit them to the registry,
+        and keep them current when your ABI or a proxy's implementation changes.
+      </p>
+      <div class="steps">
+        <span class="track" aria-hidden="true"></span>
+        <ol>
+          {
+            STEPS.map((step, i) => (
+              <li>
+                <span class="n">{String(i + 1).padStart(2, "0")}</span>
+                {step}
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+      <LinkButton href="/clear-signing/" icon="right-arrow">Get your contracts clear-signed</LinkButton>
+    </article>
+
+    <article class="product rise">
+      <div class="product-head">
+        <h3><a href="/toolkit/">Toolkit and MCP server</a></h3>
+        <Status state="drafting">In development</Status>
+      </div>
+      <p>
+        Open-source TypeScript tools that draft and check descriptors from ABIs, and an MCP server that has an agent
+        simulate, decode and clear-sign each call, then wait for a person to confirm it.
+      </p>
+    </article>
+
+    <article class="product rise">
+      <div class="product-head">
+        <h3><a href="/forge/">B3Forge</a></h3>
+        <Status state="beta">Beta</Status>
+      </div>
+      <p>
+        Visual workflows for contract calls. In beta on the Internet Computer today; a version for EVM contracts, with
+        every write step clear-signed, is in development.
+      </p>
+    </article>
+  </div>
+</Section>
+
+<style>
+  .offer {
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 3rem;
+  }
+
+  @media (min-width: 64rem) {
+    .offer {
+      grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
+      grid-template-rows: auto auto;
+    }
+    .service {
+      grid-row: span 2;
+    }
+  }
+
+  article {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background-color: var(--surface-raised);
+  }
+
+  article p {
+    margin: 0;
+    line-height: 1.6;
+  }
+
+  /* ── The service ─────────────────────────────────────────────────── */
+
+  .service {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    align-items: flex-start;
+    overflow: hidden;
+    padding: clamp(1.5rem, 1rem + 2vw, 2.5rem);
+    border-color: color-mix(in srgb, var(--brand) 45%, var(--line));
+    background-image: radial-gradient(
+      36rem 20rem at 100% 0%,
+      color-mix(in srgb, var(--brand) 10%, transparent),
+      transparent 70%
+    );
+  }
+
+  .kicker {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--sl-color-text-accent);
+  }
+
+  .service h3 {
+    max-width: 24ch;
+    margin: 0;
+    font-size: clamp(1.5rem, 1.2rem + 1.2vw, 2.2rem);
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -0.025em;
+    color: var(--sl-color-white);
+    text-wrap: balance;
+  }
+
+  .service > p:not(.kicker) {
+    max-width: 38rem;
+    color: var(--sl-color-gray-2);
+  }
+
+  /* Five steps on a line that fills as the card scrolls in. */
+  .steps {
+    position: relative;
+    align-self: stretch;
+    margin-block: 0.5rem 0.75rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .track {
+    position: absolute;
+    inset: -1px 0 auto;
+    height: 2px;
+    background-color: var(--brand);
+    transform-origin: left;
+  }
+
+  .steps ol {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .steps li {
+    display: grid;
+    align-content: start;
+    gap: 0.3rem;
+    padding: 0.85rem 0.75rem 0 0;
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--sl-color-white);
+  }
+
+  .steps li + li {
+    padding-inline-start: 0.75rem;
+    border-inline-start: 1px solid var(--line);
+  }
+
+  .steps .n {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+    color: var(--brand);
+  }
+
+  @media (max-width: 40rem) {
+    .steps ol {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .steps li,
+    .steps li + li {
+      grid-template-columns: 2rem minmax(0, 1fr);
+      align-items: baseline;
+      padding: 0.6rem 0;
+      border-inline-start: 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .track {
+      display: none;
+    }
+  }
+
+  /* ── The products ────────────────────────────────────────────────── */
+
+  .product {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.5rem;
+    transition: border-color 200ms ease;
+  }
+
+  .product:hover {
+    border-color: var(--sl-color-gray-4);
+  }
+
+  .product-head {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    align-items: flex-start;
+  }
+
+  .product h3 {
+    margin: 0;
+    font-size: var(--sl-text-xl);
+    font-weight: 600;
+  }
+
+  .product h3 a {
+    color: var(--sl-color-white);
+    text-decoration: none;
+  }
+
+  /* The whole card opens the page. */
+  .product h3 a::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+  }
+
+  .product p {
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-2);
+  }
+
+  /* The timeline is in a rule of its own (see site.css). */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .track {
+        animation: home-fill linear both;
+      }
+      .steps .track {
+        animation-timeline: view();
+        animation-range: cover 25% cover 55%;
+      }
+    }
+  }
+
+  @keyframes home-fill {
+    from {
+      scale: 0 1;
+    }
+  }
+</style>

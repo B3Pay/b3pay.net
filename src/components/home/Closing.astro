@@ -1,0 +1,180 @@
+---
+/**
+ * The closing band: the way in, over the wall of calldata from the hero,
+ * which decodes into sentences from left to right as the band scrolls up,
+ * where the browser can tie an animation to scrolling. Elsewhere, and with
+ * reduced motion, the band shows the sentences.
+ */
+import { LinkButton } from "@astrojs/starlight/components";
+import Section from "./Section.astro";
+import { wall } from "./wall";
+
+const rows = wall([-20, -52, 4, -36, 18, -64, -8, 30, -44, 10, -28, 24, -58, -14], 3);
+---
+
+<div class="closing">
+  <div class="band" aria-hidden="true" data-pagefind-ignore>
+    {
+      ["hex", "words"].map((layer) => (
+        <div class:list={["layer", layer]}>
+          {rows.map((row) => (
+            <div class="line" style={`--indent: ${row.indent}`}>
+              {row.calls.map((call) => (
+                <span style={`width: ${call.width}ch`}>
+                  {layer === "hex" ? (
+                    call.hex
+                  ) : (
+                    <>
+                      <em>{call.verb}</em> {call.rest}
+                    </>
+                  )}
+                </span>
+              ))}
+            </div>
+          ))}
+        </div>
+      ))
+    }
+  </div>
+
+  <Section id="start" fig="FIG. 05" eyebrow="Start" title="Which contracts do your users sign?">
+    <Fragment slot="lead">
+      <p>
+        Tell us the chains, the addresses and the flows your users sign: public information only. We reply with a scope
+        and a quote, based on how many contracts and functions you want covered.
+      </p>
+    </Fragment>
+    <div class="actions rise">
+      <LinkButton href="/clear-signing/#start" icon="right-arrow">Start with your contracts</LinkButton>
+      <LinkButton href="/contact/" variant="minimal">Write to us about anything else</LinkButton>
+    </div>
+  </Section>
+</div>
+
+<style>
+  @property --sweep {
+    syntax: "<percentage>";
+    inherits: true;
+    initial-value: 120%;
+  }
+
+  .closing {
+    position: relative;
+    isolation: isolate;
+    margin-top: clamp(5rem, 4rem + 6vw, 9rem);
+    padding-block: clamp(3.5rem, 2.5rem + 5vw, 6.5rem);
+  }
+
+  .closing :global(.home-section) {
+    margin-top: 0;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    align-items: center;
+    margin-top: 2.25rem;
+  }
+
+  /* Full width, behind the copy. */
+  .band {
+    position: absolute;
+    z-index: -1;
+    inset-block: 0;
+    left: 50%;
+    width: 100vw;
+    overflow: hidden;
+    translate: -50% 0;
+    border-block: 1px solid var(--line);
+    background-color: var(--surface-raised);
+    background-image: linear-gradient(90deg, color-mix(in srgb, var(--ink) 4%, transparent) 1px, transparent 1px);
+    background-size: calc(100% / 12) 100%;
+    --sweep: 120%;
+  }
+
+  @media (max-width: 48rem) {
+    .band {
+      background-size: calc(100% / 6) 100%;
+    }
+  }
+
+  .layer {
+    position: absolute;
+    inset: 0;
+    padding-top: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    line-height: 2.25;
+    white-space: nowrap;
+  }
+
+  .line {
+    margin-inline-start: calc(var(--indent) * 1ch);
+  }
+
+  .line span {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: top;
+  }
+
+  /* Quieter behind the copy on the left. The hex gives way to the sentences
+     at --sweep, which moves across as the band scrolls in. */
+  .hex {
+    color: color-mix(in srgb, var(--ink) 10%, transparent);
+    mask-image:
+      linear-gradient(90deg, transparent calc(var(--sweep) - 12%), #000 var(--sweep)),
+      linear-gradient(90deg, rgb(0 0 0 / 0.3) 0, rgb(0 0 0 / 0.3) 62%, #000 84%);
+    mask-composite: intersect;
+  }
+
+  .words {
+    color: color-mix(in srgb, var(--ink) 50%, transparent);
+    mask-image:
+      linear-gradient(90deg, #000 calc(var(--sweep) - 12%), transparent var(--sweep)),
+      linear-gradient(90deg, rgb(0 0 0 / 0.1) 0, rgb(0 0 0 / 0.1) 62%, #000 84%);
+    mask-composite: intersect;
+  }
+
+  .words em {
+    font-style: normal;
+    color: var(--brand);
+  }
+
+  /* One column: the copy spans the band, so the wall stays quiet across it. */
+  @media (max-width: 48rem) {
+    .hex {
+      mask-image:
+        linear-gradient(90deg, transparent calc(var(--sweep) - 12%), #000 var(--sweep)),
+        linear-gradient(rgb(0 0 0 / 0.45), rgb(0 0 0 / 0.45));
+    }
+    .words {
+      mask-image:
+        linear-gradient(90deg, #000 calc(var(--sweep) - 12%), transparent var(--sweep)),
+        linear-gradient(rgb(0 0 0 / 0.16), rgb(0 0 0 / 0.16));
+    }
+  }
+
+  /* The timeline is in a rule of its own (see site.css). */
+  @media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: view()) {
+      .band {
+        animation: home-sweep linear both;
+      }
+      .closing .band {
+        animation-timeline: view();
+        animation-range: cover 10% cover 55%;
+      }
+    }
+  }
+
+  @keyframes home-sweep {
+    from {
+      --sweep: 0%;
+    }
+    to {
+      --sweep: 120%;
+    }
+  }
+</style>
