@@ -31,8 +31,11 @@ export const OLD_ADDRESSES = [
   ...["api", "candid", "cli", "display", "factories", "hooks"].map((page) => [`${OLD_DOCS}/ic-reactor/${page}`, "/docs/ic-reactor/migrating-from-3/"]),
   [`${OLD_DOCS}/b3forge`, "/docs/b3forge/"],
   ...["overview", "first-workflow", "nodes", "expressions", "execution", "catalog"].map((page) => [`${OLD_DOCS}/b3forge/${page}`, "/docs/b3forge/"]),
-  [`${OLD_DOCS}/b3wallet`, "/docs/b3wallet/"],
-  ...["overview", "owners", "consensus", "chains", "upgrades", "deploy"].map((page) => [`${OLD_DOCS}/b3wallet/${page}`, "/docs/b3wallet/"]),
+  // B3Wallet is off the site: its addresses lead to /docs/b3wallet/ for good,
+  // and from there to /docs/ by a temporary redirect, so that address can
+  // serve a page again without browsers still holding the move.
+  [`${OLD_DOCS}/b3wallet`, "/docs/", true],
+  ...["overview", "owners", "consensus", "chains", "upgrades", "deploy"].map((page) => [`${OLD_DOCS}/b3wallet/${page}`, "/docs/", true]),
   [`${OLD_DOCS}/b3note`, "/docs/b3note/"],
   ...["overview", "encryption", "expiry"].map((page) => [`${OLD_DOCS}/b3note/${page}`, "/docs/b3note/"]),
   [`${OLD_DOCS}/b3note/run-locally`, "/docs/b3note/development/"],
@@ -42,13 +45,16 @@ export const OLD_ADDRESSES = [
   // b3pay.net before this change (apps/web).
   ["/products", "/"],
   ["/products/b3forge", "/forge/"],
-  ["/products/b3wallet", "/docs/b3wallet/"],
+  ["/products/b3wallet", "/docs/", true],
   ["/products/ic-reactor", "/docs/ic-reactor/"],
   ["/products/b3note", "/docs/b3note/"],
   ["/developers", "/docs/"],
   ["/about", "/about/"],
   ["/contact", "/contact/"],
   ["/blog", "https://blog.b3pay.net/", true],
+  // This site's own B3Wallet page, served from 2026-10-30 until B3Wallet came
+  // off the site.
+  ["/docs/b3wallet", "/docs/", true],
 ];
 
 /** Each address as written, and with the trailing slash links often add. */

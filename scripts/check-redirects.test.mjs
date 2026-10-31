@@ -49,7 +49,7 @@ test("a source written without its trailing slash is caught", async () => {
 
 test("a redirect that catches a page of the site is caught", async () => {
   const redirects = [{ source: "/docs/:path*/", destination: "/", permanent: true }, ...CONFIG.redirects];
-  assert.match(await run({ ...CONFIG, redirects }), /\/docs\/b3wallet\/ is a page of this build, but a redirect sends it to https:\/\/b3pay\.net\//);
+  assert.match(await run({ ...CONFIG, redirects }), /\/docs\/b3forge\/ is a page of this build, but a redirect sends it to https:\/\/b3pay\.net\//);
 });
 
 test("a page still served on docs.b3pay.net is caught", async () => {
