@@ -13,7 +13,8 @@ src/components/     the header, footer, cards and form, Starlight overrides, the
                     home page's hero and sections (home/), and the coverage
                     tracker's (coverage/)
 src/data/           the coverage tracker's report
-src/pages/          /clear-signing/coverage.json, the report as published
+src/pages/          the coverage tracker's page for each protocol, and
+                    /clear-signing/coverage.json, the report as published
 src/styles/         design tokens (from B3Pay/b3pay-design-system) and site CSS
 modules/            the docs modules: the registry, the modules written here,
                     and manifests for repositories built here (modules/README.md)
@@ -47,14 +48,20 @@ check, the build and both checks on every pull request.
 
 ## The coverage tracker
 
-`/clear-signing/coverage/` is built from one file,
+`/clear-signing/coverage/` and a page for each protocol under it,
+`/clear-signing/coverage/<protocol id>/`
+([`src/pages/clear-signing/coverage/[protocol].astro`](src/pages/clear-signing/coverage/[protocol].astro)),
+are built from one file,
 [`src/data/clear-signing-coverage.json`](src/data/clear-signing-coverage.json),
 the report the Clear Signing tracker writes (clear-signing-mcp, `cli.js
 report`). Its schema, with what each field means, is
 [`src/components/coverage/types.ts`](src/components/coverage/types.ts). The
-site publishes the file as it is at `/clear-signing/coverage.json`.
+site publishes the file as it is at `/clear-signing/coverage.json`. The
+overview keeps one light row per protocol, so it stays small: with 100
+protocols and 575 contracts it is about 130 KB of HTML, and the contracts are
+on the protocols' pages.
 
-To update the page, replace the file and check it:
+To update the tracker, replace the file and check it:
 
 ```sh
 node scripts/coverage-totals.mjs          # the counts agree with the protocol list

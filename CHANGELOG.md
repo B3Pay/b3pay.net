@@ -10,16 +10,20 @@ The site is not versioned; changes are listed by the date they merged.
   many of the most-used contracts on Ethereum, Base, Arbitrum One and OP
   Mainnet have an ERC-7730 descriptor in the registry, and how much of their
   recent traffic a wallet could clear-sign, by transactions and by senders.
-  Each chain side by side, then every protocol, busiest first, in a table
-  that filters, sorts and opens to each contract: its descriptor, the
-  functions it formats, its recent calls, Sourcify and where its address
-  came from, and, where B3Pay has a draft, how one real call reads with it.
-  Then how it is measured and what it does not claim. Every number comes
-  from `src/data/clear-signing-coverage.json`, which the site also serves as
-  `/clear-signing/coverage.json`. Without JavaScript the table shows every
-  protocol open. The file holds mock data, marked `"mock": true` and labelled
-  on the page, until the tracker's first report replaces it. Linked from the
-  Clear Signing page and the footer.
+  Each chain side by side, then every protocol, busiest first, one row each
+  in a table that searches, filters and sorts, and then how it is measured
+  and what it does not claim. Each row links to the protocol's own page, at
+  `/clear-signing/coverage/<protocol id>/`, with a title and description to
+  share with its team: its category, website, TVL when DefiLlama has it, its
+  status and totals, then each contract: its descriptor, the functions it
+  formats, its recent calls, Sourcify and where its address came from, and,
+  where B3Pay has a draft, how one real call reads with it. Every number
+  comes from `src/data/clear-signing-coverage.json`, which the site also
+  serves as `/clear-signing/coverage.json`. Every page reads without
+  JavaScript; with 100 protocols the overview is about 130 KB of HTML. The
+  file holds mock data, marked `"mock": true` and labelled on the page, until
+  the tracker's first report replaces it. Linked from the Clear Signing page
+  and the footer.
 - `scripts/coverage-totals.mjs` works out the report's totals, chains and
   categories from its protocol list, and rewrites them with `--write`.
   `scripts/coverage.test.mjs` checks that they agree and that the report
