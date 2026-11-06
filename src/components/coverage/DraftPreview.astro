@@ -8,7 +8,7 @@
  */
 import { LinkButton } from "@astrojs/starlight/components";
 import StatusBadge from "./StatusBadge.astro";
-import { chainName, lintLabel, plural, short, txUrl } from "./report.ts";
+import { chainName, lintLabel, percent, plural, short, txUrl } from "./report.ts";
 import type { Contract } from "./types.ts";
 
 interface Props {
@@ -18,6 +18,13 @@ interface Props {
 const { contract } = Astro.props;
 const { draft } = contract;
 const preview = draft.preview;
+// What the draft would format of the contract's recent calls: by senders, else by transactions.
+const reach =
+  draft.signerShareCovered !== null
+    ? `${percent(draft.signerShareCovered)} of recent senders' calls`
+    : draft.txShareCovered !== null
+      ? `${percent(draft.txShareCovered)} of recent transactions`
+      : null;
 ---
 
 <div class:list={["draft", { bare: !preview }]}>
@@ -61,6 +68,14 @@ const preview = draft.preview;
         <dt>Formats</dt>
         <dd>{plural(draft.functions, "function")}</dd>
       </div>
+      {
+        reach && (
+          <div>
+            <dt>Would cover</dt>
+            <dd>{reach}</dd>
+          </div>
+        )
+      }
       <div>
         <dt>Tested on</dt>
         <dd>{plural(draft.testedTxs, "transaction")}</dd>

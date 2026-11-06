@@ -344,7 +344,12 @@ test("the report follows the schema in src/components/coverage/types.ts", () => 
       }
 
       if (draft !== null) {
-        only(draft, ["functions", "testedTxs", "lint", "preview"], `${where} draft`);
+        only(draft, ["functions", "testedTxs", "lint", "txShareCovered", "signerShareCovered", "preview"], `${where} draft`);
+        for (const key of ["txShareCovered", "signerShareCovered"])
+          expect(key in draft && (draft[key] === null || isShare(draft[key])), where, `draft.${key} is not a share or null`);
+        // Measured over the same calls as the contract's own shares, so null exactly when those are.
+        for (const key of ["txShareCovered", "signerShareCovered"])
+          expect((draft[key] === null) === ((taken?.[key] ?? null) === null), where, `draft.${key} is null where the sample's is not, or the other way round`);
         expect(isCount(draft.functions) && draft.functions > 0, where, "draft formats no function");
         expect(isCount(draft.testedTxs) && draft.testedTxs > 0, where, "draft was tested on no transaction");
         expect(["pass", "warnings"].includes(draft.lint), where, `draft.lint ${draft.lint} is unknown`);
