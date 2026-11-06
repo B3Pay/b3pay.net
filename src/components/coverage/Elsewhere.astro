@@ -1,0 +1,199 @@
+---
+/**
+ * The contracts the registry does not list, although it has a descriptor
+ * for another deployment of them (Contract.elsewhere) whose functions make
+ * up at least COVERED_AT of what their recent senders called: they would
+ * count as covered if that descriptor listed them. Busiest first. Whether a
+ * descriptor fits a deployment it was not written for is for its owner to
+ * check, and the section says so. The rest of the contracts with such a
+ * descriptor are counted, and their pages say how much it formats.
+ */
+import Section from "../home/Section.astro";
+import Meter from "./Meter.astro";
+import { chainTag, count, fileName, perDay, percent, plural, report, short } from "./report.ts";
+import { COVERED_AT, elsewhereReach } from "./totals.ts";
+
+interface Props {
+  id: string;
+  fig: string;
+}
+
+const { id, fig } = Astro.props;
+
+const rows = report.protocols.flatMap((protocol) =>
+  protocol.contracts.flatMap((contract) => {
+    const reach = elsewhereReach(contract);
+    return contract.elsewhere && reach ? [{ protocol, contract, elsewhere: contract.elsewhere, reach }] : [];
+  }),
+);
+const near = rows
+  .filter((row) => row.reach.share >= COVERED_AT)
+  .sort((a, b) => (b.contract.sample?.perDay ?? 0) - (a.contract.sample?.perDay ?? 0));
+const partly = rows.length - near.length;
+const chainsDescribed = new Intl.ListFormat("en-GB", { type: "conjunction" }).format([
+  ...new Set(near.map((row) => row.elsewhere.chainName)),
+]);
+---
+
+<Section {id} {fig} eyebrow="Near misses" title="Described in the registry, just not for this deployment">
+  <Fragment slot="lead">
+    <p>
+      {
+        near.length === 0
+          ? "No uncovered contract here has a descriptor for another deployment that formats nearly all of its calls."
+          : `${plural(near.length, "contract")} count as uncovered although the registry has a descriptor for another deployment of the protocol, on ${chainsDescribed}, whose functions make up at least ${percent(COVERED_AT)} of what their recent senders called. Each would count as covered if that descriptor listed it.`
+      }
+    </p>
+  </Fragment>
+
+  {
+    near.length > 0 && (
+      <ol class="near rise">
+        {near.map(({ protocol, contract, elsewhere, reach }) => (
+          <li>
+            <div class="what">
+              <span class="tag">{chainTag(contract.chainId)}</span>
+              <a href={`/clear-signing/coverage/${protocol.id}/`}>{protocol.name}</a>
+              <span class="label">{contract.label}</span>
+            </div>
+            <p class="where">
+              Described for {elsewhere.sameAddress ? "the same address" : <code>{short(elsewhere.address)}</code>} on{" "}
+              {elsewhere.chainName} in{" "}
+              <a href={elsewhere.url}>
+                <code>{fileName(elsewhere.path)}</code>
+              </a>
+            </p>
+            <div class="reach">
+              <p>
+                <strong>{percent(reach.share)}</strong> {reach.by === "senders" ? "of senders' calls" : "of transactions"}
+              </p>
+              <Meter share={reach.share} />
+            </div>
+            <p class="rate">{contract.sample?.perDay != null && `${perDay(contract.sample.perDay)} a day`}</p>
+          </li>
+        ))}
+      </ol>
+    )
+  }
+
+  <p class="note rise">
+    A descriptor can hold addresses or constants of the chain it was written for, so whether it fits another deployment
+    is for its owner to check.{" "}
+    {
+      partly > 0 &&
+        `For ${count(partly)} more uncovered ${partly === 1 ? "contract" : "contracts"}, such a descriptor formats part of the calls; ${partly === 1 ? "its page says" : "their pages say"} how much.`
+    }
+  </p>
+</Section>
+
+<style>
+  .near {
+    display: grid;
+    gap: 1px;
+    margin: 2.75rem 0 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background-color: var(--line);
+    list-style: none;
+  }
+
+  .near li {
+    display: grid;
+    gap: 0.5rem 1.5rem;
+    padding: 1rem 1.25rem;
+    background-color: var(--surface-raised);
+  }
+
+  @media (min-width: 56rem) {
+    .near li {
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1.5fr) 9rem 6.5rem;
+      align-items: center;
+    }
+  }
+
+  .near p {
+    margin: 0;
+  }
+
+  .what {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.6rem;
+    align-items: baseline;
+    min-width: 0;
+  }
+
+  .what a {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .label {
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+  }
+
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.14em;
+    color: var(--sl-color-text-accent);
+  }
+
+  .where {
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-2);
+    overflow-wrap: anywhere;
+  }
+
+  .where a {
+    color: var(--sl-color-text-accent);
+  }
+
+  .near code {
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: inherit;
+  }
+
+  .reach {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .reach p {
+    font-size: var(--sl-text-xs);
+    color: var(--ink-muted);
+  }
+
+  .reach strong {
+    font-size: var(--sl-text-sm);
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+
+  .rate {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-muted);
+  }
+
+  @media (min-width: 56rem) {
+    .rate {
+      text-align: right;
+    }
+  }
+
+  .note {
+    max-width: 50rem;
+    margin: 1rem 0 0;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+  }
+</style>

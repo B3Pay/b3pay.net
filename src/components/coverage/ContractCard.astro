@@ -1,10 +1,12 @@
 ---
 /**
  * One contract of a protocol, as the protocol's page shows it
- * (./ProtocolPage.astro): where it is, what the registry holds for it, what
- * its recent calls were and which of them the descriptor formats, whether
- * Sourcify has its source, and where its address came from. A B3Pay draft for
- * it follows (./DraftPreview.astro).
+ * (./ProtocolPage.astro): where it is, what the registry holds for it (or,
+ * when it lists nothing for this deployment, the descriptor it has for
+ * another deployment that formats the same functions), what its recent calls
+ * were and which of them the descriptor formats, whether Sourcify has its
+ * source, and where its address came from. A B3Pay draft for it follows
+ * (./DraftPreview.astro).
  */
 import DraftPreview from "./DraftPreview.astro";
 import Meter from "./Meter.astro";
@@ -23,6 +25,7 @@ import {
   short,
   sourcifyLabel,
 } from "./report.ts";
+import { elsewhereReach } from "./totals.ts";
 import type { Contract } from "./types.ts";
 
 interface Props {
@@ -30,7 +33,8 @@ interface Props {
 }
 
 const { contract } = Astro.props;
-const { descriptor, functions, sample, topFunctions, draft } = contract;
+const { descriptor, functions, sample, topFunctions, elsewhere, draft } = contract;
+const elsewhereShare = elsewhereReach(contract);
 
 // "v2" for a bare number, a version as written otherwise.
 const version = contract.version && (/^\d/.test(contract.version) ? `v${contract.version}` : contract.version);
@@ -73,11 +77,33 @@ const bySenders = sample?.signerShareCovered == null ? null : percent(sample.sig
                 <span class="aside">{attestationLabel(descriptor.attestation)}</span>
               </>
             ) : (
-              <span class="missing">None in the registry</span>
+              <span class="missing">{elsewhere ? "None for this deployment" : "None in the registry"}</span>
             )
           }
         </dd>
       </div>
+
+      {
+        elsewhere && elsewhereShare && (
+          <div>
+            <dt>Described elsewhere</dt>
+            <dd>
+              <a href={elsewhere.url}>
+                <code>{fileName(elsewhere.path)}</code>
+              </a>
+              <span class="aside">
+                For {elsewhere.sameAddress ? "the same address" : <>{elsewhere.label} at <code>{short(elsewhere.address)}</code></>}{" "}
+                on {elsewhere.chainName}; it does not list this deployment.
+              </span>
+              <span class="aside">
+                {elsewhereShare.by === "senders"
+                  ? `The functions it formats make up ${percent(elsewhereShare.share)} of what recent senders called here.`
+                  : `The functions it formats make up ${percent(elsewhereShare.share)} of recent transactions here.`}
+              </span>
+            </dd>
+          </div>
+        )
+      }
 
       <div>
         <dt>Functions</dt>
@@ -99,7 +125,9 @@ const bySenders = sample?.signerShareCovered == null ? null : percent(sample.sig
         <dd>
           {
             sample === null ? (
-              <span class="missing">No recent transactions</span>
+              <span class="missing">Recent transactions could not be read</span>
+            ) : sample.count === 0 ? (
+              <span class="missing">No transactions, {days(sample.oldest, sample.newest)}</span>
             ) : (
               <>
                 {byTransactions === null ? (

@@ -37,6 +37,7 @@ const where =
     ? `The one contract of ${name} here ${totals.partial > 0 ? "is partly covered" : "has no descriptor in the registry"}.`
     : `Of the ${count(totals.contracts)} contracts of ${name} here, ${states.join(" and ")}.`;
 const drafted = protocol.contracts.filter((contract) => contract.status !== "covered" && contract.draft).length;
+const describedElsewhere = protocol.contracts.some((contract) => contract.elsewhere);
 const drafts =
   drafted === 0
     ? ""
@@ -69,6 +70,15 @@ const drafts =
       } of what recent senders called. <strong>Partial</strong> means a descriptor formats less, or its reach could not
       be measured. <strong>Uncovered</strong> means the registry has no descriptor for it.
     </li>
+    {
+      describedElsewhere && (
+        <li>
+          <strong>Described elsewhere</strong> means the registry has a descriptor for another deployment of {name}, on
+          another chain or at another address, with functions this contract's recent senders call. It does not list this
+          contract, which stays uncovered, and whether it fits is for its owner to check.
+        </li>
+      )
+    }
     <li>
       <strong>By transactions</strong>, every call counts. <strong>By senders</strong>, each address counts once for each
       function, so a relayer bot counts once however many calls it sends.

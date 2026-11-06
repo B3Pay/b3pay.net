@@ -12,7 +12,7 @@ import type { ChainId, Contract, CoverageReport, CoverageStatus, Protocol } from
 /** The file as it is, which /clear-signing/coverage.json publishes byte for byte. */
 export const RAW: string = raw;
 
-/** `mock` marks placeholder data; scripts/coverage.test.mjs refuses it once real data lands. */
+/** `mock` marks placeholder data, which scripts/coverage.test.mjs refuses. */
 export const report = JSON.parse(raw) as CoverageReport & { readonly mock?: boolean };
 
 const problems = disagreements(report);

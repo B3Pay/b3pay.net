@@ -12,7 +12,7 @@ import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { COVERED_AT, SHARE_SLACK, disagreements, reach, recompute, statusOf, totalsOf, withTotals } from "../src/components/coverage/totals.ts";
+import { COVERED_AT, SHARE_SLACK, disagreements, elsewhereReach, reach, recompute, statusOf, totalsOf, withTotals } from "../src/components/coverage/totals.ts";
 import { REPORT } from "./coverage-totals.mjs";
 import { checksum, keccak } from "./keccak.mjs";
 
@@ -22,22 +22,17 @@ test("every count agrees with the protocol list", () => {
   assert.deepEqual(disagreements(report), []);
 });
 
-// TODO(coverage data): unskip this test when the real report from the
-// tracker replaces the mock data, which happens before the pull request.
-test(
-  "the report is real data, not the mock",
-  { skip: "TODO: unskip when the real coverage data replaces the mock, before the pull request" },
-  () => {
-    assert.equal("mock" in report, false, 'src/data/clear-signing-coverage.json still has "mock": the page would show placeholders');
-  },
-);
+test("the report is real data, not the mock", () => {
+  assert.equal("mock" in report, false, 'src/data/clear-signing-coverage.json still has "mock": the page would show placeholders');
+});
 
 /** A small report whose counts are worked out by hand below. */
 function sample() {
-  const contract = (chainId, status, perDay, tx, signer, draft = null) => ({
+  const contract = (chainId, status, perDay, tx, signer, draft = null, elsewhere = null) => ({
     chainId,
     status,
     draft,
+    elsewhere,
     sample:
       perDay === undefined
         ? null
@@ -51,11 +46,15 @@ function sample() {
     categories: {},
     protocols: [
       // a's first contract is mostly relayer calls: half its transactions, but every sender, are formatted.
-      protocol("a", "dex", [contract(1, "covered", 300, 0.5, 1), contract(8453, "uncovered", 100, 0, 0, { functions: 2, testedTxs: 2, lint: "pass" })]),
+      // Its second has a draft, and the first's descriptor formats what 97% of its senders called.
+      protocol("a", "dex", [
+        contract(1, "covered", 300, 0.5, 1),
+        contract(8453, "uncovered", 100, 0, 0, { functions: 2, testedTxs: 2, lint: "pass" }, { txShareCovered: 0.4, signerShareCovered: 0.97 }),
+      ]),
       // b: no sample at all, and a sample of plain transfers only.
       protocol("b", "dex", [contract(1, "partial", undefined), contract(1, "uncovered", 50, null, null)]),
-      // c: senders unknown.
-      protocol("c", "bridge", [contract(10, "uncovered", 600, 0, null)]),
+      // c: senders unknown; a descriptor elsewhere formats 96% of its transactions, which counts.
+      protocol("c", "bridge", [contract(10, "uncovered", 600, 0, null, null, { txShareCovered: 0.96, signerShareCovered: null })]),
     ],
   };
 }
@@ -71,6 +70,7 @@ test("counts, weighted shares and statuses are worked out as the schema says", (
     partial: 0,
     uncovered: 1,
     drafts: 1,
+    describedElsewhere: 1,
     txShareCovered: 0.375,
     signerShareCovered: 0.75,
     perDay: 400,
@@ -81,6 +81,7 @@ test("counts, weighted shares and statuses are worked out as the schema says", (
     partial: 1,
     uncovered: 1,
     drafts: 0,
+    describedElsewhere: 0,
     txShareCovered: null,
     signerShareCovered: null,
     perDay: 50,
@@ -102,6 +103,7 @@ test("counts, weighted shares and statuses are worked out as the schema says", (
     partial: 1,
     uncovered: 3,
     drafts: 1,
+    describedElsewhere: 2,
     txShareCovered: 0.15,
     signerShareCovered: 0.75,
     perDay: 1050,
@@ -115,6 +117,7 @@ test("counts, weighted shares and statuses are worked out as the schema says", (
     partial: 0,
     uncovered: 0,
     drafts: 0,
+    describedElsewhere: 0,
     txShareCovered: null,
     signerShareCovered: null,
     perDay: 0,
@@ -143,6 +146,16 @@ test("a contract's status is measured on senders, then transactions, then its fu
   assert.equal(reach({ sample: null, functions: { writable: 0, formatted: 0 } }), null);
 });
 
+test("a descriptor elsewhere is measured on senders, then transactions", () => {
+  assert.deepEqual(elsewhereReach({ elsewhere: { txShareCovered: 0.4, signerShareCovered: 0.97 } }), { share: 0.97, by: "senders" });
+  assert.deepEqual(elsewhereReach({ elsewhere: { txShareCovered: 0.96, signerShareCovered: null } }), { share: 0.96, by: "transactions" });
+  assert.equal(elsewhereReach({ elsewhere: null }), null);
+  // At the covered threshold and over, the contract counts; under it, not.
+  const at = (share) => totalsOf([{ status: "uncovered", draft: null, sample: null, elsewhere: { txShareCovered: null, signerShareCovered: share } }]).describedElsewhere;
+  assert.equal(at(COVERED_AT), 1);
+  assert.equal(at(COVERED_AT - 0.0001), 0);
+});
+
 test("a count that disagrees is found, and --write puts the list's counts back", () => {
   const fixed = withTotals(sample());
   assert.deepEqual(disagreements(fixed), []);
@@ -154,12 +167,14 @@ test("a count that disagrees is found, and --write puts the list's counts back",
 
   const broken = structuredClone(fixed);
   broken.totals.covered += 1;
+  broken.totals.describedElsewhere = 0;
   broken.chains["8453"].drafts = 0;
   broken.categories.dex.txShareCovered = 0.8;
   broken.protocols[1].status = "covered";
   broken.protocols.reverse();
   assert.deepEqual(disagreements(broken), [
     "totals.covered is 2; the protocol list gives 1",
+    "totals.describedElsewhere is 0; the protocol list gives 2",
     "chains.8453.drafts is 0; the protocol list gives 1",
     "categories.dex.txShareCovered is 0.8; the protocol list gives 0.375",
     "a.status is covered; its contracts make it partial",
@@ -201,7 +216,7 @@ test("the report follows the schema in src/components/coverage/types.ts", () => 
   const STATUSES = ["covered", "partial", "uncovered"];
   const CHAINS = [1, 8453, 42161, 10];
 
-  // "mock" is the placeholder flag; the test above refuses it once real data lands.
+  // "mock" is the placeholder flag, which the test above refuses.
   only(report, ["mock", "version", "generatedAt", "registry", "sources", "totals", "chains", "categories", "protocols"], "report");
   expect(report.version === 1, "version", "is not 1");
   expect(isTime(report.generatedAt), "generatedAt", "is not an ISO time");
@@ -233,7 +248,7 @@ test("the report follows the schema in src/components/coverage/types.ts", () => 
       const where = `${at} ${contract.chainId}:${contract.address}`;
       only(
         contract,
-        ["chainId", "address", "name", "label", "role", "version", "status", "addressSource", "explorerUrl", "sourcify", "descriptor", "functions", "sample", "topFunctions", "draft"],
+        ["chainId", "address", "name", "label", "role", "version", "status", "addressSource", "explorerUrl", "sourcify", "descriptor", "functions", "sample", "topFunctions", "elsewhere", "draft"],
         where,
       );
       expect(CHAINS.includes(contract.chainId), where, "is not on one of the four chains");
@@ -266,7 +281,10 @@ test("the report follows the schema in src/components/coverage/types.ts", () => 
 
       if (taken !== null) {
         only(taken, ["count", "perDay", "oldest", "newest", "txShareCovered", "signerShareCovered"], `${where} sample`);
-        expect(isCount(taken.count) && taken.count > 0, where, "sample.count is not a positive count");
+        expect(isCount(taken.count), where, "sample.count is not a count");
+        // An empty sample: no rate but 0 or unknown, nothing formatted or called.
+        if (taken.count === 0)
+          expect((taken.perDay === 0 || taken.perDay === null) && taken.txShareCovered === null && taken.signerShareCovered === null && topFunctions.length === 0, where, "has an empty sample with a rate, a share or top functions");
         expect(taken.perDay === null || (typeof taken.perDay === "number" && taken.perDay >= 0), where, "sample.perDay is not a rate");
         expect(isTime(taken.oldest) && isTime(taken.newest) && Date.parse(taken.oldest) <= Date.parse(taken.newest), where, "sample times are not in order");
         for (const key of ["txShareCovered", "signerShareCovered"])
@@ -304,6 +322,25 @@ test("the report follows the schema in src/components/coverage/types.ts", () => 
       if (share !== null) {
         expect(formatted <= share + SHARE_SLACK, where, `its formatted top functions add up to more than its share, ${share}`);
         expect(unformatted <= 1 - share + SHARE_SLACK, where, `its unformatted top functions add up to more than 1 - ${share}`);
+      }
+
+      const { elsewhere } = contract;
+      expect(elsewhere !== undefined, where, "has no elsewhere (null when there is none)");
+      if (elsewhere) {
+        const at = `${where} elsewhere`;
+        only(elsewhere, ["chainId", "chainName", "address", "label", "sameAddress", "path", "url", "txShareCovered", "signerShareCovered"], at);
+        expect(contract.status === "uncovered", at, "is given for a contract the registry already lists");
+        expect(Number.isInteger(elsewhere.chainId) && elsewhere.chainId > 0, at, "chainId is not a chain id");
+        expect(isText(elsewhere.chainName) && isText(elsewhere.label), at, "has no chain name or label");
+        expect(/^0x[0-9a-fA-F]{40}$/.test(elsewhere.address) && checksum(elsewhere.address) === elsewhere.address, at, "address is not EIP-55");
+        const same = elsewhere.address.toLowerCase() === contract.address.toLowerCase();
+        expect(elsewhere.sameAddress === same, at, "sameAddress does not match the two addresses");
+        expect(!(same && elsewhere.chainId === contract.chainId), at, "is this deployment itself");
+        expect(/^registry\/.+\.json$/.test(elsewhere.path), at, "path is not a registry file");
+        expect(isHttps(elsewhere.url) && elsewhere.url.endsWith(`/${registry.commit}/${elsewhere.path}`), at, "url is not the file at the registry's commit");
+        for (const key of ["txShareCovered", "signerShareCovered"])
+          expect(key in elsewhere && (elsewhere[key] === null || isShare(elsewhere[key])), at, `${key} is not a share or null`);
+        expect((elsewhereReach(contract)?.share ?? 0) > 0, at, "formats none of the contract's recent calls");
       }
 
       if (draft !== null) {

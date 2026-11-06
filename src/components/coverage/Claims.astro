@@ -1,6 +1,6 @@
 ---
 /**
- * FIG. 04: what the page does not claim, in the words of the Clear Signing
+ * FIG. 05: what the page does not claim, in the words of the Clear Signing
  * page's "What we don't claim". "Attested" appears only as the schema allows
  * it: for a descriptor whose ERC-8176 attestation verified.
  */
@@ -15,7 +15,7 @@ const { id } = Astro.props;
 const { registry, sources } = report;
 ---
 
-<Section {id} fig="FIG. 04" eyebrow="Limits" title="What this page does not claim">
+<Section {id} fig="FIG. 05" eyebrow="Limits" title="What this page does not claim">
   <ul class="claims rise">
     <li>
       <strong>Being in the registry is not an audit.</strong> The registry's maintainers screen submissions, and inclusion
@@ -26,6 +26,11 @@ const { registry, sources } = report;
       claim about one exact descriptor, under ERC-8176, which is still a draft. We call a descriptor attested only when its
       attestation verified and has not been revoked: {count(attested.length)} of the {count(described.length)} contracts
       here with a descriptor.
+    </li>
+    <li>
+      <strong>A descriptor for another deployment is not coverage.</strong> When the registry describes a contract on
+      another chain or at another address, we say only that it formats the same functions. It may hold that deployment's
+      addresses or constants, and the contract stays uncovered until the registry lists it.
     </li>
     <li>
       <strong>Our drafts are drafts.</strong> A B3Pay draft is a descriptor we wrote and tested on real transactions. It is
@@ -45,8 +50,8 @@ const { registry, sources } = report;
 
   <p class="sourced rise">
     Sources: <a href={registryUrl}>the Clear Signing registry</a> at <code>{registry.commit.slice(0, 7)}</code>,{" "}
-    <a href="https://eips.ethereum.org/EIPS/eip-8176">ERC-8176</a>, <a href="https://www.blockscout.com/">Blockscout</a>{" "}
-    and <a href="https://sourcify.dev/">Sourcify</a>. How a descriptor works is in{" "}
+    <a href="https://eips.ethereum.org/EIPS/eip-8176">ERC-8176</a>, <a href="https://www.blockscout.com/">Blockscout</a>,
+    the <a href="https://docs.sqd.dev/">SQD Network</a> and <a href="https://sourcify.dev/">Sourcify</a>. How a descriptor works is in{" "}
     <a href="/docs/clear-signing/">the docs</a>.
   </p>
 </Section>

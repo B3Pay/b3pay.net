@@ -57,9 +57,12 @@ the report the Clear Signing tracker writes (clear-signing-mcp, `cli.js
 report`). Its schema, with what each field means, is
 [`src/components/coverage/types.ts`](src/components/coverage/types.ts). The
 site publishes the file as it is at `/clear-signing/coverage.json`. The
-overview keeps one light row per protocol, so it stays small: with 100
-protocols and 575 contracts it is about 130 KB of HTML, and the contracts are
-on the protocols' pages.
+overview keeps one light row per protocol, so it stays small: with 97
+protocols and 575 contracts it is about 135 KB of HTML, and the contracts are
+on the protocols' pages. A contract the registry describes for another
+deployment, though not for its own (`elsewhere` in the schema), is listed
+among the overview's near misses when that descriptor formats nearly all of
+its calls, and its card says so either way.
 
 To update the tracker, replace the file and check it:
 
@@ -69,10 +72,8 @@ node scripts/coverage-totals.mjs --write  # or: work them out again and rewrite 
 npm test                                  # the report follows its schema
 ```
 
-The build stops when a count disagrees with the protocol list. Until the
-tracker's first report lands, the file is mock data marked `"mock": true`,
-which the page labels; the skipped test in `scripts/coverage.test.mjs` that
-refuses it is unskipped with the real data.
+The build stops when a count disagrees with the protocol list, and `npm test`
+refuses a file marked `"mock": true`, the placeholder the page was built on.
 
 ## Docs modules
 

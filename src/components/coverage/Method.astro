@@ -1,6 +1,6 @@
 ---
 /**
- * FIG. 03: how the numbers are made, in plain language. Every number and
+ * FIG. 04: how the numbers are made, in plain language. Every number and
  * date in it comes from the report, and the status rule from the schema's
  * own words (./types.ts), with its threshold from ./totals.ts.
  */
@@ -17,7 +17,7 @@ const { registry, sources, totals } = report;
 const chainList = new Intl.ListFormat("en-GB", { type: "conjunction" }).format(chains.map((chain) => chain.name));
 ---
 
-<Section {id} fig="FIG. 03" eyebrow="Method" title="How we measure">
+<Section {id} fig="FIG. 04" eyebrow="Method" title="How we measure">
   <Fragment slot="lead">
     <p>
       Every number on this page is measured, the same way for every contract, from four sources read at the times it
@@ -45,10 +45,11 @@ const chainList = new Intl.ListFormat("en-GB", { type: "conjunction" }).format(c
     <li>
       <h3>Recent transactions</h3>
       <p>
-        For each contract, up to the latest {count(sampleSize)} top-level transactions, from Blockscout, read {
+        For each contract, up to its latest {count(sampleSize)} top-level transactions, read {
           days(sources.onchain.oldest, sources.onchain.newest)
-        }. We count them by function selector, the first four bytes of the calldata. Plain transfers, with no calldata,
-        are left out.
+        } from Blockscout's API or the <a href="https://docs.sqd.dev/">SQD Network</a> portal, which looks back at most 30
+        days. We count them by function selector, the first four bytes of the calldata. Plain transfers, with no
+        calldata, are left out.
       </p>
     </li>
     <li>
@@ -68,6 +69,15 @@ const chainList = new Intl.ListFormat("en-GB", { type: "conjunction" }).format(c
         state-changing functions in the verified ABI. <strong>Partial:</strong> a descriptor that formats less, or whose reach
         could not be measured. <strong>Uncovered:</strong> no descriptor for the deployment. A protocol is covered when all
         its contracts are, uncovered when none of them has a descriptor, and partial in between.
+      </p>
+    </li>
+    <li>
+      <h3>Described elsewhere</h3>
+      <p>
+        For a deployment the registry does not list, we look at its descriptors for the same address on other chains
+        and for the protocol's other contracts. One counts only when every function it formats is in this contract's
+        verified ABI, and we give how much of this contract's recent calls those functions make up. The contract stays
+        uncovered.
       </p>
     </li>
     <li>

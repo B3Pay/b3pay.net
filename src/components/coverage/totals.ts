@@ -44,12 +44,27 @@ export function reach(contract: Contract): { share: number; by: "senders" | "tra
   return null;
 }
 
+/**
+ * How much of an uncovered contract's recent calls the registry's descriptor
+ * for another deployment formats (Contract.elsewhere): by senders, else by
+ * transactions. Null without such a descriptor. At COVERED_AT or more, the
+ * contract would count as covered if that descriptor listed it, which the
+ * totals count as describedElsewhere.
+ */
+export function elsewhereReach(contract: Contract): { share: number; by: "senders" | "transactions" } | null {
+  const elsewhere = contract.elsewhere;
+  if (!elsewhere) return null;
+  if (elsewhere.signerShareCovered != null) return { share: elsewhere.signerShareCovered, by: "senders" };
+  if (elsewhere.txShareCovered != null) return { share: elsewhere.txShareCovered, by: "transactions" };
+  return null;
+}
+
 /** A share agrees when it is within a twentieth of a percentage point. */
 export const SHARE_SLACK = 0.0005;
 /** Transactions per day agree within one, or 0.1% of a large figure. */
 export const PER_DAY_SLACK = (perDay: number) => Math.max(1, Math.abs(perDay) * 0.001);
 
-const COUNTS = ["contracts", "covered", "partial", "uncovered", "drafts"] as const;
+const COUNTS = ["contracts", "covered", "partial", "uncovered", "drafts", "describedElsewhere"] as const;
 const SHARES = ["txShareCovered", "signerShareCovered"] as const;
 
 const round = (value: number, places: number) => Math.round(value * 10 ** places) / 10 ** places;
@@ -62,12 +77,14 @@ const round = (value: number, places: number) => Math.round(value * 10 ** places
 export function totalsOf(contracts: readonly Contract[]): Totals {
   const counts = { covered: 0, partial: 0, uncovered: 0 };
   let drafts = 0;
+  let describedElsewhere = 0;
   let perDay = 0;
   const weighted = { txShareCovered: 0, signerShareCovered: 0 };
   const weight = { txShareCovered: 0, signerShareCovered: 0 };
   for (const contract of contracts) {
     counts[contract.status]++;
     if (contract.draft) drafts++;
+    if ((elsewhereReach(contract)?.share ?? 0) >= COVERED_AT) describedElsewhere++;
     const rate = contract.sample?.perDay;
     if (rate == null) continue;
     perDay += rate;
@@ -83,6 +100,7 @@ export function totalsOf(contracts: readonly Contract[]): Totals {
     contracts: contracts.length,
     ...counts,
     drafts,
+    describedElsewhere,
     txShareCovered: share("txShareCovered"),
     signerShareCovered: share("signerShareCovered"),
     perDay: round(perDay, 1),
