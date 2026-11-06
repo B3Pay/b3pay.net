@@ -4,7 +4,34 @@ The site is not versioned; changes are listed by the date they merged.
 
 ## Unreleased
 
+### Added
+
+- The Clear Signing coverage tracker, at `/clear-signing/coverage/`: how
+  many of the most-used contracts on Ethereum, Base, Arbitrum One and OP
+  Mainnet have an ERC-7730 descriptor in the registry, and how much of their
+  recent traffic a wallet could clear-sign, by transactions and by senders.
+  Each chain side by side, then every protocol, busiest first, in a table
+  that filters, sorts and opens to each contract: its descriptor, the
+  functions it formats, its recent calls, Sourcify and where its address
+  came from, and, where B3Pay has a draft, how one real call reads with it.
+  Then how it is measured and what it does not claim. Every number comes
+  from `src/data/clear-signing-coverage.json`, which the site also serves as
+  `/clear-signing/coverage.json`. Without JavaScript the table shows every
+  protocol open. The file holds mock data, marked `"mock": true` and labelled
+  on the page, until the tracker's first report replaces it. Linked from the
+  Clear Signing page and the footer.
+- `scripts/coverage-totals.mjs` works out the report's totals, chains and
+  categories from its protocol list, and rewrites them with `--write`.
+  `scripts/coverage.test.mjs` checks that they agree and that the report
+  follows its schema, `src/components/coverage/types.ts`: addresses in
+  EIP-55, selectors against Keccak-256 of their signatures, each status
+  against what its descriptor formats. The build stops when a count
+  disagrees, so the last good deploy stays live.
+
 ### Changed
+
+- Keccak-256 is in `scripts/keccak.mjs`, shared by the home page's calldata
+  test and the coverage test.
 
 - B3Note's docs come from the `b3pay-site` branch that B3Pay/B3Note
   publishes, instead of a pinned commit built with a manifest kept here

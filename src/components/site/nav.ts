@@ -28,6 +28,7 @@ export const FOOTER: { label: string; links: NavLink[] }[] = [
     label: "EVM",
     links: [
       { label: "Clear Signing", href: "/clear-signing/" },
+      { label: "Coverage tracker", href: "/clear-signing/coverage/" },
       { label: "Toolkit", href: "/toolkit/" },
       { label: "B3Forge", href: "/forge/" },
     ],
