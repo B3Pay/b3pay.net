@@ -1,0 +1,114 @@
+---
+/**
+ * A status as a shape, so it never rests on color: covered is a filled disc
+ * with a check, partial a half-filled ring, uncovered a dashed empty ring,
+ * and a draft the design system's ringed dot. A function the descriptor
+ * formats takes the check, one it does not a ring with a dash. Decorative:
+ * the word always sits beside it.
+ */
+import "./coverage.css";
+
+interface Props {
+  status: "covered" | "partial" | "uncovered" | "draft" | "formatted" | "unformatted";
+}
+
+const { status } = Astro.props;
+---
+
+<svg class:list={["icon", status]} viewBox="0 0 16 16" aria-hidden="true" focusable="false">
+  {
+    (status === "covered" || status === "formatted") && (
+      <>
+        <circle class="disc" cx="8" cy="8" r="7" />
+        <path class="check" d="M4.9 8.3 7.1 10.4l4.1-4.8" />
+      </>
+    )
+  }
+  {
+    status === "partial" && (
+      <>
+        <circle class="ring" cx="8" cy="8" r="6.2" />
+        <path class="half" d="M8 1.8a6.2 6.2 0 0 0 0 12.4z" />
+      </>
+    )
+  }
+  {status === "uncovered" && <circle class="ring dashed" cx="8" cy="8" r="6.2" />}
+  {
+    status === "unformatted" && (
+      <>
+        <circle class="ring muted" cx="8" cy="8" r="6.2" />
+        <path class="dash" d="M5.4 8h5.2" />
+      </>
+    )
+  }
+  {
+    status === "draft" && (
+      <>
+        <circle class="ring" cx="8" cy="8" r="6.2" />
+        <circle class="dot" cx="8" cy="8" r="3.2" />
+      </>
+    )
+  }
+</svg>
+
+<style>
+  .icon {
+    flex-shrink: 0;
+    width: 0.9em;
+    height: 0.9em;
+    overflow: visible;
+  }
+
+  .disc,
+  .half,
+  .dot {
+    fill: var(--coverage-covered);
+  }
+
+  .check {
+    fill: none;
+    stroke: var(--on-brand);
+    stroke-width: 1.9;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .ring {
+    fill: none;
+    stroke: var(--coverage-covered);
+    stroke-width: 1.6;
+  }
+
+  .ring.dashed,
+  .ring.muted {
+    stroke: var(--ink-muted);
+  }
+
+  .ring.dashed {
+    stroke-dasharray: 2.4 2.07;
+  }
+
+  .dash {
+    fill: none;
+    stroke: var(--ink-muted);
+    stroke-width: 1.6;
+    stroke-linecap: round;
+  }
+
+  @media (forced-colors: active) {
+    .disc,
+    .half,
+    .dot {
+      fill: CanvasText;
+    }
+    .check {
+      stroke: Canvas;
+    }
+    .ring,
+    .ring.dashed,
+    .ring.muted,
+    .dash {
+      stroke: CanvasText;
+    }
+  }
+</style>

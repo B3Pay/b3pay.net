@@ -1,0 +1,51 @@
+---
+/**
+ * A share as a thin bar: the formatted part in the brand, on a hairline
+ * track. Decorative; the percentage is always written beside it. `muted`
+ * draws the part a descriptor does not format, in the de-emphasis grey.
+ */
+import "./coverage.css";
+
+interface Props {
+  share: number;
+  muted?: boolean;
+}
+
+const { share, muted = false } = Astro.props;
+if (!(share >= 0 && share <= 1)) throw new Error(`a meter takes a share from 0 to 1, not ${share}`);
+---
+
+<span class:list={["meter", { muted }]} aria-hidden="true"><span class="fill" style={`--share: ${share}`}></span></span>
+
+<style>
+  .meter {
+    display: block;
+    height: 6px;
+    overflow: hidden;
+    border-radius: var(--radius-pill);
+    background-color: var(--coverage-empty);
+  }
+
+  .fill {
+    display: block;
+    width: calc(var(--share) * 100%);
+    height: 100%;
+    border-radius: inherit;
+    background-color: var(--coverage-covered);
+  }
+
+  .muted .fill {
+    background-color: var(--sl-color-gray-4);
+  }
+
+  @media (forced-colors: active) {
+    .meter {
+      forced-color-adjust: none;
+      background-color: Canvas;
+      outline: 1px solid CanvasText;
+    }
+    .fill {
+      background-color: CanvasText;
+    }
+  }
+</style>

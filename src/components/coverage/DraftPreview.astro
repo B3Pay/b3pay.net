@@ -1,0 +1,243 @@
+---
+/**
+ * A B3Pay draft for one contract: a signature request as a wallet would show
+ * it with the draft, read from one real transaction, which links to that
+ * transaction on the explorer; then what the draft is and how it was tested,
+ * and the way to ask for it. Without a preview, only the facts and the way
+ * in. The draft itself is never on the page: it is sent on request.
+ */
+import { LinkButton } from "@astrojs/starlight/components";
+import StatusBadge from "./StatusBadge.astro";
+import { chainName, lintLabel, plural, short, txUrl } from "./report.ts";
+import type { Contract } from "./types.ts";
+
+interface Props {
+  contract: Contract & { draft: NonNullable<Contract["draft"]> };
+}
+
+const { contract } = Astro.props;
+const { draft } = contract;
+const preview = draft.preview;
+---
+
+<div class:list={["draft", { bare: !preview }]}>
+  {
+    preview && (
+      <figure class="screen">
+        <div class="screen-head">
+          <span class="who">Signature request</span>
+          <StatusBadge kind="draft" />
+        </div>
+        <p class="where">
+          {chainName(contract.chainId)} · {contract.label}
+        </p>
+        <p class="intent">{preview.intent}</p>
+        <dl>
+          {preview.fields.map((field) => (
+            <div>
+              <dt>{field.label}</dt>
+              <dd>{field.value}</dd>
+            </div>
+          ))}
+        </dl>
+        <figcaption class="from">
+          from transaction{" "}
+          <a href={txUrl(contract, preview.txHash)}>
+            <code>{short(preview.txHash)}</code>
+          </a>
+        </figcaption>
+      </figure>
+    )
+  }
+
+  <div class="about">
+    {!preview && <StatusBadge kind="draft" />}
+    <p class="what">
+      <strong>A B3Pay draft, not in the registry.</strong> Every function it formats has a test built from a real
+      transaction. The full draft is on request.
+    </p>
+    <dl class="facts">
+      <div>
+        <dt>Formats</dt>
+        <dd>{plural(draft.functions, "function")}</dd>
+      </div>
+      <div>
+        <dt>Tested on</dt>
+        <dd>{plural(draft.testedTxs, "transaction")}</dd>
+      </div>
+      <div>
+        <dt>Linter</dt>
+        <dd>{lintLabel(draft.lint)}</dd>
+      </div>
+    </dl>
+    <LinkButton href="/clear-signing/#start" icon="right-arrow">Get this descriptor</LinkButton>
+  </div>
+</div>
+
+<style>
+  .draft {
+    display: grid;
+    gap: 1.25rem;
+    align-items: center;
+    padding: 1.25rem;
+    border: 1px dashed var(--brand);
+    border-radius: var(--radius-md);
+    background-color: color-mix(in srgb, var(--brand-soft) 35%, transparent);
+  }
+
+  @media (min-width: 48rem) {
+    .draft:not(.bare) {
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+      gap: 1.75rem;
+    }
+  }
+
+  /* ── The wallet's screen ──────────────────────────────────────────── */
+
+  .screen {
+    margin: 0;
+    padding: 1.1rem 1.15rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background-color: var(--surface);
+    box-shadow: 0 18px 50px -34px color-mix(in srgb, var(--brand) 55%, transparent);
+  }
+
+  .screen-head {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .who {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .where {
+    margin: 0.85rem 0 0;
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-stretch: 87.5%;
+    color: var(--ink-muted);
+  }
+
+  .intent {
+    margin: 0.3rem 0 0;
+    font-size: 1.35rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+
+  .screen dl {
+    display: grid;
+    gap: 0.55rem;
+    margin: 0.95rem 0 0;
+  }
+
+  .screen dl div {
+    display: grid;
+    grid-template-columns: minmax(5.5rem, auto) minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: baseline;
+  }
+
+  .screen dt {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .screen dd {
+    margin: 0;
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+
+  .from {
+    margin-top: 1rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--line);
+    font-size: var(--sl-text-xs);
+    color: var(--ink-muted);
+  }
+
+  .from a {
+    color: var(--sl-color-text-accent);
+  }
+
+  .from code {
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: inherit;
+  }
+
+  /* ── What the draft is, and the way to it ─────────────────────────── */
+
+  .about {
+    display: grid;
+    gap: 0.75rem;
+    justify-items: start;
+  }
+
+  .about p {
+    margin: 0;
+  }
+
+  .what {
+    font-size: var(--sl-text-sm);
+    line-height: 1.55;
+    color: var(--sl-color-gray-2);
+  }
+
+  .what strong {
+    color: var(--ink);
+  }
+
+  .facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.5rem;
+    margin: 0;
+  }
+
+  .facts div {
+    display: grid;
+    gap: 0.1rem;
+  }
+
+  .facts dt {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .facts dd {
+    margin: 0;
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .about :global(.sl-link-button) {
+    margin-top: 0.35rem;
+  }
+</style>

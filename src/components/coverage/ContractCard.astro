@@ -1,0 +1,352 @@
+---
+/**
+ * One contract of a protocol, as a leaderboard row opens to show it: where it
+ * is, what the registry holds for it, what its recent calls were and which of
+ * them the descriptor formats, whether Sourcify has its source, and where its
+ * address came from. A B3Pay draft for it follows (./DraftPreview.astro).
+ */
+import DraftPreview from "./DraftPreview.astro";
+import Meter from "./Meter.astro";
+import StatusBadge from "./StatusBadge.astro";
+import StatusIcon from "./StatusIcon.astro";
+import {
+  attestationLabel,
+  chainName,
+  count,
+  days,
+  fileName,
+  host,
+  perDay,
+  percent,
+  plural,
+  short,
+  sourcifyLabel,
+} from "./report.ts";
+import type { Contract } from "./types.ts";
+
+interface Props {
+  contract: Contract;
+}
+
+const { contract } = Astro.props;
+const { descriptor, functions, sample, topFunctions, draft } = contract;
+
+// "v2" for a bare number, a version as written otherwise.
+const version = contract.version && (/^\d/.test(contract.version) ? `v${contract.version}` : contract.version);
+const byTransactions = sample?.txShareCovered == null ? null : percent(sample.txShareCovered);
+const bySenders = sample?.signerShareCovered == null ? null : percent(sample.signerShareCovered);
+---
+
+<article class="contract">
+  <header class="head">
+    <div class="title">
+      <p class="chain">{chainName(contract.chainId)}</p>
+      <h3>{contract.label}</h3>
+      <p class="role">{contract.role}</p>
+    </div>
+    <StatusBadge kind={contract.status} />
+  </header>
+
+  <div class="body">
+    <dl class="facts">
+      <div>
+        <dt>Address</dt>
+        <dd>
+          <a href={contract.explorerUrl} title={contract.address}>
+            <code>{short(contract.address)}</code>
+          </a>
+          <span class="aside">{version ? `${contract.name} · ${version}` : contract.name}</span>
+        </dd>
+      </div>
+
+      <div>
+        <dt>Descriptor</dt>
+        <dd>
+          {
+            descriptor ? (
+              <>
+                <a href={descriptor.url}>
+                  <code>{fileName(descriptor.path)}</code>
+                </a>
+                <span class="aside">{descriptor.owner ? `Owner: ${descriptor.owner}` : "No owner named"}</span>
+                <span class="aside">{attestationLabel(descriptor.attestation)}</span>
+              </>
+            ) : (
+              <span class="missing">None in the registry</span>
+            )
+          }
+        </dd>
+      </div>
+
+      <div>
+        <dt>Functions</dt>
+        <dd>
+          {
+            functions ? (
+              <>
+                {count(functions.formatted)} of {plural(functions.writable, "writable function")} formatted
+              </>
+            ) : (
+              <span class="missing">No verified ABI to count them</span>
+            )
+          }
+        </dd>
+      </div>
+
+      <div>
+        <dt>Recent calls</dt>
+        <dd>
+          {
+            sample === null ? (
+              <span class="missing">No recent transactions</span>
+            ) : (
+              <>
+                {byTransactions === null ? (
+                  <span class="missing">Only plain transfers, with no calldata</span>
+                ) : (
+                  <span>
+                    Formatted: <strong>{byTransactions}</strong> of recent transactions,{" "}
+                    {bySenders === null ? "senders not known" : <><strong>{bySenders}</strong> of recent senders</>}
+                  </span>
+                )}
+                <span class="aside">
+                  {plural(sample.count, "transaction")}, {days(sample.oldest, sample.newest)}
+                  {sample.perDay !== null && <> · {perDay(sample.perDay)} a day</>}
+                </span>
+              </>
+            )
+          }
+        </dd>
+      </div>
+
+      <div>
+        <dt>Sourcify</dt>
+        <dd>{sourcifyLabel(contract.sourcify)}</dd>
+      </div>
+
+      <div>
+        <dt>Address from</dt>
+        <dd>
+          <a href={contract.addressSource}>{host(contract.addressSource)}</a>
+        </dd>
+      </div>
+    </dl>
+
+    {
+      topFunctions.length > 0 && (
+        <div class="calls">
+          <h4>Most-called functions</h4>
+          <ol>
+            {topFunctions.map((fn) => (
+              <li>
+                <StatusIcon status={fn.formatted ? "formatted" : "unformatted"} />
+                <code class="signature">
+                  {fn.signature === null
+                    ? fn.selector
+                    : fn.signature.split(",").map((part, i) => (i === 0 ? part : <><wbr />,{part}</>))}
+                </code>
+                <span class="pct">{percent(fn.share)}</span>
+                <Meter share={fn.share} muted={!fn.formatted} />
+                <span class="how">
+                  {fn.formatted ? "Formatted" : "Not formatted"}
+                  {fn.signature === null && " · name not known"}
+                  {fn.senders !== null && <> · {plural(fn.senders, "sender")}</>}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )
+    }
+  </div>
+
+  {draft && <DraftPreview contract={{ ...contract, draft }} />}
+</article>
+
+<style>
+  .contract {
+    display: grid;
+    gap: 1.25rem;
+    padding: 1.25rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background-color: var(--surface-raised);
+  }
+
+  .contract p {
+    margin: 0;
+  }
+
+  .head {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    justify-content: space-between;
+  }
+
+  .title {
+    display: grid;
+    gap: 0.25rem;
+    min-width: 0;
+  }
+
+  .chain {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--sl-color-text-accent);
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  .role {
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+  }
+
+  .body {
+    display: grid;
+    gap: 1.25rem;
+    padding-top: 1.1rem;
+    border-top: 1px solid var(--line);
+  }
+
+  @media (min-width: 56rem) {
+    .body {
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+      gap: 2rem;
+    }
+  }
+
+  /* ── The facts ────────────────────────────────────────────────────── */
+
+  .facts {
+    display: grid;
+    gap: 0.7rem;
+    align-content: start;
+    margin: 0;
+  }
+
+  .facts > div {
+    display: grid;
+    grid-template-columns: 7.5rem minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: baseline;
+  }
+
+  @media (max-width: 30rem) {
+    .facts > div {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 0.15rem;
+    }
+  }
+
+  dt {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  dd {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.15rem 0.6rem;
+    align-items: baseline;
+    margin: 0;
+    font-size: var(--sl-text-sm);
+    line-height: 1.5;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+
+  dd a {
+    color: var(--sl-color-text-accent);
+  }
+
+  dd code {
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: inherit;
+  }
+
+  .aside {
+    font-size: var(--sl-text-xs);
+    color: var(--ink-muted);
+  }
+
+  .missing {
+    color: var(--ink-muted);
+  }
+
+  /* ── The functions people called ──────────────────────────────────── */
+
+  h4 {
+    margin: 0 0 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .calls ol {
+    display: grid;
+    gap: 0.85rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .calls li {
+    display: grid;
+    grid-template-columns: 1rem minmax(0, 1fr) auto;
+    gap: 0.3rem 0.6rem;
+    align-items: center;
+    font-size: var(--sl-text-sm);
+  }
+
+  .calls li :global(.icon) {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+
+  .signature {
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-stretch: 87.5%;
+    color: var(--ink);
+    overflow-wrap: anywhere;
+  }
+
+  .pct {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink);
+  }
+
+  .calls li :global(.meter),
+  .how {
+    grid-column: 2 / -1;
+  }
+
+  .how {
+    font-size: var(--sl-text-xs);
+    color: var(--ink-muted);
+  }
+</style>

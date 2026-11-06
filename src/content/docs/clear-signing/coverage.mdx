@@ -1,0 +1,33 @@
+---
+title: Clear Signing coverage tracker
+description: How many of the most-used contracts on Ethereum, Base, Arbitrum One and OP Mainnet have an ERC-7730 descriptor in the Clear Signing registry, and how much of their recent traffic a wallet could clear-sign, measured from the registry and the chains.
+template: splash
+hero:
+  title: Which contracts can a wallet clear-sign?
+  tagline: We check the most-used contracts on Ethereum, Base, Arbitrum One and OP Mainnet against the Clear Signing registry, and measure how much of their recent traffic a wallet could show as readable text instead of raw calldata.
+  actions:
+    - text: Get your protocol clear-signed
+      link: /clear-signing/#start
+      icon: right-arrow
+    - text: How we measure
+      link: "#how-we-measure"
+      variant: minimal
+---
+
+import Chains from "../../../components/coverage/Chains.astro";
+import Claims from "../../../components/coverage/Claims.astro";
+import Closing from "../../../components/coverage/Closing.astro";
+import Leaderboard from "../../../components/coverage/Leaderboard.astro";
+import Method from "../../../components/coverage/Method.astro";
+
+{/* The hero is CoverageHero.astro, through the Hero override. Every number on this page comes from src/data/clear-signing-coverage.json. */}
+
+<Chains id="by-chain" />
+
+<Leaderboard id="protocols" />
+
+<Method id="how-we-measure" />
+
+<Claims id="what-we-dont-claim" />
+
+<Closing id="get-covered" />

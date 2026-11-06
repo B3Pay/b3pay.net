@@ -1,0 +1,14 @@
+/*
+ * The coverage tracker's status colors, defined once. They are steps of the
+ * brand's one hue, so the page stays amber on graphite: covered is the brand
+ * itself, partial a step toward the surface, and uncovered the hairline, as
+ * empty as a meter's track. Covered and partial pass the dataviz validator as
+ * an ordinal ramp in both themes, partial at 2:1 or more against both
+ * surfaces. Color never carries a status alone: every mark has a shape, and
+ * every count its word.
+ */
+:root {
+  --coverage-covered: var(--brand);
+  --coverage-partial: color-mix(in oklab, var(--brand) 55%, var(--surface-raised));
+  --coverage-empty: var(--line);
+}
