@@ -1,9 +1,10 @@
 ---
 /**
- * One contract of a protocol, as a leaderboard row opens to show it: where it
- * is, what the registry holds for it, what its recent calls were and which of
- * them the descriptor formats, whether Sourcify has its source, and where its
- * address came from. A B3Pay draft for it follows (./DraftPreview.astro).
+ * One contract of a protocol, as the protocol's page shows it
+ * (./ProtocolPage.astro): where it is, what the registry holds for it, what
+ * its recent calls were and which of them the descriptor formats, whether
+ * Sourcify has its source, and where its address came from. A B3Pay draft for
+ * it follows (./DraftPreview.astro).
  */
 import DraftPreview from "./DraftPreview.astro";
 import Meter from "./Meter.astro";
@@ -52,7 +53,7 @@ const bySenders = sample?.signerShareCovered == null ? null : percent(sample.sig
       <div>
         <dt>Address</dt>
         <dd>
-          <a href={contract.explorerUrl} title={contract.address}>
+          <a href={contract.explorerUrl} title={contract.address} data-pagefind-index-attrs="title">
             <code>{short(contract.address)}</code>
           </a>
           <span class="aside">{version ? `${contract.name} · ${version}` : contract.name}</span>

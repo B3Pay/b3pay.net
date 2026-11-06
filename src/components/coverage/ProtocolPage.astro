@@ -1,0 +1,173 @@
+---
+/**
+ * The body of a protocol's page, under its hero (./CoverageHero.astro): its
+ * contracts, busiest first, each with what the registry holds for it, what
+ * people called and, where B3Pay has a draft, how one real call reads with
+ * it (./ContractCard.astro); then what the numbers mean, and the way in.
+ */
+import Section from "../home/Section.astro";
+import Closing from "./Closing.astro";
+import ContractCard from "./ContractCard.astro";
+import { COVERED_AT } from "./totals.ts";
+import { count, percent, plural } from "./report.ts";
+import type { CoverageStatus, Protocol } from "./types.ts";
+
+interface Props {
+  protocol: Protocol;
+}
+
+const { protocol } = Astro.props;
+const { name, totals } = protocol;
+
+const ORDER: Record<CoverageStatus, number> = { covered: 0, partial: 1, uncovered: 2 };
+const contracts = [...protocol.contracts].sort(
+  (a, b) => (b.sample?.perDay ?? 0) - (a.sample?.perDay ?? 0) || ORDER[a.status] - ORDER[b.status],
+);
+// The closing band speaks to where the protocol stands: which of its
+// contracts are left, and which of those B3Pay already has a draft for.
+const covered = protocol.status === "covered";
+const left = totals.partial + totals.uncovered;
+const states = [
+  totals.partial > 0 && `${count(totals.partial)} ${totals.partial === 1 ? "is" : "are"} partly covered`,
+  totals.uncovered > 0 &&
+    `${count(totals.uncovered)} ${totals.uncovered === 1 ? "has" : "have"} no descriptor in the registry`,
+].filter(Boolean);
+const where =
+  totals.contracts === 1
+    ? `The one contract of ${name} here ${totals.partial > 0 ? "is partly covered" : "has no descriptor in the registry"}.`
+    : `Of the ${count(totals.contracts)} contracts of ${name} here, ${states.join(" and ")}.`;
+const drafted = protocol.contracts.filter((contract) => contract.status !== "covered" && contract.draft).length;
+const drafts =
+  drafted === 0
+    ? ""
+    : drafted === left
+      ? left === 1
+        ? " B3Pay has a tested draft for it, and the full draft is on request."
+        : " B3Pay has a tested draft for each, and the full drafts are on request."
+      : ` B3Pay has a tested draft for ${count(drafted)} of the ${count(left)}, and the full ${drafted === 1 ? "draft is" : "drafts are"} on request.`;
+---
+
+<Section id="contracts" fig="FIG. 01" eyebrow="Contracts" title={`${plural(totals.contracts, "contract")}, busiest first`}>
+  <Fragment slot="lead">
+    <p>
+      For each: its address and where it came from, the registry's descriptor for it, the functions it formats, and
+      which of its recent calls a wallet could clear-sign.{
+        totals.drafts > 0 && " Where B3Pay has a draft, one real transaction shows how a call reads with it."
+      }
+    </p>
+  </Fragment>
+  <div class="contracts">
+    {contracts.map((contract) => <ContractCard contract={contract} />)}
+  </div>
+</Section>
+
+<Section id="reading-it" fig="FIG. 02" eyebrow="Reading it" title="What these numbers say, and do not">
+  <ul class="notes rise">
+    <li>
+      <strong>Covered</strong> means the registry has a descriptor for the deployment and it formats at least {
+        percent(COVERED_AT)
+      } of what recent senders called. <strong>Partial</strong> means a descriptor formats less, or its reach could not
+      be measured. <strong>Uncovered</strong> means the registry has no descriptor for it.
+    </li>
+    <li>
+      <strong>By transactions</strong>, every call counts. <strong>By senders</strong>, each address counts once for each
+      function, so a relayer bot counts once however many calls it sends.
+    </li>
+    {
+      totals.drafts > 0 && (
+        <li>
+          <strong>A draft is B3Pay's, not the registry's.</strong> No wallet reads it yet, and its preview shows how one
+          call would read, not how any wallet shows it today.
+        </li>
+      )
+    }
+    <li>
+      <strong>A descriptor is not an audit</strong>, and wallets decide which descriptors they trust.
+    </li>
+  </ul>
+  <p class="more rise">
+    <a href="/clear-signing/coverage/#how-we-measure">How we measure</a>
+    <a href="/clear-signing/coverage/#what-we-dont-claim">What the tracker does not claim</a>
+    <a href={`/clear-signing/coverage/#protocol-${protocol.id}`}>All protocols</a>
+  </p>
+</Section>
+
+<Closing
+  id="get-covered"
+  fig="FIG. 03"
+  title={covered ? `Keep ${name} clear-signed as it changes` : `Get ${name} clear-signed`}
+  back={{ href: `/clear-signing/coverage/#protocol-${protocol.id}`, text: "All protocols" }}
+>
+  {
+    covered ? (
+      <p>
+        Every contract of {name} here is covered. When a proxy is upgraded or an ABI changes, a descriptor can stop
+        matching: we write, test and submit descriptors, and keep them current.
+      </p>
+    ) : (
+      <p>
+        {where}
+        {drafts} We write, test and submit descriptors.
+      </p>
+    )
+  }
+</Closing>
+
+<style>
+  .contracts {
+    display: grid;
+    gap: 1rem;
+    margin-top: 2.5rem;
+  }
+
+  .notes {
+    display: grid;
+    max-width: 50rem;
+    margin: 2.25rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .notes li {
+    position: relative;
+    padding: 1rem 0 1rem 1.75rem;
+    border-top: 1px solid var(--line);
+    line-height: 1.6;
+    color: var(--sl-color-gray-2);
+  }
+
+  /* The amber dash of the tracker's "does not claim" list. */
+  .notes li::before {
+    content: "";
+    position: absolute;
+    top: 1.85rem;
+    left: 0;
+    width: 0.75rem;
+    height: 1px;
+    background-color: var(--brand);
+  }
+
+  .notes strong {
+    color: var(--ink);
+  }
+
+  .more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1.75rem;
+    max-width: 50rem;
+    margin: 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+    font-size: var(--sl-text-sm);
+  }
+
+  .more a {
+    font-weight: 600;
+    color: var(--sl-color-text-accent);
+  }
+
+  .more a::after {
+    content: " →";
+  }
+</style>

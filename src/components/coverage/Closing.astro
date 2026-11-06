@@ -1,30 +1,31 @@
 ---
 /**
- * FIG. 05: the way in, on the home page's closing band: the hairline grid
- * on the raised surface, full width, without the wall of calldata.
+ * The way in, on the home page's closing band: the hairline grid on the
+ * raised surface, full width, without the wall of calldata. The overview
+ * and each protocol's page give it their own title and words; the default
+ * slot is the lead.
  */
 import { LinkButton } from "@astrojs/starlight/components";
 import Section from "../home/Section.astro";
 
 interface Props {
   id: string;
+  fig: string;
+  title: string;
+  /** The second way out: by default, what B3Pay does for a protocol. */
+  back?: { href: string; text: string };
 }
 
-const { id } = Astro.props;
+const { id, fig, title, back = { href: "/clear-signing/", text: "What we do for a protocol" } } = Astro.props;
 ---
 
 <div class="closing">
   <div class="band" aria-hidden="true"></div>
-  <Section {id} fig="FIG. 05" eyebrow="Get covered" title="Is your protocol missing or partly covered?">
-    <Fragment slot="lead">
-      <p>
-        We write, test and submit descriptors. Tell us the chains, the addresses and the flows your users sign. Where this
-        page shows a draft ready for one of your contracts, the full draft is on request.
-      </p>
-    </Fragment>
+  <Section {id} {fig} eyebrow="Get covered" {title}>
+    <Fragment slot="lead"><slot /></Fragment>
     <div class="actions rise">
       <LinkButton href="/clear-signing/#start" icon="right-arrow">Start with your contracts</LinkButton>
-      <LinkButton href="/clear-signing/" variant="minimal">What we do for a protocol</LinkButton>
+      <LinkButton href={back.href} variant="minimal">{back.text}</LinkButton>
     </div>
   </Section>
 </div>

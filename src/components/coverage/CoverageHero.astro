@@ -1,21 +1,29 @@
 ---
 /**
- * The coverage tracker's hero, through the Hero override: the page's title,
- * tagline and actions from its frontmatter, and beside them the two headline
- * numbers, worked out from the report and never written by hand: how many of
- * the contracts tracked have a descriptor in the registry, and how much of
- * their recent traffic a wallet could clear-sign, by transactions first and
- * then by senders. Under them, what was measured and when.
+ * The coverage tracker's hero, through the Hero override, on the overview
+ * and on each protocol's page: the page's title, tagline and actions from
+ * its frontmatter, and beside them the two headline numbers, worked out from
+ * the report and never written by hand: how many of the contracts have a
+ * descriptor in the registry, and how much of their recent traffic a wallet
+ * could clear-sign, by transactions first and then by senders. Under them,
+ * what was measured and when. A protocol's page adds its status, category,
+ * website and, when DefiLlama has it, its TVL.
  */
 import { LinkButton } from "@astrojs/starlight/components";
 import Meter from "./Meter.astro";
+import StatusBadge from "./StatusBadge.astro";
 import StatusIcon from "./StatusIcon.astro";
-import { count, day, days, percent, registryUrl, report } from "./report.ts";
+import { count, day, days, host, percent, protocolById, registryUrl, report, usd } from "./report.ts";
 
-const { data } = Astro.locals.starlightRoute.entry;
-const { title = data.title, tagline, actions = [] } = data.hero ?? {};
+const { id, entry } = Astro.locals.starlightRoute;
+const { title = entry.data.title, tagline, actions = [] } = entry.data.hero ?? {};
 
-const { totals, registry, sources } = report;
+// A protocol's page is /clear-signing/coverage/<id>/; the overview is the page above them.
+const PROTOCOLS = "clear-signing/coverage/";
+const protocol = id.startsWith(PROTOCOLS) ? protocolById(id.slice(PROTOCOLS.length)) : null;
+
+const { registry, sources } = report;
+const totals = protocol ? protocol.totals : report.totals;
 const withDescriptor = totals.covered + totals.partial;
 const parts = [
   { status: "covered", n: totals.covered },
@@ -28,9 +36,57 @@ const parts = [
   <div class="backdrop" aria-hidden="true"><div class="glow"></div></div>
 
   <div class="copy">
-    <p class="eyebrow"><span class="dot"></span>Clear Signing coverage tracker</p>
+    {
+      protocol ? (
+        <p class="eyebrow">
+          <span class="dot" />
+          <a href="/clear-signing/coverage/">Clear Signing coverage tracker</a>
+          <span aria-hidden="true">/</span> {protocol.categoryLabel}
+        </p>
+      ) : (
+        <p class="eyebrow">
+          <span class="dot" />
+          Clear Signing coverage tracker
+        </p>
+      )
+    }
     <h1 id="_top" data-page-title set:html={title} />
     {tagline && <p class="tagline" set:html={tagline} />}
+    {
+      protocol && (
+        <dl class="facts">
+          <div>
+            <dt>Status</dt>
+            <dd>
+              <StatusBadge kind={protocol.status} />
+              {protocol.totals.drafts > 0 && (
+                <>
+                  {" "}
+                  <StatusBadge kind="draft" />
+                </>
+              )}
+            </dd>
+          </div>
+          <div>
+            <dt>Website</dt>
+            <dd>
+              <a href={protocol.website}>{host(protocol.website)}</a>
+            </dd>
+          </div>
+          {protocol.tvlUsd !== null && (
+            <div>
+              <dt>TVL</dt>
+              <dd>
+                {usd(protocol.tvlUsd)}{" "}
+                <span class="source">
+                  on the four chains, from DefiLlama{sources.defillama && `, ${day(sources.defillama)}`}
+                </span>
+              </dd>
+            </div>
+          )}
+        </dl>
+      )
+    }
     {
       report.mock && (
         <p class="mock">
@@ -60,7 +116,13 @@ const parts = [
         <p class="value">
           {count(withDescriptor)}<span class="of"> of {count(totals.contracts)}</span>
         </p>
-        <p class="label">most-used contracts have a descriptor in the registry</p>
+        <p class="label">
+          {
+            protocol
+              ? `${totals.contracts === 1 ? "contract" : "contracts"} here ${withDescriptor === 1 || totals.contracts === 1 ? "has" : "have"} a descriptor in the registry`
+              : "most-used contracts have a descriptor in the registry"
+          }
+        </p>
         <span class="segments" aria-hidden="true">
           {parts.filter((part) => part.n > 0).map((part) => <span class:list={["segment", part.status]} style={`flex-grow: ${part.n}`} />)}
         </span>
@@ -80,7 +142,7 @@ const parts = [
         <p class="kicker">Recent traffic</p>
         {
           totals.txShareCovered === null ? (
-            <p class="value none">No sample</p>
+            <p class="value none">No recent transactions</p>
           ) : (
             <>
               <p class="value">{percent(totals.txShareCovered)}</p>
@@ -114,7 +176,10 @@ const parts = [
         }
       </span>
       <span>On-chain reads {days(sources.onchain.oldest, sources.onchain.newest)}</span>
-      <span>{count(Math.round(totals.perDay))} transactions a day across {count(totals.contracts)} contracts</span>
+      <span>
+        {count(Math.round(totals.perDay))} transactions a day across {count(totals.contracts)}{" "}
+        {totals.contracts === 1 ? "contract" : "contracts"}
+      </span>
       <a href="/clear-signing/coverage.json">The data, as JSON</a>
     </figcaption>
   </figure>
@@ -151,6 +216,16 @@ const parts = [
     color: var(--sl-color-gray-2);
   }
 
+  .eyebrow a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .eyebrow a:hover {
+    color: var(--sl-color-text-accent);
+    text-decoration: underline;
+  }
+
   .dot {
     width: 0.45rem;
     height: 0.45rem;
@@ -177,6 +252,50 @@ const parts = [
     line-height: 1.55;
     color: var(--sl-color-gray-2);
     text-wrap: pretty;
+  }
+
+  /* A protocol's status, website and TVL, under its name. */
+  .facts {
+    display: grid;
+    gap: 0.55rem;
+    max-width: 36rem;
+    margin: 1.6rem 0 0;
+  }
+
+  .facts div {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: baseline;
+  }
+
+  .facts dt {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .facts dd {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.5rem;
+    align-items: baseline;
+    margin: 0;
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .facts dd a {
+    color: var(--sl-color-text-accent);
+  }
+
+  .facts .source {
+    font-size: var(--sl-text-xs);
+    font-weight: 400;
+    color: var(--ink-muted);
   }
 
   /* Placeholder data says so where no one can miss it. */

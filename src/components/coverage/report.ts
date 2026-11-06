@@ -21,6 +21,14 @@ if (problems.length)
     `src/data/clear-signing-coverage.json: ${problems.length} count(s) disagree with its protocol list; see node scripts/coverage-totals.mjs\n  ${problems.join("\n  ")}`,
   );
 
+// Each protocol's id is its page's address, so a second page cannot take it.
+const seen = new Set<string>();
+for (const { id } of report.protocols) {
+  if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(id) || seen.has(id))
+    throw new Error(`src/data/clear-signing-coverage.json: protocol id "${id}" is not unique kebab-case`);
+  seen.add(id);
+}
+
 /** A value the page has no words for stops the build instead of printing "undefined". */
 function lookup<K extends string | number, V>(table: Record<K, V>, key: K, what: string): V {
   if (!Object.hasOwn(table, key)) throw new Error(`src/data/clear-signing-coverage.json: unknown ${what} "${key}"`);
@@ -99,15 +107,62 @@ export function txUrl(contract: Contract, hash: string): string {
   return url;
 }
 
+/** A protocol by its id, which is its page's address: /clear-signing/coverage/<id>/. */
+export function protocolById(id: string): Protocol {
+  const protocol = report.protocols.find((candidate) => candidate.id === id);
+  if (!protocol) throw new Error(`src/data/clear-signing-coverage.json: no protocol "${id}"`);
+  return protocol;
+}
+
+const LIST = new Intl.ListFormat("en-GB", { type: "conjunction" });
+
+/** Chains by name, as a sentence lists them: "Ethereum, Base and OP Mainnet". */
+export const chainList = (ids: readonly ChainId[]) => LIST.format(ids.map(chainName));
+
+const USD = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", notation: "compact", maximumSignificantDigits: 3 });
+
+/** An amount in US dollars, to three figures: $2.41B. */
+export const usd = (value: number) => USD.format(value);
+
 /** The chains a protocol's contracts are on, in the page's order. */
 export const chainsOf = (protocol: Protocol) =>
   CHAINS.map(({ id }) => id).filter((id) => protocol.contracts.some((contract) => contract.chainId === id));
+
+/** Text for a place that takes HTML, such as a hero's title and tagline. */
+export const escapeHtml = (text: string) =>
+  text.replace(/[&<>"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[char]!);
 
 /** A link's host, which is what a reader needs to know before following it: docs.example.com. */
 export const host = (url: string) => new URL(url).host.replace(/^www\./, "");
 
 /** A registry file by its name: calldata-UniversalRouter.json. */
 export const fileName = (path: string) => path.slice(path.lastIndexOf("/") + 1);
+
+/**
+ * A protocol's page in words: its title, the description its link carries
+ * when it is shared, and the line under its name. Only what the report says.
+ */
+export function protocolCopy(protocol: Protocol) {
+  const { name, totals } = protocol;
+  const one = totals.contracts === 1;
+  const where = chainList(chainsOf(protocol));
+  const described = totals.covered + totals.partial;
+  const reach =
+    totals.txShareCovered === null
+      ? ""
+      : `, and a wallet could clear-sign ${percent(totals.txShareCovered)} of ${one ? "its" : "their"} recent transactions`;
+  const drafts = totals.drafts ? ` B3Pay has a tested draft descriptor for ${one ? "it" : `${count(totals.drafts)} of them`}.` : "";
+  const measured = days(report.sources.onchain.oldest, report.sources.onchain.newest);
+  return {
+    title: `${name}: Clear Signing coverage`,
+    description: `${name} on ${where}: ${
+      one
+        ? `its contract has ${described ? "a" : "no"} descriptor`
+        : `${count(described)} of ${plural(totals.contracts, "contract")} ${described === 1 ? "has" : "have"} a descriptor`
+    } in the Clear Signing registry${reach}.${drafts} Measured ${measured}.`,
+    tagline: `${plural(totals.contracts, "contract")} of ${name} on ${where}, checked against the Clear Signing registry and ${one ? "its" : "their"} recent transactions.`,
+  };
+}
 
 /** The registry at the report's commit, on GitHub. */
 export const registryUrl = `https://github.com/${report.registry.repo}/tree/${report.registry.commit}`;
