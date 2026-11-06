@@ -1,0 +1,2576 @@
+{
+  "mock": true,
+  "version": 1,
+  "generatedAt": "2026-11-05T21:05:00Z",
+  "registry": {
+    "repo": "ethereum/clear-signing-erc7730-registry",
+    "commit": "0123456789abcdef0123456789abcdef01234567",
+    "committedAt": "2026-11-04T09:12:41Z",
+    "deploymentsOnTrackedChains": 412
+  },
+  "sources": {
+    "onchain": {
+      "oldest": "2026-11-05T06:00:00Z",
+      "newest": "2026-11-05T20:40:00Z"
+    },
+    "defillama": "2026-11-05T05:48:10Z"
+  },
+  "totals": {
+    "protocols": 14,
+    "contracts": 40,
+    "covered": 17,
+    "partial": 4,
+    "uncovered": 19,
+    "drafts": 10,
+    "txShareCovered": 0.8379,
+    "signerShareCovered": 0.8553,
+    "perDay": 597023.7
+  },
+  "chains": {
+    "1": {
+      "name": "Ethereum",
+      "contracts": 15,
+      "covered": 9,
+      "partial": 1,
+      "uncovered": 5,
+      "drafts": 2,
+      "txShareCovered": 0.8848,
+      "signerShareCovered": 0.8866,
+      "perDay": 139497.8
+    },
+    "10": {
+      "name": "OP Mainnet",
+      "contracts": 5,
+      "covered": 0,
+      "partial": 1,
+      "uncovered": 4,
+      "drafts": 2,
+      "txShareCovered": 0.3871,
+      "signerShareCovered": 0.4392,
+      "perDay": 18110.8
+    },
+    "8453": {
+      "name": "Base",
+      "contracts": 11,
+      "covered": 5,
+      "partial": 2,
+      "uncovered": 4,
+      "drafts": 3,
+      "txShareCovered": 0.9322,
+      "signerShareCovered": 0.941,
+      "perDay": 320966.1
+    },
+    "42161": {
+      "name": "Arbitrum One",
+      "contracts": 9,
+      "covered": 3,
+      "partial": 0,
+      "uncovered": 6,
+      "drafts": 3,
+      "txShareCovered": 0.5968,
+      "signerShareCovered": 0.6426,
+      "perDay": 118449
+    }
+  },
+  "categories": {
+    "dex": {
+      "label": "DEX",
+      "contracts": 9,
+      "covered": 3,
+      "partial": 3,
+      "uncovered": 3,
+      "drafts": 2,
+      "txShareCovered": 0.8994,
+      "signerShareCovered": 0.9156,
+      "perDay": 343399.7
+    },
+    "lending": {
+      "label": "Lending",
+      "contracts": 7,
+      "covered": 4,
+      "partial": 0,
+      "uncovered": 3,
+      "drafts": 2,
+      "txShareCovered": 0.8695,
+      "signerShareCovered": 0.8704,
+      "perDay": 52293.3
+    },
+    "bridge": {
+      "label": "Bridge",
+      "contracts": 6,
+      "covered": 3,
+      "partial": 0,
+      "uncovered": 3,
+      "drafts": 3,
+      "txShareCovered": 0.466,
+      "signerShareCovered": 0.5795,
+      "perDay": 42227.2
+    },
+    "liquid-staking": {
+      "label": "Liquid staking",
+      "contracts": 4,
+      "covered": 2,
+      "partial": 0,
+      "uncovered": 2,
+      "drafts": 0,
+      "txShareCovered": 0.8228,
+      "signerShareCovered": 0.8328,
+      "perDay": 12317.7
+    },
+    "derivatives": {
+      "label": "Derivatives",
+      "contracts": 4,
+      "covered": 0,
+      "partial": 0,
+      "uncovered": 4,
+      "drafts": 1,
+      "txShareCovered": 0,
+      "signerShareCovered": 0,
+      "perDay": 24320.7
+    },
+    "yield": {
+      "label": "Yield",
+      "contracts": 5,
+      "covered": 1,
+      "partial": 1,
+      "uncovered": 3,
+      "drafts": 2,
+      "txShareCovered": 0.4761,
+      "signerShareCovered": 0.5607,
+      "perDay": 10860.7
+    },
+    "stablecoin": {
+      "label": "Stablecoin",
+      "contracts": 2,
+      "covered": 2,
+      "partial": 0,
+      "uncovered": 0,
+      "drafts": 0,
+      "txShareCovered": 0.9986,
+      "signerShareCovered": 0.9984,
+      "perDay": 90330.3
+    },
+    "nft": {
+      "label": "NFT marketplace",
+      "contracts": 3,
+      "covered": 2,
+      "partial": 0,
+      "uncovered": 1,
+      "drafts": 0,
+      "txShareCovered": 0.9581,
+      "signerShareCovered": 0.9652,
+      "perDay": 21274.1
+    }
+  },
+  "protocols": [
+    {
+      "id": "example-swap",
+      "name": "Example Swap",
+      "category": "dex",
+      "categoryLabel": "DEX",
+      "website": "https://example.com/example-swap",
+      "tvlUsd": 2410000000,
+      "status": "partial",
+      "totals": {
+        "contracts": 5,
+        "covered": 3,
+        "partial": 1,
+        "uncovered": 1,
+        "drafts": 1,
+        "txShareCovered": 0.9608,
+        "signerShareCovered": 0.9654,
+        "perDay": 265895.8
+      },
+      "contracts": [
+        {
+          "chainId": 1,
+          "address": "0x0000000000000000000000000000000000000001",
+          "name": "UniversalRouter",
+          "label": "Universal Router (v2)",
+          "role": "Swaps and multi-step trades through one entry point.",
+          "version": "2",
+          "status": "covered",
+          "addressSource": "https://example.com/example-swap/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/ethereum/address/0x0000000000000000000000000000000000000001",
+          "sourcify": "exact_match",
+          "descriptor": {
+            "path": "registry/example-swap/calldata-UniversalRouter.json",
+            "url": "https://example.com/registry/blob/0123456789abcdef0123456789abcdef01234567/registry/example-swap/calldata-UniversalRouter.json",
+            "owner": "Example Swap Labs",
+            "formats": 3,
+            "attestation": "none"
+          },
+          "functions": {
+            "writable": 6,
+            "formatted": 3
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 38420.5,
+            "oldest": "2026-11-05T05:19:31Z",
+            "newest": "2026-11-05T05:57:00Z",
+            "txShareCovered": 0.9824,
+            "signerShareCovered": 0.9902
+          },
+          "topFunctions": [
+            {
+              "selector": "0x3593564c",
+              "signature": "execute(bytes,bytes[],uint256)",
+              "share": 0.8742,
+              "senders": 481,
+              "formatted": true
+            },
+            {
+              "selector": "0x24856bc3",
+              "signature": "execute(bytes,bytes[])",
+              "share": 0.1082,
+              "senders": 60,
+              "formatted": true
+            },
+            {
+              "selector": "0x709a1cc2",
+              "signature": "collectRewards(bytes)",
+              "share": 0.0061,
+              "senders": 3,
+              "formatted": false
+            }
+          ],
+          "draft": null
+        },
+        {
+          "chainId": 8453,
+          "address": "0x0000000000000000000000000000000000000002",
+          "name": "UniversalRouter",
+          "label": "Universal Router (v2)",
+          "role": "Swaps and multi-step trades through one entry point.",
+          "version": "2",
+          "status": "covered",
+          "addressSource": "https://example.com/example-swap/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/base/address/0x0000000000000000000000000000000000000002",
+          "sourcify": "exact_match",
+          "descriptor": {
+            "path": "registry/example-swap/calldata-UniversalRouter.json",
+            "url": "https://example.com/registry/blob/0123456789abcdef0123456789abcdef01234567/registry/example-swap/calldata-UniversalRouter.json",
+            "owner": "Example Swap Labs",
+            "formats": 3,
+            "attestation": "none"
+          },
+          "functions": {
+            "writable": 6,
+            "formatted": 3
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 152310.2,
+            "oldest": "2026-11-05T06:09:07Z",
+            "newest": "2026-11-05T06:18:34Z",
+            "txShareCovered": 0.9911,
+            "signerShareCovered": 0.995
+          },
+          "topFunctions": [
+            {
+              "selector": "0x3593564c",
+              "signature": "execute(bytes,bytes[],uint256)",
+              "share": 0.9013,
+              "senders": 496,
+              "formatted": true
+            },
+            {
+              "selector": "0x24856bc3",
+              "signature": "execute(bytes,bytes[])",
+              "share": 0.0898,
+              "senders": 49,
+              "formatted": true
+            },
+            {
+              "selector": "0x709a1cc2",
+              "signature": "collectRewards(bytes)",
+              "share": 0.0042,
+              "senders": 2,
+              "formatted": false
+            }
+          ],
+          "draft": null
+        },
+        {
+          "chainId": 42161,
+          "address": "0x0000000000000000000000000000000000000003",
+          "name": "UniversalRouter",
+          "label": "Universal Router (v2)",
+          "role": "Swaps and multi-step trades through one entry point.",
+          "version": "2",
+          "status": "covered",
+          "addressSource": "https://example.com/example-swap/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/arbitrum-one/address/0x0000000000000000000000000000000000000003",
+          "sourcify": "exact_match",
+          "descriptor": {
+            "path": "registry/example-swap/calldata-UniversalRouter.json",
+            "url": "https://example.com/registry/blob/0123456789abcdef0123456789abcdef01234567/registry/example-swap/calldata-UniversalRouter.json",
+            "owner": "Example Swap Labs",
+            "formats": 3,
+            "attestation": "none"
+          },
+          "functions": {
+            "writable": 6,
+            "formatted": 3
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 61204.8,
+            "oldest": "2026-11-05T06:16:36Z",
+            "newest": "2026-11-05T06:40:08Z",
+            "txShareCovered": 0.9763,
+            "signerShareCovered": 0.9871
+          },
+          "topFunctions": [
+            {
+              "selector": "0x3593564c",
+              "signature": "execute(bytes,bytes[],uint256)",
+              "share": 0.8521,
+              "senders": 469,
+              "formatted": true
+            },
+            {
+              "selector": "0x24856bc3",
+              "signature": "execute(bytes,bytes[])",
+              "share": 0.1242,
+              "senders": 68,
+              "formatted": true
+            },
+            {
+              "selector": "0x7a1eb1b9",
+              "signature": null,
+              "share": 0.0118,
+              "senders": 6,
+              "formatted": false
+            }
+          ],
+          "draft": null
+        },
+        {
+          "chainId": 10,
+          "address": "0x0000000000000000000000000000000000000004",
+          "name": "UniversalRouter",
+          "label": "Universal Router (v1)",
+          "role": "Swaps and multi-step trades through one entry point.",
+          "version": "1",
+          "status": "partial",
+          "addressSource": "https://example.com/example-swap/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/op-mainnet/address/0x0000000000000000000000000000000000000004",
+          "sourcify": "exact_match",
+          "descriptor": {
+            "path": "registry/example-swap/calldata-UniversalRouter-v1.json",
+            "url": "https://example.com/registry/blob/0123456789abcdef0123456789abcdef01234567/registry/example-swap/calldata-UniversalRouter-v1.json",
+            "owner": "Example Swap Labs",
+            "formats": 1,
+            "attestation": "none"
+          },
+          "functions": {
+            "writable": 6,
+            "formatted": 1
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 9840,
+            "oldest": "2026-11-05T04:35:21Z",
+            "newest": "2026-11-05T07:01:42Z",
+            "txShareCovered": 0.7124,
+            "signerShareCovered": 0.6802
+          },
+          "topFunctions": [
+            {
+              "selector": "0x3593564c",
+              "signature": "execute(bytes,bytes[],uint256)",
+              "share": 0.7124,
+              "senders": 392,
+              "formatted": true
+            },
+            {
+              "selector": "0x24856bc3",
+              "signature": "execute(bytes,bytes[])",
+              "share": 0.2651,
+              "senders": 146,
+              "formatted": false
+            },
+            {
+              "selector": "0x709a1cc2",
+              "signature": "collectRewards(bytes)",
+              "share": 0.0129,
+              "senders": 7,
+              "formatted": false
+            }
+          ],
+          "draft": null
+        },
+        {
+          "chainId": 1,
+          "address": "0x0000000000000000000000000000000000000005",
+          "name": "PositionManager",
+          "label": "Position Manager",
+          "role": "Opens, adds to and closes liquidity positions.",
+          "status": "uncovered",
+          "addressSource": "https://example.com/example-swap/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/ethereum/address/0x0000000000000000000000000000000000000005",
+          "sourcify": "exact_match",
+          "descriptor": null,
+          "functions": {
+            "writable": 14,
+            "formatted": 0
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 4120.3,
+            "oldest": "2026-11-05T01:33:46Z",
+            "newest": "2026-11-05T07:23:15Z",
+            "txShareCovered": 0,
+            "signerShareCovered": 0
+          },
+          "topFunctions": [
+            {
+              "selector": "0xac9650d8",
+              "signature": "multicall(bytes[])",
+              "share": 0.441,
+              "senders": 243,
+              "formatted": false
+            },
+            {
+              "selector": "0x88316456",
+              "signature": "mint((address,address,uint24,int24,int24,uint256,uint256,uint256,uint256,address,uint256))",
+              "share": 0.1983,
+              "senders": 109,
+              "formatted": false
+            },
+            {
+              "selector": "0x0c49ccbe",
+              "signature": "decreaseLiquidity((uint256,uint128,uint256,uint256,uint256))",
+              "share": 0.1622,
+              "senders": 89,
+              "formatted": false
+            },
+            {
+              "selector": "0xfc6f7865",
+              "signature": "collect((uint256,address,uint128,uint128))",
+              "share": 0.1204,
+              "senders": 66,
+              "formatted": false
+            },
+            {
+              "selector": "0x219f5d17",
+              "signature": "increaseLiquidity((uint256,uint256,uint256,uint256,uint256,uint256))",
+              "share": 0.0631,
+              "senders": 35,
+              "formatted": false
+            }
+          ],
+          "draft": {
+            "functions": 9,
+            "testedTxs": 14,
+            "lint": "pass",
+            "preview": {
+              "txHash": "0x12ab000000000000000000000000000000000000000000000000000000000005",
+              "intent": "Add liquidity to EXA / ETH",
+              "fields": [
+                {
+                  "label": "Pool",
+                  "value": "EXA / ETH, 0.3% fee"
+                },
+                {
+                  "label": "Up to",
+                  "value": "1,250 EXA"
+                },
+                {
+                  "label": "And up to",
+                  "value": "0.42 ETH"
+                },
+                {
+                  "label": "Position to",
+                  "value": "0x0000…0b0b"
+                },
+                {
+                  "label": "Expires",
+                  "value": "5 Nov 2026, 14:20 UTC"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "demo-stable",
+      "name": "Demo Stable",
+      "category": "stablecoin",
+      "categoryLabel": "Stablecoin",
+      "website": "https://example.com/demo-stable",
+      "tvlUsd": null,
+      "status": "covered",
+      "totals": {
+        "contracts": 2,
+        "covered": 2,
+        "partial": 0,
+        "uncovered": 0,
+        "drafts": 0,
+        "txShareCovered": 0.9986,
+        "signerShareCovered": 0.9984,
+        "perDay": 90330.3
+      },
+      "contracts": [
+        {
+          "chainId": 1,
+          "address": "0x0000000000000000000000000000000000000027",
+          "name": "DemoDollar",
+          "label": "Demo Dollar token",
+          "role": "Sends and approves the token.",
+          "status": "covered",
+          "addressSource": "https://example.com/demo-stable/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/ethereum/address/0x0000000000000000000000000000000000000027",
+          "sourcify": "exact_match",
+          "descriptor": {
+            "path": "registry/demo-stable/calldata-DemoDollar.json",
+            "url": "https://example.com/registry/blob/0123456789abcdef0123456789abcdef01234567/registry/demo-stable/calldata-DemoDollar.json",
+            "owner": "Demo Stable",
+            "formats": 6,
+            "attestation": "unverified"
+          },
+          "functions": {
+            "writable": 9,
+            "formatted": 6
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 31420,
+            "oldest": "2026-11-05T14:52:50Z",
+            "newest": "2026-11-05T15:38:40Z",
+            "txShareCovered": 0.9991,
+            "signerShareCovered": 0.9993
+          },
+          "topFunctions": [
+            {
+              "selector": "0xa9059cbb",
+              "signature": "transfer(address,uint256)",
+              "share": 0.8302,
+              "senders": 457,
+              "formatted": true
+            },
+            {
+              "selector": "0x095ea7b3",
+              "signature": "approve(address,uint256)",
+              "share": 0.141,
+              "senders": 78,
+              "formatted": true
+            },
+            {
+              "selector": "0x23b872dd",
+              "signature": "transferFrom(address,address,uint256)",
+              "share": 0.0279,
+              "senders": 15,
+              "formatted": true
+            }
+          ],
+          "draft": null
+        },
+        {
+          "chainId": 8453,
+          "address": "0x0000000000000000000000000000000000000028",
+          "name": "DemoDollar",
+          "label": "Demo Dollar token",
+          "role": "Sends and approves the token.",
+          "status": "covered",
+          "addressSource": "https://example.com/demo-stable/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/base/address/0x0000000000000000000000000000000000000028",
+          "sourcify": "exact_match",
+          "descriptor": {
+            "path": "registry/demo-stable/calldata-DemoDollar.json",
+            "url": "https://example.com/registry/blob/0123456789abcdef0123456789abcdef01234567/registry/demo-stable/calldata-DemoDollar.json",
+            "owner": "Demo Stable",
+            "formats": 6,
+            "attestation": "none"
+          },
+          "functions": {
+            "writable": 9,
+            "formatted": 6
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 58910.3,
+            "oldest": "2026-11-05T15:42:47Z",
+            "newest": "2026-11-05T16:07:14Z",
+            "txShareCovered": 0.9984,
+            "signerShareCovered": 0.9979
+          },
+          "topFunctions": [
+            {
+              "selector": "0xa9059cbb",
+              "signature": "transfer(address,uint256)",
+              "share": 0.8811,
+              "senders": 485,
+              "formatted": true
+            },
+            {
+              "selector": "0x095ea7b3",
+              "signature": "approve(address,uint256)",
+              "share": 0.1032,
+              "senders": 57,
+              "formatted": true
+            },
+            {
+              "selector": "0xe3ee160e",
+              "signature": "transferWithAuthorization(address,address,uint256,uint256,uint256,bytes32,uint8,bytes32,bytes32)",
+              "share": 0.0141,
+              "senders": 8,
+              "formatted": true
+            }
+          ],
+          "draft": null
+        }
+      ]
+    },
+    {
+      "id": "example-aggregator",
+      "name": "Example Aggregator",
+      "category": "dex",
+      "categoryLabel": "DEX",
+      "website": "https://example.com/example-aggregator",
+      "tvlUsd": null,
+      "status": "partial",
+      "totals": {
+        "contracts": 4,
+        "covered": 0,
+        "partial": 2,
+        "uncovered": 2,
+        "drafts": 1,
+        "txShareCovered": 0.6887,
+        "signerShareCovered": 0.738,
+        "perDay": 77503.9
+      },
+      "contracts": [
+        {
+          "chainId": 1,
+          "address": "0x0000000000000000000000000000000000000015",
+          "name": "AggregationRouter",
+          "label": "Aggregation Router (v6)",
+          "role": "Routes one swap across several pools.",
+          "version": "6",
+          "status": "partial",
+          "addressSource": "https://example.com/example-aggregator/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/ethereum/address/0x0000000000000000000000000000000000000015",
+          "sourcify": "exact_match",
+          "descriptor": {
+            "path": "registry/example-aggregator/calldata-AggregationRouter.json",
+            "url": "https://example.com/registry/blob/0123456789abcdef0123456789abcdef01234567/registry/example-aggregator/calldata-AggregationRouter.json",
+            "owner": null,
+            "formats": 7,
+            "attestation": "none"
+          },
+          "functions": {
+            "writable": 21,
+            "formatted": 7
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 18200.4,
+            "oldest": "2026-11-05T09:53:47Z",
+            "newest": "2026-11-05T11:12:54Z",
+            "txShareCovered": 0.8841,
+            "signerShareCovered": 0.9123
+          },
+          "topFunctions": [
+            {
+              "selector": "0x07ed2379",
+              "signature": "swap(address,(address,address,address,address,uint256,uint256,uint256),bytes)",
+              "share": 0.662,
+              "senders": 364,
+              "formatted": true
+            },
+            {
+              "selector": "0xf497df75",
+              "signature": "fillOrderArgs((uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256),bytes32,bytes32,uint256,uint256,bytes)",
+              "share": 0.1121,
+              "senders": 62,
+              "formatted": true
+            },
+            {
+              "selector": "0x83800a8e",
+              "signature": "unoswap(uint256,uint256,uint256,uint256)",
+              "share": 0.079,
+              "senders": 43,
+              "formatted": false
+            },
+            {
+              "selector": "0x0d5f0e3b",
+              "signature": "uniswapV3SwapTo(uint256,uint256,uint256,uint256[])",
+              "share": 0.032,
+              "senders": 18,
+              "formatted": false
+            }
+          ],
+          "draft": null
+        },
+        {
+          "chainId": 8453,
+          "address": "0x0000000000000000000000000000000000000016",
+          "name": "AggregationRouter",
+          "label": "Aggregation Router (v6)",
+          "role": "Routes one swap across several pools.",
+          "version": "6",
+          "status": "partial",
+          "addressSource": "https://example.com/example-aggregator/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/base/address/0x0000000000000000000000000000000000000016",
+          "sourcify": "exact_match",
+          "descriptor": {
+            "path": "registry/example-aggregator/calldata-AggregationRouter.json",
+            "url": "https://example.com/registry/blob/0123456789abcdef0123456789abcdef01234567/registry/example-aggregator/calldata-AggregationRouter.json",
+            "owner": null,
+            "formats": 7,
+            "attestation": "none"
+          },
+          "functions": {
+            "writable": 21,
+            "formatted": 7
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 41330.7,
+            "oldest": "2026-11-05T10:59:37Z",
+            "newest": "2026-11-05T11:34:28Z",
+            "txShareCovered": 0.9021,
+            "signerShareCovered": 0.931
+          },
+          "topFunctions": [
+            {
+              "selector": "0x07ed2379",
+              "signature": "swap(address,(address,address,address,address,uint256,uint256,uint256),bytes)",
+              "share": 0.7012,
+              "senders": 386,
+              "formatted": true
+            },
+            {
+              "selector": "0xf497df75",
+              "signature": "fillOrderArgs((uint256,uint256,uint256,uint256,uint256,uint256,uint256,uint256),bytes32,bytes32,uint256,uint256,bytes)",
+              "share": 0.143,
+              "senders": 79,
+              "formatted": true
+            },
+            {
+              "selector": "0x83800a8e",
+              "signature": "unoswap(uint256,uint256,uint256,uint256)",
+              "share": 0.0911,
+              "senders": 50,
+              "formatted": false
+            }
+          ],
+          "draft": null
+        },
+        {
+          "chainId": 42161,
+          "address": "0x0000000000000000000000000000000000000017",
+          "name": "AggregationRouter",
+          "label": "Aggregation Router (v6)",
+          "role": "Routes one swap across several pools.",
+          "version": "6",
+          "status": "uncovered",
+          "addressSource": "https://example.com/example-aggregator/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/arbitrum-one/address/0x0000000000000000000000000000000000000017",
+          "sourcify": "exact_match",
+          "descriptor": null,
+          "functions": {
+            "writable": 21,
+            "formatted": 0
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 15102.2,
+            "oldest": "2026-11-05T10:20:41Z",
+            "newest": "2026-11-05T11:56:02Z",
+            "txShareCovered": 0,
+            "signerShareCovered": 0
+          },
+          "topFunctions": [
+            {
+              "selector": "0x07ed2379",
+              "signature": "swap(address,(address,address,address,address,uint256,uint256,uint256),bytes)",
+              "share": 0.6841,
+              "senders": 376,
+              "formatted": false
+            },
+            {
+              "selector": "0x83800a8e",
+              "signature": "unoswap(uint256,uint256,uint256,uint256)",
+              "share": 0.1702,
+              "senders": 94,
+              "formatted": false
+            },
+            {
+              "selector": "0x0d5f0e3b",
+              "signature": "uniswapV3SwapTo(uint256,uint256,uint256,uint256[])",
+              "share": 0.0911,
+              "senders": 50,
+              "formatted": false
+            }
+          ],
+          "draft": {
+            "functions": 12,
+            "testedTxs": 19,
+            "lint": "pass",
+            "preview": {
+              "txHash": "0x12ab000000000000000000000000000000000000000000000000000000000017",
+              "intent": "Swap SMP for ETH",
+              "fields": [
+                {
+                  "label": "Send",
+                  "value": "2,500 SMP"
+                },
+                {
+                  "label": "Receive at least",
+                  "value": "0.79 ETH"
+                },
+                {
+                  "label": "Recipient",
+                  "value": "0x0000…0b0b"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "chainId": 10,
+          "address": "0x0000000000000000000000000000000000000018",
+          "name": "AggregationRouter",
+          "label": "Aggregation Router (v6)",
+          "role": "Routes one swap across several pools.",
+          "version": "6",
+          "status": "uncovered",
+          "addressSource": "https://example.com/example-aggregator/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/op-mainnet/address/0x0000000000000000000000000000000000000018",
+          "sourcify": "exact_match",
+          "descriptor": null,
+          "functions": {
+            "writable": 21,
+            "formatted": 0
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 2870.6,
+            "oldest": "2026-11-05T03:55:57Z",
+            "newest": "2026-11-05T12:17:35Z",
+            "txShareCovered": 0,
+            "signerShareCovered": null
+          },
+          "topFunctions": [
+            {
+              "selector": "0x07ed2379",
+              "signature": "swap(address,(address,address,address,address,uint256,uint256,uint256),bytes)",
+              "share": 0.7203,
+              "senders": null,
+              "formatted": false
+            },
+            {
+              "selector": "0x83800a8e",
+              "signature": "unoswap(uint256,uint256,uint256,uint256)",
+              "share": 0.201,
+              "senders": null,
+              "formatted": false
+            }
+          ],
+          "draft": null
+        }
+      ]
+    },
+    {
+      "id": "sample-lend",
+      "name": "Sample Lend",
+      "category": "lending",
+      "categoryLabel": "Lending",
+      "website": "https://example.com/sample-lend",
+      "tvlUsd": 9870000000,
+      "status": "covered",
+      "totals": {
+        "contracts": 4,
+        "covered": 4,
+        "partial": 0,
+        "uncovered": 0,
+        "drafts": 0,
+        "txShareCovered": 0.9936,
+        "signerShareCovered": 0.9945,
+        "perDay": 45765.8
+      },
+      "contracts": [
+        {
+          "chainId": 1,
+          "address": "0x0000000000000000000000000000000000000006",
+          "name": "Pool",
+          "label": "Pool (v3)",
+          "role": "Supply, borrow, repay and withdraw.",
+          "version": "3",
+          "status": "covered",
+          "addressSource": "https://example.com/sample-lend/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/ethereum/address/0x0000000000000000000000000000000000000006",
+          "sourcify": "exact_match",
+          "descriptor": {
+            "path": "registry/sample-lend/calldata-Pool.json",
+            "url": "https://example.com/registry/blob/0123456789abcdef0123456789abcdef01234567/registry/sample-lend/calldata-Pool.json",
+            "owner": "Sample Lend DAO",
+            "formats": 11,
+            "attestation": "verified"
+          },
+          "functions": {
+            "writable": 18,
+            "formatted": 11
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 12840.1,
+            "oldest": "2026-11-05T05:52:40Z",
+            "newest": "2026-11-05T07:44:49Z",
+            "txShareCovered": 0.9968,
+            "signerShareCovered": 0.9981
+          },
+          "topFunctions": [
+            {
+              "selector": "0x617ba037",
+              "signature": "supply(address,uint256,address,uint16)",
+              "share": 0.342,
+              "senders": 188,
+              "formatted": true
+            },
+            {
+              "selector": "0x69328dec",
+              "signature": "withdraw(address,uint256,address)",
+              "share": 0.2611,
+              "senders": 144,
+              "formatted": true
+            },
+            {
+              "selector": "0x573ade81",
+              "signature": "repay(address,uint256,uint256,address)",
+              "share": 0.1802,
+              "senders": 99,
+              "formatted": true
+            },
+            {
+              "selector": "0xa415bcad",
+              "signature": "borrow(address,uint256,uint256,uint16,address)",
+              "share": 0.151,
+              "senders": 83,
+              "formatted": true
+            },
+            {
+              "selector": "0x5a3b74b9",
+              "signature": "setUserUseReserveAsCollateral(address,bool)",
+              "share": 0.0541,
+              "senders": 30,
+              "formatted": true
+            }
+          ],
+          "draft": null
+        },
+        {
+          "chainId": 8453,
+          "address": "0x0000000000000000000000000000000000000007",
+          "name": "Pool",
+          "label": "Pool (v3)",
+          "role": "Supply, borrow, repay and withdraw.",
+          "version": "3",
+          "status": "covered",
+          "addressSource": "https://example.com/sample-lend/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/base/address/0x0000000000000000000000000000000000000007",
+          "sourcify": "exact_match",
+          "descriptor": {
+            "path": "registry/sample-lend/calldata-Pool.json",
+            "url": "https://example.com/registry/blob/0123456789abcdef0123456789abcdef01234567/registry/sample-lend/calldata-Pool.json",
+            "owner": "Sample Lend DAO",
+            "formats": 11,
+            "attestation": "none"
+          },
+          "functions": {
+            "writable": 18,
+            "formatted": 11
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 22410.6,
+            "oldest": "2026-11-05T07:09:08Z",
+            "newest": "2026-11-05T08:13:23Z",
+            "txShareCovered": 0.9931,
+            "signerShareCovered": 0.994
+          },
+          "topFunctions": [
+            {
+              "selector": "0x617ba037",
+              "signature": "supply(address,uint256,address,uint16)",
+              "share": 0.3802,
+              "senders": 209,
+              "formatted": true
+            },
+            {
+              "selector": "0x69328dec",
+              "signature": "withdraw(address,uint256,address)",
+              "share": 0.2507,
+              "senders": 138,
+              "formatted": true
+            },
+            {
+              "selector": "0xa415bcad",
+              "signature": "borrow(address,uint256,uint256,uint16,address)",
+              "share": 0.1631,
+              "senders": 90,
+              "formatted": true
+            },
+            {
+              "selector": "0x573ade81",
+              "signature": "repay(address,uint256,uint256,address)",
+              "share": 0.1508,
+              "senders": 83,
+              "formatted": true
+            },
+            {
+              "selector": "0x00a718a9",
+              "signature": "liquidationCall(address,address,address,uint256,bool)",
+              "share": 0.0061,
+              "senders": 3,
+              "formatted": false
+            }
+          ],
+          "draft": null
+        },
+        {
+          "chainId": 42161,
+          "address": "0x0000000000000000000000000000000000000008",
+          "name": "Pool",
+          "label": "Pool (v3)",
+          "role": "Supply, borrow, repay and withdraw.",
+          "version": "3",
+          "status": "covered",
+          "addressSource": "https://example.com/sample-lend/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/arbitrum-one/address/0x0000000000000000000000000000000000000008",
+          "sourcify": "exact_match",
+          "descriptor": {
+            "path": "registry/sample-lend/calldata-Pool.json",
+            "url": "https://example.com/registry/blob/0123456789abcdef0123456789abcdef01234567/registry/sample-lend/calldata-Pool.json",
+            "owner": "Sample Lend DAO",
+            "formats": 11,
+            "attestation": "none"
+          },
+          "functions": {
+            "writable": 18,
+            "formatted": 11
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 9310.4,
+            "oldest": "2026-11-05T06:00:17Z",
+            "newest": "2026-11-05T08:34:57Z",
+            "txShareCovered": 0.9894,
+            "signerShareCovered": 0.9902
+          },
+          "topFunctions": [
+            {
+              "selector": "0x617ba037",
+              "signature": "supply(address,uint256,address,uint16)",
+              "share": 0.3611,
+              "senders": 199,
+              "formatted": true
+            },
+            {
+              "selector": "0x69328dec",
+              "signature": "withdraw(address,uint256,address)",
+              "share": 0.2702,
+              "senders": 149,
+              "formatted": true
+            },
+            {
+              "selector": "0x573ade81",
+              "signature": "repay(address,uint256,uint256,address)",
+              "share": 0.172,
+              "senders": 95,
+              "formatted": true
+            },
+            {
+              "selector": "0xa415bcad",
+              "signature": "borrow(address,uint256,uint256,uint16,address)",
+              "share": 0.1491,
+              "senders": 82,
+              "formatted": true
+            },
+            {
+              "selector": "0x00a718a9",
+              "signature": "liquidationCall(address,address,address,uint256,bool)",
+              "share": 0.0098,
+              "senders": 5,
+              "formatted": false
+            }
+          ],
+          "draft": null
+        },
+        {
+          "chainId": 1,
+          "address": "0x0000000000000000000000000000000000000009",
+          "name": "WrappedTokenGateway",
+          "label": "Wrapped Token Gateway",
+          "role": "Supplies and withdraws the chain's native token.",
+          "status": "covered",
+          "addressSource": "https://example.com/sample-lend/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/ethereum/address/0x0000000000000000000000000000000000000009",
+          "sourcify": "exact_match",
+          "descriptor": {
+            "path": "registry/sample-lend/calldata-WrappedTokenGateway.json",
+            "url": "https://example.com/registry/blob/0123456789abcdef0123456789abcdef01234567/registry/sample-lend/calldata-WrappedTokenGateway.json",
+            "owner": "Sample Lend DAO",
+            "formats": 4,
+            "attestation": "none"
+          },
+          "functions": {
+            "writable": 4,
+            "formatted": 4
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 1204.7,
+            "oldest": "2026-11-04T13:01:12Z",
+            "newest": "2026-11-05T08:56:31Z",
+            "txShareCovered": 1,
+            "signerShareCovered": 1
+          },
+          "topFunctions": [
+            {
+              "selector": "0x474cf53d",
+              "signature": "depositETH(address,address,uint16)",
+              "share": 0.623,
+              "senders": 343,
+              "formatted": true
+            },
+            {
+              "selector": "0x80500d20",
+              "signature": "withdrawETH(address,uint256,address)",
+              "share": 0.3014,
+              "senders": 166,
+              "formatted": true
+            },
+            {
+              "selector": "0x02c5fcf8",
+              "signature": "repayETH(address,uint256,uint256,address)",
+              "share": 0.0756,
+              "senders": 42,
+              "formatted": true
+            }
+          ],
+          "draft": null
+        }
+      ]
+    },
+    {
+      "id": "sample-relay",
+      "name": "Sample Relay",
+      "category": "bridge",
+      "categoryLabel": "Bridge",
+      "website": "https://example.com/sample-relay",
+      "tvlUsd": 96000000,
+      "status": "covered",
+      "totals": {
+        "contracts": 3,
+        "covered": 3,
+        "partial": 0,
+        "uncovered": 0,
+        "drafts": 0,
+        "txShareCovered": 0.796,
+        "signerShareCovered": 0.9899,
+        "perDay": 24721.1
+      },
+      "contracts": [
+        {
+          "chainId": 1,
+          "address": "0x0000000000000000000000000000000000000038",
+          "name": "RelayDepository",
+          "label": "Relay Depository",
+          "role": "Takes deposits for fast transfers between chains.",
+          "status": "covered",
+          "addressSource": "https://example.com/sample-relay/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/ethereum/address/0x0000000000000000000000000000000000000038",
+          "sourcify": "exact_match",
+          "descriptor": {
+            "path": "registry/sample-relay/calldata-RelayDepository.json",
+            "url": "https://example.com/registry/blob/0123456789abcdef0123456789abcdef01234567/registry/sample-relay/calldata-RelayDepository.json",
+            "owner": "Sample Relay",
+            "formats": 4,
+            "attestation": "none"
+          },
+          "functions": {
+            "writable": 5,
+            "formatted": 4
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 3210.4,
+            "oldest": "2026-11-05T12:21:20Z",
+            "newest": "2026-11-05T19:49:52Z",
+            "txShareCovered": 0.9871,
+            "signerShareCovered": 0.9902
+          },
+          "topFunctions": [
+            {
+              "selector": "0x49290c1c",
+              "signature": "depositNative(address,bytes32)",
+              "share": 0.711,
+              "senders": 391,
+              "formatted": true
+            },
+            {
+              "selector": "0xe8017952",
+              "signature": "depositErc20(address,address,uint256,bytes32)",
+              "share": 0.2761,
+              "senders": 152,
+              "formatted": true
+            },
+            {
+              "selector": "0x01681a62",
+              "signature": "sweep(address)",
+              "share": 0.0129,
+              "senders": 7,
+              "formatted": false
+            }
+          ],
+          "draft": null
+        },
+        {
+          "chainId": 8453,
+          "address": "0x0000000000000000000000000000000000000039",
+          "name": "RelayDepository",
+          "label": "Relay Depository",
+          "role": "Takes deposits for fast transfers between chains.",
+          "status": "covered",
+          "addressSource": "https://example.com/sample-relay/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/base/address/0x0000000000000000000000000000000000000039",
+          "sourcify": "exact_match",
+          "descriptor": {
+            "path": "registry/sample-relay/calldata-RelayDepository.json",
+            "url": "https://example.com/registry/blob/0123456789abcdef0123456789abcdef01234567/registry/sample-relay/calldata-RelayDepository.json",
+            "owner": "Sample Relay",
+            "formats": 4,
+            "attestation": "none"
+          },
+          "functions": {
+            "writable": 5,
+            "formatted": 4
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 14870.2,
+            "oldest": "2026-11-05T18:34:36Z",
+            "newest": "2026-11-05T20:11:26Z",
+            "txShareCovered": 0.994,
+            "signerShareCovered": 0.9961
+          },
+          "topFunctions": [
+            {
+              "selector": "0x49290c1c",
+              "signature": "depositNative(address,bytes32)",
+              "share": 0.802,
+              "senders": 441,
+              "formatted": true
+            },
+            {
+              "selector": "0xe8017952",
+              "signature": "depositErc20(address,address,uint256,bytes32)",
+              "share": 0.192,
+              "senders": 106,
+              "formatted": true
+            }
+          ],
+          "draft": null
+        },
+        {
+          "chainId": 42161,
+          "address": "0x0000000000000000000000000000000000000040",
+          "name": "RelayDepository",
+          "label": "Relay Depository",
+          "role": "Takes deposits for fast transfers between chains; relayers fill them.",
+          "status": "covered",
+          "addressSource": "https://example.com/sample-relay/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/arbitrum-one/address/0x0000000000000000000000000000000000000040",
+          "sourcify": "exact_match",
+          "descriptor": {
+            "path": "registry/sample-relay/calldata-RelayDepository.json",
+            "url": "https://example.com/registry/blob/0123456789abcdef0123456789abcdef01234567/registry/sample-relay/calldata-RelayDepository.json",
+            "owner": "Sample Relay",
+            "formats": 4,
+            "attestation": "none"
+          },
+          "functions": {
+            "writable": 5,
+            "formatted": 4
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 6640.5,
+            "oldest": "2026-11-05T16:56:09Z",
+            "newest": "2026-11-05T20:33:00Z",
+            "txShareCovered": 0.2604,
+            "signerShareCovered": 0.9758
+          },
+          "topFunctions": [
+            {
+              "selector": "0x1ca507dd",
+              "signature": "fill((bytes32,address,uint256),bytes)",
+              "share": 0.7396,
+              "senders": 6,
+              "formatted": false
+            },
+            {
+              "selector": "0x49290c1c",
+              "signature": "depositNative(address,bytes32)",
+              "share": 0.2204,
+              "senders": 205,
+              "formatted": true
+            },
+            {
+              "selector": "0xe8017952",
+              "signature": "depositErc20(address,address,uint256,bytes32)",
+              "share": 0.04,
+              "senders": 37,
+              "formatted": true
+            }
+          ],
+          "draft": null
+        }
+      ]
+    },
+    {
+      "id": "sample-perps",
+      "name": "Sample Perps",
+      "category": "derivatives",
+      "categoryLabel": "Derivatives",
+      "website": "https://example.com/sample-perps",
+      "tvlUsd": 640000000,
+      "status": "uncovered",
+      "totals": {
+        "contracts": 2,
+        "covered": 0,
+        "partial": 0,
+        "uncovered": 2,
+        "drafts": 1,
+        "txShareCovered": 0,
+        "signerShareCovered": 0,
+        "perDay": 24320.7
+      },
+      "contracts": [
+        {
+          "chainId": 42161,
+          "address": "0x0000000000000000000000000000000000000019",
+          "name": "ExchangeRouter",
+          "label": "Exchange Router",
+          "role": "Opens, changes and closes leveraged positions.",
+          "status": "uncovered",
+          "addressSource": "https://example.com/sample-perps/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/arbitrum-one/address/0x0000000000000000000000000000000000000019",
+          "sourcify": "exact_match",
+          "descriptor": null,
+          "functions": {
+            "writable": 16,
+            "formatted": 0
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 24010.5,
+            "oldest": "2026-11-05T11:39:11Z",
+            "newest": "2026-11-05T12:39:09Z",
+            "txShareCovered": 0,
+            "signerShareCovered": 0
+          },
+          "topFunctions": [
+            {
+              "selector": "0xac9650d8",
+              "signature": "multicall(bytes[])",
+              "share": 0.8812,
+              "senders": 485,
+              "formatted": false
+            },
+            {
+              "selector": "0x7489ec23",
+              "signature": "cancelOrder(bytes32)",
+              "share": 0.071,
+              "senders": 39,
+              "formatted": false
+            },
+            {
+              "selector": "0xc41b1ab3",
+              "signature": "claimFundingFees(address[],address[],address)",
+              "share": 0.0302,
+              "senders": 17,
+              "formatted": false
+            }
+          ],
+          "draft": {
+            "functions": 8,
+            "testedTxs": 16,
+            "lint": "pass",
+            "preview": {
+              "txHash": "0x12ab000000000000000000000000000000000000000000000000000000000019",
+              "intent": "Open a long position",
+              "fields": [
+                {
+                  "label": "Market",
+                  "value": "EXA perpetual"
+                },
+                {
+                  "label": "Collateral",
+                  "value": "500 SMP"
+                },
+                {
+                  "label": "Leverage",
+                  "value": "5x"
+                },
+                {
+                  "label": "Acceptable fill",
+                  "value": "within 0.5%"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "chainId": 42161,
+          "address": "0x0000000000000000000000000000000000000020",
+          "name": "OrderVault",
+          "label": "Order Vault",
+          "role": "Holds collateral while an order waits to execute.",
+          "status": "uncovered",
+          "addressSource": "https://example.com/sample-perps/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/arbitrum-one/address/0x0000000000000000000000000000000000000020",
+          "sourcify": "not_verified",
+          "descriptor": null,
+          "functions": null,
+          "sample": {
+            "count": 1000,
+            "perDay": 310.2,
+            "oldest": "2026-11-02T07:38:33Z",
+            "newest": "2026-11-05T13:00:43Z",
+            "txShareCovered": 0,
+            "signerShareCovered": 0
+          },
+          "topFunctions": [
+            {
+              "selector": "0x2e1a7d4d",
+              "signature": null,
+              "share": 0.941,
+              "senders": 4,
+              "formatted": false
+            },
+            {
+              "selector": "0xd0e30db0",
+              "signature": null,
+              "share": 0.059,
+              "senders": 1,
+              "formatted": false
+            }
+          ],
+          "draft": null
+        }
+      ]
+    },
+    {
+      "id": "sample-nft-market",
+      "name": "Sample NFT Market",
+      "category": "nft",
+      "categoryLabel": "NFT marketplace",
+      "website": "https://example.com/sample-nft-market",
+      "tvlUsd": null,
+      "status": "partial",
+      "totals": {
+        "contracts": 3,
+        "covered": 2,
+        "partial": 0,
+        "uncovered": 1,
+        "drafts": 0,
+        "txShareCovered": 0.9581,
+        "signerShareCovered": 0.9652,
+        "perDay": 21274.1
+      },
+      "contracts": [
+        {
+          "chainId": 1,
+          "address": "0x0000000000000000000000000000000000000033",
+          "name": "Marketplace",
+          "label": "Marketplace (v1.6)",
+          "role": "Buys, lists and accepts offers on NFTs.",
+          "version": "1.6",
+          "status": "covered",
+          "addressSource": "https://example.com/sample-nft-market/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/ethereum/address/0x0000000000000000000000000000000000000033",
+          "sourcify": "exact_match",
+          "descriptor": {
+            "path": "registry/sample-nft-market/calldata-Marketplace.json",
+            "url": "https://example.com/registry/blob/0123456789abcdef0123456789abcdef01234567/registry/sample-nft-market/calldata-Marketplace.json",
+            "owner": "Sample NFT Market",
+            "formats": 9,
+            "attestation": "none"
+          },
+          "functions": {
+            "writable": 12,
+            "formatted": 9
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 8870.1,
+            "oldest": "2026-11-05T15:12:42Z",
+            "newest": "2026-11-05T17:55:03Z",
+            "txShareCovered": 0.9682,
+            "signerShareCovered": null
+          },
+          "topFunctions": [
+            {
+              "selector": "0x8c34e366",
+              "signature": "fulfillListing(bytes32,uint256)",
+              "share": 0.6102,
+              "senders": null,
+              "formatted": true
+            },
+            {
+              "selector": "0x3e314b5a",
+              "signature": "acceptOffer(bytes32,uint256)",
+              "share": 0.221,
+              "senders": null,
+              "formatted": true
+            },
+            {
+              "selector": "0xbe23628d",
+              "signature": "cancelListings(bytes32[])",
+              "share": 0.137,
+              "senders": null,
+              "formatted": true
+            },
+            {
+              "selector": "0x5b34b966",
+              "signature": "incrementCounter()",
+              "share": 0.0201,
+              "senders": null,
+              "formatted": false
+            }
+          ],
+          "draft": null
+        },
+        {
+          "chainId": 8453,
+          "address": "0x0000000000000000000000000000000000000034",
+          "name": "Marketplace",
+          "label": "Marketplace (v1.6)",
+          "role": "Buys, lists and accepts offers on NFTs.",
+          "version": "1.6",
+          "status": "covered",
+          "addressSource": "https://example.com/sample-nft-market/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/base/address/0x0000000000000000000000000000000000000034",
+          "sourcify": "exact_match",
+          "descriptor": {
+            "path": "registry/sample-nft-market/calldata-Marketplace.json",
+            "url": "https://example.com/registry/blob/0123456789abcdef0123456789abcdef01234567/registry/sample-nft-market/calldata-Marketplace.json",
+            "owner": "Sample NFT Market",
+            "formats": 9,
+            "attestation": "none"
+          },
+          "functions": {
+            "writable": 12,
+            "formatted": 9
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 12400.6,
+            "oldest": "2026-11-05T16:20:30Z",
+            "newest": "2026-11-05T18:16:37Z",
+            "txShareCovered": 0.9512,
+            "signerShareCovered": 0.9655
+          },
+          "topFunctions": [
+            {
+              "selector": "0x8c34e366",
+              "signature": "fulfillListing(bytes32,uint256)",
+              "share": 0.701,
+              "senders": 294,
+              "formatted": true
+            },
+            {
+              "selector": "0x3e314b5a",
+              "signature": "acceptOffer(bytes32,uint256)",
+              "share": 0.1702,
+              "senders": 71,
+              "formatted": true
+            },
+            {
+              "selector": "0xbe23628d",
+              "signature": "cancelListings(bytes32[])",
+              "share": 0.08,
+              "senders": 34,
+              "formatted": true
+            },
+            {
+              "selector": "0x5b34b966",
+              "signature": "incrementCounter()",
+              "share": 0.0388,
+              "senders": 16,
+              "formatted": false
+            }
+          ],
+          "draft": null
+        },
+        {
+          "chainId": 1,
+          "address": "0x0000000000000000000000000000000000000035",
+          "name": "ConduitController",
+          "label": "Conduit Controller",
+          "role": "Sets which contracts may move a seller's NFTs.",
+          "status": "uncovered",
+          "addressSource": "https://example.com/sample-nft-market/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/ethereum/address/0x0000000000000000000000000000000000000035",
+          "sourcify": "match",
+          "descriptor": null,
+          "functions": {
+            "writable": 6,
+            "formatted": 0
+          },
+          "sample": {
+            "count": 412,
+            "perDay": 3.4,
+            "oldest": "2026-07-07T14:31:04Z",
+            "newest": "2026-11-05T18:45:11Z",
+            "txShareCovered": 0,
+            "signerShareCovered": 0
+          },
+          "topFunctions": [
+            {
+              "selector": "0x794593bc",
+              "signature": "createConduit(bytes32,address)",
+              "share": 0.682,
+              "senders": 155,
+              "formatted": false
+            },
+            {
+              "selector": "0x13ad9cab",
+              "signature": "updateChannel(address,address,bool)",
+              "share": 0.318,
+              "senders": 72,
+              "formatted": false
+            }
+          ],
+          "draft": null
+        }
+      ]
+    },
+    {
+      "id": "demo-bridge",
+      "name": "Demo Bridge",
+      "category": "bridge",
+      "categoryLabel": "Bridge",
+      "website": "https://example.com/demo-bridge",
+      "tvlUsd": 1120000000,
+      "status": "uncovered",
+      "totals": {
+        "contracts": 3,
+        "covered": 0,
+        "partial": 0,
+        "uncovered": 3,
+        "drafts": 3,
+        "txShareCovered": 0,
+        "signerShareCovered": 0,
+        "perDay": 17506.1
+      },
+      "contracts": [
+        {
+          "chainId": 1,
+          "address": "0x0000000000000000000000000000000000000010",
+          "name": "BridgePortal",
+          "label": "Bridge Portal",
+          "role": "Moves ETH and tokens to the other chains.",
+          "status": "uncovered",
+          "addressSource": "https://example.com/demo-bridge/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/ethereum/address/0x0000000000000000000000000000000000000010",
+          "sourcify": "exact_match",
+          "descriptor": null,
+          "functions": {
+            "writable": 9,
+            "formatted": 0
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 6480.2,
+            "oldest": "2026-11-05T05:35:52Z",
+            "newest": "2026-11-05T09:18:05Z",
+            "txShareCovered": 0,
+            "signerShareCovered": 0
+          },
+          "topFunctions": [
+            {
+              "selector": "0xe11013dd",
+              "signature": "bridgeETHTo(address,uint32,bytes)",
+              "share": 0.581,
+              "senders": 320,
+              "formatted": false
+            },
+            {
+              "selector": "0x838b2520",
+              "signature": "depositERC20To(address,address,address,uint256,uint32,bytes)",
+              "share": 0.2902,
+              "senders": 160,
+              "formatted": false
+            },
+            {
+              "selector": "0x10dce426",
+              "signature": "finalizeWithdrawal(bytes32)",
+              "share": 0.1204,
+              "senders": 66,
+              "formatted": false
+            }
+          ],
+          "draft": {
+            "functions": 5,
+            "testedTxs": 9,
+            "lint": "pass",
+            "preview": {
+              "txHash": "0x12ab000000000000000000000000000000000000000000000000000000000010",
+              "intent": "Bridge 0.25 ETH to Base",
+              "fields": [
+                {
+                  "label": "Amount",
+                  "value": "0.25 ETH"
+                },
+                {
+                  "label": "To",
+                  "value": "0x0000…0b0b on Base"
+                },
+                {
+                  "label": "Gas limit on Base",
+                  "value": "200,000"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "chainId": 8453,
+          "address": "0x0000000000000000000000000000000000000011",
+          "name": "BridgePortal",
+          "label": "Bridge Portal",
+          "role": "Moves ETH and tokens to the other chains.",
+          "status": "uncovered",
+          "addressSource": "https://example.com/demo-bridge/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/base/address/0x0000000000000000000000000000000000000011",
+          "sourcify": "exact_match",
+          "descriptor": null,
+          "functions": {
+            "writable": 9,
+            "formatted": 0
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 7920.9,
+            "oldest": "2026-11-05T06:37:51Z",
+            "newest": "2026-11-05T09:39:38Z",
+            "txShareCovered": 0,
+            "signerShareCovered": 0
+          },
+          "topFunctions": [
+            {
+              "selector": "0xe11013dd",
+              "signature": "bridgeETHTo(address,uint32,bytes)",
+              "share": 0.6402,
+              "senders": 352,
+              "formatted": false
+            },
+            {
+              "selector": "0x838b2520",
+              "signature": "depositERC20To(address,address,address,uint256,uint32,bytes)",
+              "share": 0.2511,
+              "senders": 138,
+              "formatted": false
+            },
+            {
+              "selector": "0x10dce426",
+              "signature": "finalizeWithdrawal(bytes32)",
+              "share": 0.0987,
+              "senders": 54,
+              "formatted": false
+            }
+          ],
+          "draft": {
+            "functions": 5,
+            "testedTxs": 8,
+            "lint": "pass"
+          }
+        },
+        {
+          "chainId": 10,
+          "address": "0x0000000000000000000000000000000000000012",
+          "name": "BridgePortal",
+          "label": "Bridge Portal",
+          "role": "Moves ETH and tokens to the other chains.",
+          "status": "uncovered",
+          "addressSource": "https://example.com/demo-bridge/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/op-mainnet/address/0x0000000000000000000000000000000000000012",
+          "sourcify": "exact_match",
+          "descriptor": null,
+          "functions": {
+            "writable": 9,
+            "formatted": 0
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 3105,
+            "oldest": "2026-11-05T02:17:26Z",
+            "newest": "2026-11-05T10:01:12Z",
+            "txShareCovered": 0,
+            "signerShareCovered": 0
+          },
+          "topFunctions": [
+            {
+              "selector": "0xe11013dd",
+              "signature": "bridgeETHTo(address,uint32,bytes)",
+              "share": 0.612,
+              "senders": 337,
+              "formatted": false
+            },
+            {
+              "selector": "0x838b2520",
+              "signature": "depositERC20To(address,address,address,uint256,uint32,bytes)",
+              "share": 0.3043,
+              "senders": 167,
+              "formatted": false
+            }
+          ],
+          "draft": {
+            "functions": 5,
+            "testedTxs": 7,
+            "lint": "warnings"
+          }
+        }
+      ]
+    },
+    {
+      "id": "mock-stake",
+      "name": "Mock Stake",
+      "category": "liquid-staking",
+      "categoryLabel": "Liquid staking",
+      "website": "https://example.com/mock-stake",
+      "tvlUsd": 18300000000,
+      "status": "covered",
+      "totals": {
+        "contracts": 2,
+        "covered": 2,
+        "partial": 0,
+        "uncovered": 0,
+        "drafts": 0,
+        "txShareCovered": 0.9643,
+        "signerShareCovered": 0.9759,
+        "perDay": 10511.1
+      },
+      "contracts": [
+        {
+          "chainId": 1,
+          "address": "0x0000000000000000000000000000000000000013",
+          "name": "StakedEther",
+          "label": "Staked Ether token",
+          "role": "Stakes ETH, and moves and approves the staked token.",
+          "status": "covered",
+          "addressSource": "https://example.com/mock-stake/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/ethereum/address/0x0000000000000000000000000000000000000013",
+          "sourcify": "exact_match",
+          "descriptor": {
+            "path": "registry/mock-stake/calldata-StakedEther.json",
+            "url": "https://example.com/registry/blob/0123456789abcdef0123456789abcdef01234567/registry/mock-stake/calldata-StakedEther.json",
+            "owner": "Mock Stake",
+            "formats": 5,
+            "attestation": "none"
+          },
+          "functions": {
+            "writable": 8,
+            "formatted": 5
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 9870.3,
+            "oldest": "2026-11-05T07:56:53Z",
+            "newest": "2026-11-05T10:22:46Z",
+            "txShareCovered": 0.962,
+            "signerShareCovered": 0.9744
+          },
+          "topFunctions": [
+            {
+              "selector": "0xa9059cbb",
+              "signature": "transfer(address,uint256)",
+              "share": 0.553,
+              "senders": 304,
+              "formatted": true
+            },
+            {
+              "selector": "0x095ea7b3",
+              "signature": "approve(address,uint256)",
+              "share": 0.2741,
+              "senders": 151,
+              "formatted": true
+            },
+            {
+              "selector": "0xa1903eab",
+              "signature": "submit(address)",
+              "share": 0.1349,
+              "senders": 74,
+              "formatted": true
+            },
+            {
+              "selector": "0x8fcb4e5b",
+              "signature": "transferShares(address,uint256)",
+              "share": 0.0311,
+              "senders": 17,
+              "formatted": false
+            }
+          ],
+          "draft": null
+        },
+        {
+          "chainId": 1,
+          "address": "0x0000000000000000000000000000000000000014",
+          "name": "WithdrawalQueue",
+          "label": "Withdrawal Queue",
+          "role": "Requests and claims withdrawals of staked ETH.",
+          "status": "covered",
+          "addressSource": "https://example.com/mock-stake/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/ethereum/address/0x0000000000000000000000000000000000000014",
+          "sourcify": "match",
+          "descriptor": {
+            "path": "registry/mock-stake/calldata-WithdrawalQueue.json",
+            "url": "https://example.com/registry/blob/0123456789abcdef0123456789abcdef01234567/registry/mock-stake/calldata-WithdrawalQueue.json",
+            "owner": "Mock Stake",
+            "formats": 4,
+            "attestation": "none"
+          },
+          "functions": {
+            "writable": 7,
+            "formatted": 4
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 640.8,
+            "oldest": "2026-11-03T21:24:09Z",
+            "newest": "2026-11-05T10:51:20Z",
+            "txShareCovered": 0.999,
+            "signerShareCovered": 0.999
+          },
+          "topFunctions": [
+            {
+              "selector": "0xd6681042",
+              "signature": "requestWithdrawals(uint256[],address)",
+              "share": 0.512,
+              "senders": 282,
+              "formatted": true
+            },
+            {
+              "selector": "0xe3afe0a3",
+              "signature": "claimWithdrawals(uint256[],uint256[])",
+              "share": 0.441,
+              "senders": 243,
+              "formatted": true
+            },
+            {
+              "selector": "0xacf41e4d",
+              "signature": "requestWithdrawalsWithPermit(uint256[],address,(uint256,uint256,uint8,bytes32,bytes32))",
+              "share": 0.046,
+              "senders": 25,
+              "formatted": true
+            }
+          ],
+          "draft": null
+        }
+      ]
+    },
+    {
+      "id": "placeholder-vaults",
+      "name": "Placeholder Vaults",
+      "category": "yield",
+      "categoryLabel": "Yield",
+      "website": "https://example.com/placeholder-vaults",
+      "tvlUsd": 410000000,
+      "status": "partial",
+      "totals": {
+        "contracts": 3,
+        "covered": 1,
+        "partial": 1,
+        "uncovered": 1,
+        "drafts": 1,
+        "txShareCovered": 0.5709,
+        "signerShareCovered": 0.6723,
+        "perDay": 8240.2
+      },
+      "contracts": [
+        {
+          "chainId": 1,
+          "address": "0x0000000000000000000000000000000000000021",
+          "name": "VaultRouter",
+          "label": "Vault Router",
+          "role": "Deposits into and withdraws from the vaults.",
+          "status": "covered",
+          "addressSource": "https://example.com/placeholder-vaults/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/ethereum/address/0x0000000000000000000000000000000000000021",
+          "sourcify": "exact_match",
+          "descriptor": {
+            "path": "registry/placeholder-vaults/calldata-VaultRouter.json",
+            "url": "https://example.com/registry/blob/0123456789abcdef0123456789abcdef01234567/registry/placeholder-vaults/calldata-VaultRouter.json",
+            "owner": "Placeholder Vaults",
+            "formats": 4,
+            "attestation": "none"
+          },
+          "functions": {
+            "writable": 6,
+            "formatted": 4
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 2410,
+            "oldest": "2026-11-05T03:31:46Z",
+            "newest": "2026-11-05T13:29:17Z",
+            "txShareCovered": 0.9552,
+            "signerShareCovered": 0.961
+          },
+          "topFunctions": [
+            {
+              "selector": "0xf45346dc",
+              "signature": "deposit(address,uint256,address)",
+              "share": 0.5501,
+              "senders": 303,
+              "formatted": true
+            },
+            {
+              "selector": "0xdfcd412e",
+              "signature": "withdraw(address,uint256,address,address)",
+              "share": 0.4051,
+              "senders": 223,
+              "formatted": true
+            },
+            {
+              "selector": "0xf16565ee",
+              "signature": "migrate(address,address,uint256)",
+              "share": 0.0448,
+              "senders": 25,
+              "formatted": false
+            }
+          ],
+          "draft": null
+        },
+        {
+          "chainId": 8453,
+          "address": "0x0000000000000000000000000000000000000022",
+          "name": "VaultRouter",
+          "label": "Vault Router",
+          "role": "Deposits into and withdraws from the vaults.",
+          "status": "partial",
+          "addressSource": "https://example.com/placeholder-vaults/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/base/address/0x0000000000000000000000000000000000000022",
+          "sourcify": "exact_match",
+          "descriptor": {
+            "path": "registry/placeholder-vaults/calldata-VaultRouter.json",
+            "url": "https://example.com/registry/blob/0123456789abcdef0123456789abcdef01234567/registry/placeholder-vaults/calldata-VaultRouter.json",
+            "owner": "Placeholder Vaults",
+            "formats": 4,
+            "attestation": "none"
+          },
+          "functions": {
+            "writable": 9,
+            "formatted": 4
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 5830.2,
+            "oldest": "2026-11-05T09:43:51Z",
+            "newest": "2026-11-05T13:50:51Z",
+            "txShareCovered": 0.412,
+            "signerShareCovered": 0.553
+          },
+          "topFunctions": [
+            {
+              "selector": "0xde27010a",
+              "signature": "depositWithPermit(address,uint256,address,uint256,uint8,bytes32,bytes32)",
+              "share": 0.4821,
+              "senders": 149,
+              "formatted": false
+            },
+            {
+              "selector": "0xf45346dc",
+              "signature": "deposit(address,uint256,address)",
+              "share": 0.261,
+              "senders": 81,
+              "formatted": true
+            },
+            {
+              "selector": "0xdfcd412e",
+              "signature": "withdraw(address,uint256,address,address)",
+              "share": 0.151,
+              "senders": 47,
+              "formatted": true
+            },
+            {
+              "selector": "0xdd714533",
+              "signature": "zapIn(address,address,uint256,bytes)",
+              "share": 0.1011,
+              "senders": 31,
+              "formatted": false
+            }
+          ],
+          "draft": {
+            "functions": 9,
+            "testedTxs": 12,
+            "lint": "warnings"
+          }
+        },
+        {
+          "chainId": 42161,
+          "address": "0x0000000000000000000000000000000000000023",
+          "name": "VaultRouter",
+          "label": "Vault Router",
+          "role": "Deposits into and withdraws from the vaults.",
+          "status": "uncovered",
+          "addressSource": "https://example.com/placeholder-vaults/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/arbitrum-one/address/0x0000000000000000000000000000000000000023",
+          "sourcify": "unknown",
+          "descriptor": null,
+          "functions": null,
+          "sample": null,
+          "topFunctions": [],
+          "draft": null
+        }
+      ]
+    },
+    {
+      "id": "sample-money-market",
+      "name": "Sample Money Market",
+      "category": "lending",
+      "categoryLabel": "Lending",
+      "website": "https://example.com/sample-money-market",
+      "tvlUsd": 2050000000,
+      "status": "uncovered",
+      "totals": {
+        "contracts": 3,
+        "covered": 0,
+        "partial": 0,
+        "uncovered": 3,
+        "drafts": 2,
+        "txShareCovered": 0,
+        "signerShareCovered": 0,
+        "perDay": 6527.5
+      },
+      "contracts": [
+        {
+          "chainId": 8453,
+          "address": "0x0000000000000000000000000000000000000024",
+          "name": "Market",
+          "label": "Market (SMP)",
+          "role": "Supplies and borrows against collateral.",
+          "status": "uncovered",
+          "addressSource": "https://example.com/sample-money-market/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/base/address/0x0000000000000000000000000000000000000024",
+          "sourcify": "exact_match",
+          "descriptor": null,
+          "functions": {
+            "writable": 12,
+            "formatted": 0
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 4002.1,
+            "oldest": "2026-11-05T08:34:10Z",
+            "newest": "2026-11-05T14:33:58Z",
+            "txShareCovered": 0,
+            "signerShareCovered": 0
+          },
+          "topFunctions": [
+            {
+              "selector": "0xf2b9fdb8",
+              "signature": "supply(address,uint256)",
+              "share": 0.441,
+              "senders": 243,
+              "formatted": false
+            },
+            {
+              "selector": "0xf3fef3a3",
+              "signature": "withdraw(address,uint256)",
+              "share": 0.3302,
+              "senders": 182,
+              "formatted": false
+            },
+            {
+              "selector": "0xc3cecfd2",
+              "signature": "absorb(address,address[])",
+              "share": 0.0213,
+              "senders": 12,
+              "formatted": false
+            }
+          ],
+          "draft": {
+            "functions": 7,
+            "testedTxs": 10,
+            "lint": "pass"
+          }
+        },
+        {
+          "chainId": 42161,
+          "address": "0x0000000000000000000000000000000000000025",
+          "name": "Market",
+          "label": "Market (SMP)",
+          "role": "Supplies and borrows against collateral.",
+          "status": "uncovered",
+          "addressSource": "https://example.com/sample-money-market/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/arbitrum-one/address/0x0000000000000000000000000000000000000025",
+          "sourcify": "exact_match",
+          "descriptor": null,
+          "functions": {
+            "writable": 12,
+            "formatted": 0
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 1870.4,
+            "oldest": "2026-11-05T02:05:39Z",
+            "newest": "2026-11-05T14:55:32Z",
+            "txShareCovered": 0,
+            "signerShareCovered": 0
+          },
+          "topFunctions": [
+            {
+              "selector": "0xf2b9fdb8",
+              "signature": "supply(address,uint256)",
+              "share": 0.481,
+              "senders": 265,
+              "formatted": false
+            },
+            {
+              "selector": "0xf3fef3a3",
+              "signature": "withdraw(address,uint256)",
+              "share": 0.3511,
+              "senders": 193,
+              "formatted": false
+            }
+          ],
+          "draft": {
+            "functions": 7,
+            "testedTxs": 9,
+            "lint": "pass"
+          }
+        },
+        {
+          "chainId": 10,
+          "address": "0x0000000000000000000000000000000000000026",
+          "name": "Market",
+          "label": "Market (SMP)",
+          "role": "Supplies and borrows against collateral.",
+          "status": "uncovered",
+          "addressSource": "https://example.com/sample-money-market/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/op-mainnet/address/0x0000000000000000000000000000000000000026",
+          "sourcify": "match",
+          "descriptor": null,
+          "functions": {
+            "writable": 12,
+            "formatted": 0
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 655,
+            "oldest": "2026-11-04T02:38:38Z",
+            "newest": "2026-11-05T15:17:06Z",
+            "txShareCovered": 0,
+            "signerShareCovered": 0
+          },
+          "topFunctions": [
+            {
+              "selector": "0xf2b9fdb8",
+              "signature": "supply(address,uint256)",
+              "share": 0.502,
+              "senders": 276,
+              "formatted": false
+            },
+            {
+              "selector": "0xf3fef3a3",
+              "signature": "withdraw(address,uint256)",
+              "share": 0.389,
+              "senders": 214,
+              "formatted": false
+            }
+          ],
+          "draft": null
+        }
+      ]
+    },
+    {
+      "id": "test-yield",
+      "name": "Test Yield",
+      "category": "yield",
+      "categoryLabel": "Yield",
+      "website": "https://example.com/test-yield",
+      "tvlUsd": 185000000,
+      "status": "uncovered",
+      "totals": {
+        "contracts": 2,
+        "covered": 0,
+        "partial": 0,
+        "uncovered": 2,
+        "drafts": 1,
+        "txShareCovered": 0,
+        "signerShareCovered": 0,
+        "perDay": 2620.5
+      },
+      "contracts": [
+        {
+          "chainId": 10,
+          "address": "0x0000000000000000000000000000000000000036",
+          "name": "YieldVault",
+          "label": "Yield Vault (SMP)",
+          "role": "Deposits SMP and mints vault shares.",
+          "status": "uncovered",
+          "addressSource": "https://example.com/test-yield/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/op-mainnet/address/0x0000000000000000000000000000000000000036",
+          "sourcify": "exact_match",
+          "descriptor": null,
+          "functions": {
+            "writable": 8,
+            "formatted": 0
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 1640.2,
+            "oldest": "2026-11-05T04:28:48Z",
+            "newest": "2026-11-05T19:06:45Z",
+            "txShareCovered": 0,
+            "signerShareCovered": 0
+          },
+          "topFunctions": [
+            {
+              "selector": "0x6e553f65",
+              "signature": "deposit(uint256,address)",
+              "share": 0.623,
+              "senders": 343,
+              "formatted": false
+            },
+            {
+              "selector": "0xba087652",
+              "signature": "redeem(uint256,address,address)",
+              "share": 0.3011,
+              "senders": 166,
+              "formatted": false
+            },
+            {
+              "selector": "0xb460af94",
+              "signature": "withdraw(uint256,address,address)",
+              "share": 0.0759,
+              "senders": 42,
+              "formatted": false
+            }
+          ],
+          "draft": {
+            "functions": 6,
+            "testedTxs": 8,
+            "lint": "pass",
+            "preview": {
+              "txHash": "0x12ab000000000000000000000000000000000000000000000000000000000036",
+              "intent": "Deposit into the SMP vault",
+              "fields": [
+                {
+                  "label": "Deposit",
+                  "value": "1,000 SMP"
+                },
+                {
+                  "label": "Receive at least",
+                  "value": "982.4 tySMP"
+                },
+                {
+                  "label": "Shares to",
+                  "value": "0x0000…0b0b"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "chainId": 8453,
+          "address": "0x0000000000000000000000000000000000000037",
+          "name": "YieldVault",
+          "label": "Yield Vault (SMP)",
+          "role": "Receives the chain's native token for later deposit.",
+          "status": "uncovered",
+          "addressSource": "https://example.com/test-yield/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/base/address/0x0000000000000000000000000000000000000037",
+          "sourcify": "exact_match",
+          "descriptor": null,
+          "functions": {
+            "writable": 8,
+            "formatted": 0
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 980.3,
+            "oldest": "2026-11-04T18:59:22Z",
+            "newest": "2026-11-05T19:28:18Z",
+            "txShareCovered": null,
+            "signerShareCovered": null
+          },
+          "topFunctions": [],
+          "draft": null
+        }
+      ]
+    },
+    {
+      "id": "example-restake",
+      "name": "Example Restake",
+      "category": "liquid-staking",
+      "categoryLabel": "Liquid staking",
+      "website": "https://example.com/example-restake",
+      "tvlUsd": 3300000000,
+      "status": "uncovered",
+      "totals": {
+        "contracts": 2,
+        "covered": 0,
+        "partial": 0,
+        "uncovered": 2,
+        "drafts": 0,
+        "txShareCovered": 0,
+        "signerShareCovered": 0,
+        "perDay": 1806.6
+      },
+      "contracts": [
+        {
+          "chainId": 1,
+          "address": "0x0000000000000000000000000000000000000029",
+          "name": "StrategyManager",
+          "label": "Strategy Manager",
+          "role": "Deposits tokens into restaking strategies.",
+          "status": "uncovered",
+          "addressSource": "https://example.com/example-restake/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/ethereum/address/0x0000000000000000000000000000000000000029",
+          "sourcify": "exact_match",
+          "descriptor": null,
+          "functions": {
+            "writable": 11,
+            "formatted": 0
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 1102.4,
+            "oldest": "2026-11-04T18:42:33Z",
+            "newest": "2026-11-05T16:28:48Z",
+            "txShareCovered": 0,
+            "signerShareCovered": 0
+          },
+          "topFunctions": [
+            {
+              "selector": "0xe7a050aa",
+              "signature": "depositIntoStrategy(address,address,uint256)",
+              "share": 0.892,
+              "senders": 491,
+              "formatted": false
+            },
+            {
+              "selector": "0x32e89ace",
+              "signature": "depositIntoStrategyWithSignature(address,address,uint256,address,uint256,bytes)",
+              "share": 0.1011,
+              "senders": 56,
+              "formatted": false
+            }
+          ],
+          "draft": null
+        },
+        {
+          "chainId": 1,
+          "address": "0x0000000000000000000000000000000000000030",
+          "name": "DelegationManager",
+          "label": "Delegation Manager",
+          "role": "Delegates stake to operators and queues withdrawals.",
+          "status": "uncovered",
+          "addressSource": "https://example.com/example-restake/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/ethereum/address/0x0000000000000000000000000000000000000030",
+          "sourcify": "exact_match",
+          "descriptor": null,
+          "functions": {
+            "writable": 15,
+            "formatted": 0
+          },
+          "sample": {
+            "count": 1000,
+            "perDay": 704.2,
+            "oldest": "2026-11-04T06:45:29Z",
+            "newest": "2026-11-05T16:50:22Z",
+            "txShareCovered": 0,
+            "signerShareCovered": 0
+          },
+          "topFunctions": [
+            {
+              "selector": "0x0dd8dd02",
+              "signature": "queueWithdrawals((address[],uint256[],address)[])",
+              "share": 0.441,
+              "senders": 243,
+              "formatted": false
+            },
+            {
+              "selector": "0xeea9064b",
+              "signature": "delegateTo(address,(bytes,uint256),bytes32)",
+              "share": 0.312,
+              "senders": 172,
+              "formatted": false
+            },
+            {
+              "selector": "0xda8be864",
+              "signature": "undelegate(address)",
+              "share": 0.115,
+              "senders": 63,
+              "formatted": false
+            }
+          ],
+          "draft": null
+        }
+      ]
+    },
+    {
+      "id": "mock-options",
+      "name": "Mock Options",
+      "category": "derivatives",
+      "categoryLabel": "Derivatives",
+      "website": "https://example.com/mock-options",
+      "tvlUsd": null,
+      "status": "uncovered",
+      "totals": {
+        "contracts": 2,
+        "covered": 0,
+        "partial": 0,
+        "uncovered": 2,
+        "drafts": 0,
+        "txShareCovered": null,
+        "signerShareCovered": null,
+        "perDay": 0
+      },
+      "contracts": [
+        {
+          "chainId": 42161,
+          "address": "0x0000000000000000000000000000000000000031",
+          "name": "OptionMarket",
+          "label": "Option Market",
+          "role": "Opens and closes option positions.",
+          "status": "uncovered",
+          "addressSource": "https://example.com/mock-options/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/arbitrum-one/address/0x0000000000000000000000000000000000000031",
+          "sourcify": "unknown",
+          "descriptor": null,
+          "functions": null,
+          "sample": null,
+          "topFunctions": [],
+          "draft": null
+        },
+        {
+          "chainId": 8453,
+          "address": "0x0000000000000000000000000000000000000032",
+          "name": "OptionMarket",
+          "label": "Option Market",
+          "role": "Opens and closes option positions.",
+          "status": "uncovered",
+          "addressSource": "https://example.com/mock-options/docs/deployments",
+          "explorerUrl": "https://example.com/explorer/base/address/0x0000000000000000000000000000000000000032",
+          "sourcify": "not_verified",
+          "descriptor": null,
+          "functions": null,
+          "sample": null,
+          "topFunctions": [],
+          "draft": null
+        }
+      ]
+    }
+  ]
+}
