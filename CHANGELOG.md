@@ -4,6 +4,16 @@ The site is not versioned; changes are listed by the date they merged.
 
 ## Unreleased
 
+### Fixed
+
+- The coverage tracker's draft previews: 29 contracts showed a call that
+  was sent on another chain, or to another deployment of the same draft,
+  linked to their own chain's explorer, where it does not exist (Aero's
+  Slipstream SwapRouter on OP Mainnet showed a Base transaction). Each
+  contract now shows only a call made to it, and one with none shows that
+  its draft exists, without a call. The data is the tracker's report of run
+  42360796513, which also brings DefiLlama's TVL figures up to date.
+
 ### Added
 
 - The Clear Signing coverage tracker, at `/clear-signing/coverage/`: how
