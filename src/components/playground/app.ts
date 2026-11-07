@@ -540,12 +540,14 @@ function setUp(root: HTMLElement): void {
       "fetch-error": "The registry lists a descriptor for this contract, but it could not be read from GitHub. Try again in a moment.",
       other: "The library could not format this call with the registry's descriptor, so a wallet can show only the raw call.",
     }[reason];
+    // The registry may have a descriptor that still does not format the call: say which.
+    const tag = { "no-descriptor": "No descriptor", "no-format": "Not formatted", "fetch-error": "Not read", other: "Not formatted" }[reason];
     const skip = new Set(["NO_DESCRIPTOR", "NO_FORMAT_MATCH"]);
     return pane(
       h(
         "figure",
         { class: "pg-screen pg-blind" },
-        screenHead("No descriptor", "none"),
+        screenHead(tag, "none"),
         h("p", { class: "pg-where" }, `${chain.name} · ${short(call.to)}`),
         h("p", { class: "pg-intent" }, "Contract interaction"),
         h("dl", { class: "pg-fields" }, fact("Function", code(selector)), fact("Data", plural(words, "word"), " of raw data")),

@@ -64,7 +64,9 @@ protocols and 564 contracts it is about 155 KB of HTML, and the contracts are
 on the protocols' pages. A contract the registry describes for another
 deployment, though not for its own (`elsewhere` in the schema), is listed
 among the overview's near misses when that descriptor formats nearly all of
-its calls, and its card says so either way.
+its calls, and its card says so either way. Each of a contract's most-called
+functions names a real call of it from the tracker's sample (`exampleTx`),
+and its card links that call to the playground ("Try it").
 
 To update the tracker, replace the file and check it:
 

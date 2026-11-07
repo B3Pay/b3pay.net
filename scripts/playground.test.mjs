@@ -33,7 +33,9 @@ import {
   parseChain,
   parseEther,
   parseHash,
+  PLAYGROUND_PATH,
   requestFromHash,
+  txInPlayground,
 } from "../src/components/playground/input.ts";
 import { createProvider } from "../src/components/playground/provider.ts";
 import { createRpc, getTransaction, RpcError } from "../src/components/playground/rpc.ts";
@@ -388,6 +390,23 @@ test("every contract in the report is in the playground's data once, with what i
     for (const selector of Object.keys(entry.functions)) assert.match(selector, /^0x[0-9a-f]{8}$/);
   }
   assert.equal(contractAnchor(8453, BASE_USDC), `contract-8453-${BASE_USDC.toLowerCase()}`);
+});
+
+test("each most-called function with a real call links the playground to that call, on its contract's chain", () => {
+  let links = 0;
+  for (const contract of report.protocols.flatMap((protocol) => protocol.contracts))
+    for (const fn of contract.topFunctions) {
+      if (fn.exampleTx === null) continue;
+      const href = txInPlayground(contract.chainId, fn.exampleTx);
+      const url = new URL(href, "https://b3pay.net");
+      assert.equal(url.pathname, PLAYGROUND_PATH);
+      assert.equal(url.search, "", "nothing looked up reaches the server");
+      assert.deepEqual(requestFromHash(url.hash), { ok: true, value: { kind: "hash", chainId: contract.chainId, hash: fn.exampleTx } });
+      links += 1;
+    }
+  // Most of them: the sample keeps calls of the busiest selectors, so a few top functions have none.
+  const all = report.protocols.flatMap((protocol) => protocol.contracts.flatMap((contract) => contract.topFunctions)).length;
+  assert.ok(links >= all * 0.9, `${links} of ${all} top functions link a real call`);
 });
 
 test("each example is a real call to a contract the report lists, and shows what it is there for", () => {

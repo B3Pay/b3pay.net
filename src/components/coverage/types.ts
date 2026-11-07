@@ -129,6 +129,10 @@ export interface Contract {
     readonly share: number // 0..1 of the sample's calls with calldata
     readonly senders: number | null // distinct senders of this function in the sample
     readonly formatted: boolean // the registry descriptor formats it
+    /** A real call to this function on this contract: the newest in the
+     *  tracker's kept sample that succeeded, 0x + 64 lower-case hex. Null
+     *  when the sample kept none. The card links it to the playground. */
+    readonly exampleTx: string | null
   }[]
   /** For a deployment the registry does not list: the registry's descriptor
    *  for another deployment (the same address on another chain, or another

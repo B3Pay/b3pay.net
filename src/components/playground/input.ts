@@ -104,6 +104,12 @@ export function requestFromHash(fragment: string): Parsed<Request> | null {
   return ok({ kind: "call", chainId: chain.value, to: address.value, data: data.value, value: BigInt(value) });
 }
 
+/** Where the playground is. */
+export const PLAYGROUND_PATH = "/clear-signing/playground/";
+
+/** The playground's address for a transaction, which looks it up on arrival: where a coverage page sends a reader to try a real call. */
+export const txInPlayground = (chainId: ChainId, hash: string): string => `${PLAYGROUND_PATH}${hashOf({ kind: "hash", chainId, hash })}`;
+
 /** The page address's fragment for a request, #chain=…, or null when its calldata is too long to carry. */
 export function hashOf(request: Request): string | null {
   const query = new URLSearchParams({ chain: String(request.chainId) });

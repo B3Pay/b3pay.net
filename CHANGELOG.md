@@ -29,10 +29,12 @@ The site is not versioned; changes are listed by the date they merged.
   address's fragment, so a result can be shared by its link and this site's
   server never sees it. Linked from the Clear Signing page, the tracker's
   hero and the footer. Each contract's card on a protocol's page has an id,
-  `contract-<chain id>-<address>`, that the playground links to.
-  `scripts/playground.test.mjs` tests the parsing, the RPC fallback, the
-  token reads and the library on real calls, and
-  `scripts/playground-examples.mjs` writes the examples.
+  `contract-<chain id>-<address>`, that the playground links to, and each of
+  its most-called functions a "Try it" link that opens a real call of it in
+  the playground: the newest in the tracker's sample (`exampleTx` in the
+  report, from the tracker's run 42365364521). `scripts/playground.test.mjs`
+  tests the parsing, the RPC fallback, the token reads and the library on
+  real calls, and `scripts/playground-examples.mjs` writes the examples.
 - The Clear Signing coverage tracker, at `/clear-signing/coverage/`: how
   many of the most-used contracts on Ethereum, Base, Arbitrum One and OP
   Mainnet have an ERC-7730 descriptor in the registry, and how much of their
