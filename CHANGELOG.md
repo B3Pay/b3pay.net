@@ -20,10 +20,11 @@ The site is not versioned; changes are listed by the date they merged.
   status and totals, then each contract: its descriptor, the functions it
   formats, any descriptor the registry has for another deployment of it, its
   recent calls, Sourcify and where its address came from, and, where B3Pay
-  has a draft, how one real call reads with it. Every number comes from
+  has a draft, how one real call reads with it and how much of the
+  contract's calls it would cover. Every number comes from
   `src/data/clear-signing-coverage.json`, the tracker's report, which the
   site also serves as `/clear-signing/coverage.json`. Every page reads
-  without JavaScript; with 97 protocols the overview is about 135 KB of
+  without JavaScript; with 96 protocols the overview is about 155 KB of
   HTML. Linked from the Clear Signing page and the footer.
 - `scripts/coverage-totals.mjs` works out the report's totals, chains and
   categories from its protocol list, and rewrites them with `--write`.

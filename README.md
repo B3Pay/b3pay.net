@@ -57,8 +57,8 @@ the report the Clear Signing tracker writes (clear-signing-mcp, `cli.js
 report`). Its schema, with what each field means, is
 [`src/components/coverage/types.ts`](src/components/coverage/types.ts). The
 site publishes the file as it is at `/clear-signing/coverage.json`. The
-overview keeps one light row per protocol, so it stays small: with 97
-protocols and 575 contracts it is about 135 KB of HTML, and the contracts are
+overview keeps one light row per protocol, so it stays small: with 96
+protocols and 564 contracts it is about 155 KB of HTML, and the contracts are
 on the protocols' pages. A contract the registry describes for another
 deployment, though not for its own (`elsewhere` in the schema), is listed
 among the overview's near misses when that descriptor formats nearly all of
