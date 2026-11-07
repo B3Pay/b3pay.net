@@ -6,15 +6,17 @@ docs each repository publishes. Built with [Astro](https://astro.build) and
 [Starlight](https://starlight.astro.build), deployed on Vercel.
 
 ```
-src/content/docs/   the site's own pages: home, Clear Signing and its coverage
-                    tracker, Toolkit, B3Forge, Internet Computer, About, Contact,
-                    and /docs/
+src/content/docs/   the site's own pages: home, Clear Signing with its coverage
+                    tracker and playground, Toolkit, B3Forge, Internet Computer,
+                    About, Contact, and /docs/
 src/components/     the header, footer, cards and form, Starlight overrides, the
-                    home page's hero and sections (home/), and the coverage
-                    tracker's (coverage/)
+                    home page's hero and sections (home/), the Clear Signing
+                    page's hero (clear-signing/), the coverage tracker's
+                    (coverage/) and the playground's (playground/)
 src/data/           the coverage tracker's report
-src/pages/          the coverage tracker's page for each protocol, and
-                    /clear-signing/coverage.json, the report as published
+src/pages/          the coverage tracker's page for each protocol,
+                    /clear-signing/coverage.json, the report as published, and
+                    the contracts the playground looks up
 src/styles/         design tokens (from B3Pay/b3pay-design-system) and site CSS
 modules/            the docs modules: the registry, the modules written here,
                     and manifests for repositories built here (modules/README.md)
@@ -34,8 +36,9 @@ npm run dev              # sync the modules, then the dev server
 npm run build            # sync the modules, then build dist/
 npm run preview          # serve dist/ the way Vercel does, on localhost:4180
 npm test                 # module rules, archive safety, the checkers themselves,
-                         # the home page's calldata against its sentences, and
-                         # the coverage report against its schema and its counts
+                         # the home page's calldata against its sentences, the
+                         # coverage report against its schema and its counts,
+                         # and the playground's reading and formatting
 npm run typecheck        # astro check, and the API function
 npm run check:links      # every link in dist/ reaches a page, a file or the API
 npm run check:redirects  # every old address ends where it should
@@ -62,7 +65,12 @@ protocols and 564 contracts it is about 155 KB of HTML, and the contracts are
 on the protocols' pages. A contract the registry describes for another
 deployment, though not for its own (`elsewhere` in the schema), is listed
 among the overview's near misses when that descriptor formats nearly all of
-its calls, and its card says so either way.
+its calls, and its card says so either way. Each of a contract's most-called
+functions names a real call of it from the tracker's sample (`exampleTx`),
+and its card links that call to the playground ("Try it"). The Clear Signing
+page opens with the tracker's headline and one of the playground's examples
+of each kind
+([`src/components/clear-signing/ClearSigningHero.astro`](src/components/clear-signing/ClearSigningHero.astro)).
 
 To update the tracker, replace the file and check it:
 
@@ -74,6 +82,36 @@ npm test                                  # the report follows its schema
 
 The build stops when a count disagrees with the protocol list, and `npm test`
 refuses a file marked `"mock": true`, the placeholder the page was built on.
+
+## The playground
+
+`/clear-signing/playground/` takes a transaction hash, or a contract's address
+and calldata, on one of the tracker's four chains, and shows the raw call
+beside what a wallet that reads the Clear Signing registry would show for it.
+It all happens in the reader's browser
+([`src/components/playground/app.ts`](src/components/playground/app.ts)): the
+transaction comes from the chain's public RPCs
+([`chains.ts`](src/components/playground/chains.ts)), the registry's index and
+descriptors from GitHub, and the formatting from Sourcify's
+[`@ethereum-sourcify/clear-signing`](https://github.com/sourcifyeth/clear-signing),
+pinned to the exact version the page names. What is looked up lives in the
+address's fragment (`#chain=8453&tx=0x…`), which a browser never sends, so a
+result's link can be shared and this site's server never sees it.
+
+Beside the result is what the tracker knows of the contract, from
+`/clear-signing/playground/contracts.json`, which the build makes from the
+coverage report: its status, with a link to its card on its protocol's page;
+the descriptor the registry has for another deployment of it, which the page
+binds to this one to show a preview (a near miss); and B3Pay's draft
+preview. The examples are real transactions from the tracker's samples,
+carried in the page so they need no RPC. To pick others, edit the list in
+[`scripts/playground-examples.mjs`](scripts/playground-examples.mjs) and run it
+with a clone of the registry and clear-signing-mcp's tracker:
+
+```sh
+node scripts/playground-examples.mjs <registry clone> <clear-signing-mcp>/tracker
+npm test   # the examples against the report, and the library on real calls
+```
 
 ## Docs modules
 

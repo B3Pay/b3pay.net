@@ -1,0 +1,41 @@
+---
+/**
+ * FIG. 02 of the playground's page: what it does not claim, in the words of
+ * the coverage tracker's own limits (../coverage/Claims.astro). "Attested"
+ * appears only to say the page does not check it.
+ */
+import Section from "../home/Section.astro";
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+---
+
+<Section {id} fig="FIG. 02" eyebrow="Limits" title="What the playground does not claim">
+  <ul class="pg-claims rise">
+    <li>
+      <strong>It does not check attestations.</strong> A wallet may show only a descriptor an auditor has attested under
+      ERC-8176. The playground shows what the registry's descriptor says, attested or not, so a wallet you use may still
+      show the raw call.
+    </li>
+    <li>
+      <strong>A near miss's preview is not coverage.</strong> When the registry describes a contract only at another
+      deployment, the playground formats the call as if that descriptor listed this one too. No wallet does that: the
+      protocol has to check that the descriptor fits, and add the deployment.
+    </li>
+    <li>
+      <strong>A draft's preview comes from the report.</strong> B3Pay's drafts are not on this site. A preview is one real
+      call to the contract, as the draft rendered it when it was tested, and no wallet reads the draft yet.
+    </li>
+    <li>
+      <strong>Calls, not messages.</strong> The playground reads a transaction's calldata. Signed messages, such as
+      EIP-712 permits and orders, are not read here.
+    </li>
+    <li>
+      <strong>Wallets decide.</strong> Each wallet chooses which registries and reviewers it trusts, and how it lays out a
+      request, so what yours shows may differ from this page.
+    </li>
+  </ul>
+</Section>

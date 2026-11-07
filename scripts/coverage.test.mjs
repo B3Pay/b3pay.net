@@ -307,7 +307,7 @@ test("the report follows the schema in src/components/coverage/types.ts", () => 
       let unformatted = 0;
       topFunctions.forEach((fn, i) => {
         const at = `${where} topFunctions[${i}]`;
-        only(fn, ["selector", "signature", "share", "senders", "formatted"], at);
+        only(fn, ["selector", "signature", "share", "senders", "formatted", "exampleTx"], at);
         expect(/^0x[0-9a-f]{8}$/.test(fn.selector), at, "selector is not 4 bytes of lower-case hex");
         if (fn.signature !== null) expect(fn.selector === `0x${keccak(fn.signature).slice(0, 8)}`, at, `selector is not Keccak-256 of ${fn.signature}`);
         expect(isShare(fn.share), at, "share is not a share");
@@ -315,6 +315,8 @@ test("the report follows the schema in src/components/coverage/types.ts", () => 
         expect(typeof fn.formatted === "boolean", at, "formatted is not true or false");
         expect(descriptor !== null || !fn.formatted, at, "is formatted without a descriptor");
         expect(i === 0 || topFunctions[i - 1].share >= fn.share, at, "is not in order, most called first");
+        // The card links it to the playground, which looks it up on the contract's chain.
+        expect("exampleTx" in fn && (fn.exampleTx === null || /^0x[0-9a-f]{64}$/.test(fn.exampleTx)), at, "exampleTx is not a transaction hash or null");
         if (fn.formatted) formatted += fn.share;
         else unformatted += fn.share;
       });

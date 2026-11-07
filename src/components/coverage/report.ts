@@ -1,13 +1,19 @@
 /**
  * The coverage report the tracker page renders, src/data/clear-signing-coverage.json,
- * and the ways the page writes its values. The page and /clear-signing/coverage.json
- * both read it from here, and neither builds while the report's counts disagree
- * with its protocol list (./totals.ts): the page never shows two numbers that
- * contradict each other, and the last good deploy stays live.
+ * and the words the page has for its values; ./format.ts writes its numbers,
+ * shares and days, and the playground shares it. The page and
+ * /clear-signing/coverage.json both read the report from here, and neither
+ * builds while the report's counts disagree with its protocol list
+ * (./totals.ts): the page never shows two numbers that contradict each
+ * other, and the last good deploy stays live.
  */
 import raw from "../../data/clear-signing-coverage.json?raw";
+import { count, days, percent, plural } from "./format.ts";
 import { CHAINS, disagreements } from "./totals.ts";
 import type { ChainId, Contract, CoverageReport, CoverageStatus, Protocol } from "./types.ts";
+
+// How the site writes values, passed on so the coverage components keep one import.
+export { count, day, days, escapeHtml, fileName, host, percent, perDay, plural, short, usd } from "./format.ts";
 
 /** The file as it is, which /clear-signing/coverage.json publishes byte for byte. */
 export const RAW: string = raw;
@@ -70,36 +76,6 @@ export const attestationLabel = (attestation: Attestation) => lookup(ATTESTATION
 const LINT: Record<NonNullable<Contract["draft"]>["lint"], string> = { pass: "Pass", warnings: "Warnings" };
 export const lintLabel = (lint: NonNullable<Contract["draft"]>["lint"]) => lookup(LINT, lint, "lint result");
 
-const NUMBER = new Intl.NumberFormat("en-US");
-
-/** A count with thousands separators: 12,840. */
-export const count = (value: number) => NUMBER.format(value);
-
-/** A count and its noun: "1 contract", "40 contracts". */
-export const plural = (value: number, one: string, many = `${one}s`) => `${count(value)} ${value === 1 ? one : many}`;
-
-/** Transactions per day: whole from 10 up, one decimal below. */
-export const perDay = (value: number) => (value >= 10 ? NUMBER.format(Math.round(value)) : String(Math.round(value * 10) / 10));
-
-/** A share as a whole percentage, which reads 0% or 100% only when it is exactly that. */
-export function percent(share: number): string {
-  const whole = Math.round(share * 100);
-  if (share > 0 && whole === 0) return "<1%";
-  if (share < 1 && whole === 100) return ">99%";
-  return `${whole}%`;
-}
-
-const DAY = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" });
-
-/** A day as the site writes it: 4 November 2026. */
-export const day = (iso: string) => DAY.format(new Date(iso));
-
-/** Two times as days: "5 November 2026", "3–5 November 2026" or "30 October – 2 November 2026". */
-export const days = (from: string, to: string) => DAY.formatRange(new Date(from), new Date(to));
-
-/** An address or hash shortened in the middle, as the design system writes it: 0x0000…0001. */
-export const short = (hex: string) => `${hex.slice(0, 6)}…${hex.slice(-4)}`;
-
 /** The explorer's page for a transaction, from the contract's: /address/<address> becomes /tx/<hash>. */
 export function txUrl(contract: Contract, hash: string): string {
   const url = contract.explorerUrl.replace(/\/address\/0x[0-9a-fA-F]{40}\/?$/, `/tx/${hash}`);
@@ -119,24 +95,9 @@ const LIST = new Intl.ListFormat("en-GB", { type: "conjunction" });
 /** Chains by name, as a sentence lists them: "Ethereum, Base and OP Mainnet". */
 export const chainList = (ids: readonly ChainId[]) => LIST.format(ids.map(chainName));
 
-const USD = new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", notation: "compact", maximumSignificantDigits: 3 });
-
-/** An amount in US dollars, to three figures: $2.41B. */
-export const usd = (value: number) => USD.format(value);
-
 /** The chains a protocol's contracts are on, in the page's order. */
 export const chainsOf = (protocol: Protocol) =>
   CHAINS.map(({ id }) => id).filter((id) => protocol.contracts.some((contract) => contract.chainId === id));
-
-/** Text for a place that takes HTML, such as a hero's title and tagline. */
-export const escapeHtml = (text: string) =>
-  text.replace(/[&<>"]/g, (char) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[char]!);
-
-/** A link's host, which is what a reader needs to know before following it: docs.example.com. */
-export const host = (url: string) => new URL(url).host.replace(/^www\./, "");
-
-/** A registry file by its name: calldata-UniversalRouter.json. */
-export const fileName = (path: string) => path.slice(path.lastIndexOf("/") + 1);
 
 /**
  * A protocol's page in words: its title, the description its link carries

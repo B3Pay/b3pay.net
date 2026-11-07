@@ -3,7 +3,10 @@
  * Every link, image, script, stylesheet, form and head tag in the built pages
  * that points into this site must reach a file of the build, or a function in
  * api/, the way Vercel serves it (scripts/vercel-routes.mjs), without passing
- * through a redirect; and a #fragment must name an element of its page.
+ * through a redirect; and a #fragment must name an element of its page,
+ * unless that page keeps its state in the fragment and says so with
+ * data-fragment-state (the playground's #chain=…&tx=…), and the fragment is
+ * state: name=value pairs.
  *
  * Starlight's link validator checks the Markdown pages while they build. This
  * checks the HTML everything else makes as well: the header and footer, the
@@ -64,6 +67,12 @@ export function targetsOf(html) {
   return targets;
 }
 
+/** Whether a page reads its state from the address's fragment, as it says with data-fragment-state. */
+export const keepsStateIn = (html) => /<[a-z][^>]*\sdata-fragment-state[\s=>]/i.test(html);
+
+/** A fragment that is state, not a place: name=value pairs, as in chain=8453&tx=0x…. */
+export const isState = (fragment) => /^[\w-]+=[^&=]*(&[\w-]+=[^&=]*)*$/.test(fragment);
+
 export function checkLinks({ router, pages }) {
   const html = new Map();
   const read = (file) => {
@@ -119,8 +128,9 @@ export function checkLinks({ router, pages }) {
       else if (end.function) {
         if (link.attribute !== "action") report(`${shown} points at the function ${end.function}`, page);
       } else if (end.status !== 200 || !end.file) report(`${shown} is broken (HTTP ${end.status})`, page);
-      else if (fragment && end.file.endsWith(".html") && !targetsIn(end.file).has(fragment))
-        report(`${shown}: ${end.url} has no element with id "${fragment}"`, page);
+      else if (fragment && end.file.endsWith(".html") && !targetsIn(end.file).has(fragment)) {
+        if (!(isState(fragment) && keepsStateIn(read(end.file)))) report(`${shown}: ${end.url} has no element with id "${fragment}"`, page);
+      }
     }
   }
   return { problems, internal, external };

@@ -6,7 +6,9 @@
  * another deployment that formats the same functions), what its recent calls
  * were and which of them the descriptor formats, whether Sourcify has its
  * source, and where its address came from. A B3Pay draft for it follows
- * (./DraftPreview.astro).
+ * (./DraftPreview.astro). Its id, contract-<chain id>-<address>, is where the
+ * playground links to it, and each of its most-called functions links to the
+ * playground with a real call of it from the tracker's sample.
  */
 import DraftPreview from "./DraftPreview.astro";
 import Meter from "./Meter.astro";
@@ -25,6 +27,8 @@ import {
   short,
   sourcifyLabel,
 } from "./report.ts";
+import { contractAnchor } from "./format.ts";
+import { txInPlayground } from "../playground/input.ts";
 import { elsewhereReach } from "./totals.ts";
 import type { Contract } from "./types.ts";
 
@@ -42,7 +46,7 @@ const byTransactions = sample?.txShareCovered == null ? null : percent(sample.tx
 const bySenders = sample?.signerShareCovered == null ? null : percent(sample.signerShareCovered);
 ---
 
-<article class="contract">
+<article class="contract" id={contractAnchor(contract.chainId, contract.address)}>
   <header class="head">
     <div class="title">
       <p class="chain">{chainName(contract.chainId)}</p>
@@ -177,9 +181,17 @@ const bySenders = sample?.signerShareCovered == null ? null : percent(sample.sig
                 <span class="pct">{percent(fn.share)}</span>
                 <Meter share={fn.share} muted={!fn.formatted} />
                 <span class="how">
-                  {fn.formatted ? "Formatted" : "Not formatted"}
-                  {fn.signature === null && " · name not known"}
-                  {fn.senders !== null && <> · {plural(fn.senders, "sender")}</>}
+                  <span>
+                    {fn.formatted ? "Formatted" : "Not formatted"}
+                    {fn.signature === null && " · name not known"}
+                    {fn.senders !== null && <> · {plural(fn.senders, "sender")}</>}
+                  </span>
+                  {fn.exampleTx && (
+                    <a class="try" href={txInPlayground(contract.chainId, fn.exampleTx)} data-pagefind-ignore>
+                      Try it<span class="sr-only">: a real call of {fn.signature ?? fn.selector} in the playground</span>
+                      <span aria-hidden="true">→</span>
+                    </a>
+                  )}
                 </span>
               </li>
             ))}
@@ -375,7 +387,27 @@ const bySenders = sample?.signerShareCovered == null ? null : percent(sample.sig
   }
 
   .how {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.15rem 1rem;
+    align-items: baseline;
+    justify-content: space-between;
     font-size: var(--sl-text-xs);
     color: var(--ink-muted);
+  }
+
+  /* A real call of the function, opened in the playground. */
+  .try {
+    display: inline-flex;
+    gap: 0.3rem;
+    align-items: baseline;
+    font-weight: 600;
+    color: var(--sl-color-text-accent);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .try:hover {
+    text-decoration: underline;
   }
 </style>

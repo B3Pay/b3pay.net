@@ -16,6 +16,31 @@ The site is not versioned; changes are listed by the date they merged.
 
 ### Added
 
+- The Clear Signing playground, at `/clear-signing/playground/`: paste a
+  transaction hash, or a contract's address and calldata, on Ethereum, Base,
+  Arbitrum One or OP Mainnet, and see the raw call beside what a wallet that
+  reads the ERC-7730 registry would show for it, formatted in the browser by
+  Sourcify's `@ethereum-sourcify/clear-signing` 0.3.1 (pinned) from the
+  registry as it is on GitHub. Beside it is what the coverage tracker knows
+  of the contract: its status and a link to its card, a preview of how a near
+  miss would read if the registry listed this deployment, and B3Pay's draft
+  preview. Seven examples, real transactions from the tracker's samples, show
+  each kind of result without asking a chain. What is looked up stays in the
+  address's fragment, so a result can be shared by its link and this site's
+  server never sees it. Linked from the Clear Signing page, the tracker's
+  hero and the footer. Each contract's card on a protocol's page has an id,
+  `contract-<chain id>-<address>`, that the playground links to, and each of
+  its most-called functions a "Try it" link that opens a real call of it in
+  the playground: the newest in the tracker's sample (`exampleTx` in the
+  report, from the tracker's run 42365364521). `scripts/playground.test.mjs`
+  tests the parsing, the RPC fallback, the token reads and the library on
+  real calls, and `scripts/playground-examples.mjs` writes the examples.
+- The Clear Signing page opens with the coverage tracker's headline beside
+  its offer: how much of the most-used contracts' recent traffic a wallet
+  could clear-sign, how many of them have a descriptor, and one of the
+  playground's examples of each kind (a call the registry formats, one it
+  does not describe, a near miss and a B3Pay draft), each opening in the
+  playground.
 - The Clear Signing coverage tracker, at `/clear-signing/coverage/`: how
   many of the most-used contracts on Ethereum, Base, Arbitrum One and OP
   Mainnet have an ERC-7730 descriptor in the registry, and how much of their
@@ -46,6 +71,11 @@ The site is not versioned; changes are listed by the date they merged.
 
 ### Changed
 
+- How the coverage pages write numbers, shares, days and addresses is in
+  `src/components/coverage/format.ts`, which the playground shares.
+- `npm run check:links` takes a fragment of name=value pairs as state, not
+  as an element's id, on a page marked `data-fragment-state`, as the
+  playground is. On every other page a fragment still has to name an element.
 - Keccak-256 is in `scripts/keccak.mjs`, shared by the home page's calldata
   test and the coverage test.
 
