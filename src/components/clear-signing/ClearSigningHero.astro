@@ -1,0 +1,381 @@
+---
+/**
+ * The Clear Signing page's hero, through the Hero override
+ * (../starlight/Hero.astro): the offer, from the page's frontmatter (title,
+ * tagline and actions), and beside it something to look at and something to
+ * try. First the coverage tracker's headline, worked out from its report and
+ * never written by hand: how much of the most-used contracts' recent traffic
+ * a wallet could clear-sign, and how many of them have a descriptor. Then
+ * one of the playground's examples of each kind (a call the registry
+ * formats, one it does not describe, a near miss and a B3Pay draft), each a
+ * link that opens it in the playground (../playground/example-links.ts).
+ */
+import { LinkButton } from "@astrojs/starlight/components";
+import Meter from "../coverage/Meter.astro";
+import StatusIcon from "../coverage/StatusIcon.astro";
+import { chainList, chains, count, days, percent, registryUrl, report } from "../coverage/report.ts";
+import { exampleLinks, type ExampleKind } from "../playground/example-links.ts";
+import { PLAYGROUND_PATH } from "../playground/input.ts";
+
+const { entry } = Astro.locals.starlightRoute;
+const { title = entry.data.title, tagline, actions = [] } = entry.data.hero ?? {};
+
+const { totals, registry, sources } = report;
+const withDescriptor = totals.covered + totals.partial;
+
+/** One example of each kind, in this order, with the shape its contract's status takes. */
+const KINDS = [
+  { kind: "formatted", icon: "formatted", label: "Formatted" },
+  { kind: "no-descriptor", icon: "unformatted", label: null },
+  { kind: "near-miss", icon: "unformatted", label: null },
+  { kind: "draft", icon: "draft", label: null },
+] as const satisfies readonly { kind: ExampleKind; icon: string; label: string | null }[];
+const examples = KINDS.flatMap(({ kind, icon, label }) => {
+  const example = exampleLinks.find((link) => link.kind === kind);
+  return example ? [{ ...example, icon, label: label ?? example.tag }] : [];
+});
+---
+
+<div class="cs-hero">
+  <div class="backdrop" aria-hidden="true"><div class="glow"></div></div>
+
+  <div class="copy">
+    <p class="eyebrow">
+      <span class="dot"></span>
+      Clear Signing
+    </p>
+    <h1 id="_top" data-page-title set:html={title} />
+    {tagline && <p class="tagline" set:html={tagline} />}
+    {
+      actions.length > 0 && (
+        <div class="actions">
+          {actions.map(({ attrs: { class: className, ...attrs } = {}, icon, link: href, text, variant }) => (
+            <LinkButton {href} {variant} icon={icon?.name} class:list={[className]} {...attrs}>
+              {text}
+              {icon?.html && <Fragment set:html={icon.html} />}
+            </LinkButton>
+          ))}
+        </div>
+      )
+    }
+  </div>
+
+  <figure class="readout">
+    <div class="today">
+      <p class="kicker">The registry today</p>
+      {
+        totals.txShareCovered === null ? (
+          <p class="value none">No recent transactions</p>
+        ) : (
+          <>
+            <p class="value">{percent(totals.txShareCovered)}</p>
+            <p class="label">
+              of recent transactions to the {count(totals.contracts)} most-used contracts could be clear-signed.
+            </p>
+            <Meter share={totals.txShareCovered} />
+          </>
+        )
+      }
+      <p class="more">
+        {count(withDescriptor)} of {count(totals.contracts)} have a descriptor in the registry.{" "}
+        <a href="/clear-signing/coverage/">See which ones<span aria-hidden="true">&nbsp;→</span></a>
+      </p>
+    </div>
+
+    {
+      examples.length > 0 && (
+        <nav class="try" aria-labelledby="cs-try">
+          <p class="kicker" id="cs-try">
+            Try a real transaction
+          </p>
+          <ul>
+            {examples.map((example) => (
+              <li>
+                <a href={example.href}>
+                  <StatusIcon status={example.icon} />
+                  <span class="name">{example.title}</span>
+                  <span class="meta">
+                    {example.chain} · {example.label}
+                  </span>
+                  <span class="go" aria-hidden="true">
+                    →
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+          <a class="own" href={PLAYGROUND_PATH}>
+            Or paste your own<span aria-hidden="true">&nbsp;→</span>
+          </a>
+        </nav>
+      )
+    }
+
+    <figcaption class="measured">
+      <span>{chainList(chains.map((chain) => chain.id))}</span>
+      <span>
+        Registry at <a href={registryUrl}><code>{registry.commit.slice(0, 7)}</code></a>
+      </span>
+      <span>On-chain reads {days(sources.onchain.oldest, sources.onchain.newest)}</span>
+    </figcaption>
+  </figure>
+</div>
+
+<style>
+  .cs-hero {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    gap: 2.75rem;
+    align-items: center;
+    padding-block: clamp(1.5rem, 5vw, 4rem) clamp(2rem, 5vw, 4rem);
+  }
+
+  @media (min-width: 64rem) {
+    .cs-hero {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 3.5rem;
+    }
+  }
+
+  /* ── The offer ────────────────────────────────────────────────────── */
+
+  .eyebrow {
+    display: inline-flex;
+    gap: 0.6rem;
+    align-items: center;
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--sl-color-gray-2);
+  }
+
+  .dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background-color: var(--accent);
+    box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+
+  h1 {
+    margin: 1.4rem 0 0;
+    max-width: 15ch;
+    font-size: clamp(2.4rem, 1.3rem + 3.6vw, 4.25rem);
+    font-weight: 700;
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+    color: var(--sl-color-white);
+    text-wrap: balance;
+  }
+
+  .tagline {
+    margin: 1.5rem 0 0;
+    max-width: 36rem;
+    font-size: clamp(1.05rem, 0.98rem + 0.3vw, 1.2rem);
+    line-height: 1.55;
+    color: var(--sl-color-gray-2);
+    text-wrap: pretty;
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    align-items: center;
+    margin-top: 2.25rem;
+  }
+
+  /* ── The readout: the registry today, then calls to try ──────────── */
+
+  .readout {
+    margin: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background-color: var(--surface-raised);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--brand) 6%, transparent),
+      0 30px 80px -40px color-mix(in srgb, var(--brand) 35%, transparent);
+  }
+
+  .readout p {
+    margin: 0;
+  }
+
+  .today {
+    display: grid;
+    gap: 0.6rem;
+    padding: 1.4rem 1.4rem 1.3rem;
+  }
+
+  .kicker {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--sl-color-text-accent);
+  }
+
+  .value {
+    font-size: clamp(3rem, 2.4rem + 2vw, 4rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+  }
+
+  .value.none {
+    font-size: 1.5rem;
+    color: var(--ink-muted);
+  }
+
+  .label {
+    max-width: 30rem;
+    font-size: var(--sl-text-sm);
+    line-height: 1.45;
+    color: var(--sl-color-gray-2);
+  }
+
+  .today :global(.meter) {
+    margin-top: 0.3rem;
+    height: 8px;
+  }
+
+  .today .more {
+    margin-top: 0.2rem;
+    font-size: var(--sl-text-sm);
+    color: var(--ink-muted);
+  }
+
+  .more a,
+  .own,
+  .measured a {
+    color: var(--sl-color-text-accent);
+  }
+
+  .more a {
+    white-space: nowrap;
+  }
+
+  .try {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1.2rem 1.4rem 1.3rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .try ul {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .try li + li {
+    border-top: 1px solid var(--line);
+  }
+
+  .try li a {
+    display: grid;
+    grid-template-columns: 1rem minmax(0, 1fr) auto;
+    gap: 0.1rem 0.7rem;
+    align-items: center;
+    padding: 0.6rem 0.2rem;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .try li a :global(.icon) {
+    width: 0.95rem;
+    height: 0.95rem;
+  }
+
+  .name {
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+  }
+
+  .meta {
+    grid-column: 2;
+    font-size: var(--sl-text-xs);
+    color: var(--ink-muted);
+  }
+
+  .go {
+    grid-row: 1 / span 2;
+    grid-column: 3;
+    color: var(--sl-color-text-accent);
+    transition: translate 150ms ease;
+  }
+
+  .try li a:hover .name,
+  .try li a:focus-visible .name {
+    color: var(--sl-color-text-accent);
+  }
+
+  .try li a:hover .go {
+    translate: 0.2rem 0;
+  }
+
+  .own {
+    justify-self: start;
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+  }
+
+  .measured {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.25rem;
+    padding: 0.85rem 1.4rem 1rem;
+    border-top: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-stretch: 87.5%;
+    line-height: 1.6;
+    color: var(--ink-muted);
+  }
+
+  .measured code {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .go {
+      transition: none;
+    }
+  }
+
+  /* ── The backdrop: the coverage pages' hairline grid and glow ─────── */
+
+  .backdrop {
+    position: absolute;
+    z-index: -1;
+    inset-block: -1.5rem -2rem;
+    left: 50%;
+    width: 100vw;
+    overflow: hidden;
+    pointer-events: none;
+    translate: -50% 0;
+    background-image: linear-gradient(90deg, color-mix(in srgb, var(--ink) 4%, transparent) 1px, transparent 1px);
+    background-size: calc(100% / 12) 100%;
+    mask-image: linear-gradient(to bottom, #000 60%, transparent);
+  }
+
+  @media (max-width: 48rem) {
+    .backdrop {
+      background-size: calc(100% / 6) 100%;
+    }
+  }
+
+  .glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(40rem 26rem at 76% 42%, color-mix(in srgb, var(--brand) 12%, transparent), transparent 70%);
+  }
+</style>

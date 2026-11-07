@@ -5,45 +5,23 @@
  * examples under them, and under all of it the result, which ./app.ts draws.
  *
  * The examples are grouped by what the coverage report says of their
- * contracts, so the page never says by hand which calls the registry formats.
- * Each is a link to its own page address (#chain=…&tx=…), which the script
- * reads; data-fragment-state tells scripts/check-links.mjs that such a
- * fragment is state, not an element. Without scripts the form says it needs
- * them; the parts that only work with them (the calldata tab and the button)
- * start switched off. The status badges the result shows are rendered here,
- * in templates the script copies, so they are the coverage pages' own.
+ * contracts (./example-links.ts), so the page never says by hand which calls
+ * the registry formats. Each is a link to its own page address
+ * (#chain=…&tx=…), which the script reads; data-fragment-state tells
+ * scripts/check-links.mjs that such a fragment is state, not an element.
+ * Without scripts the form says it needs them; the parts that only work with
+ * them (the calldata tab and the button) start switched off. The status
+ * badges the result shows are rendered here, in templates the script copies,
+ * so they are the coverage pages' own.
  */
 import StatusBadge from "../coverage/StatusBadge.astro";
-import { report } from "../coverage/report.ts";
-import { chainById, CHAINS } from "./chains.ts";
-import { contractKey } from "./contracts.ts";
-import { EXAMPLES, type Example } from "./examples.ts";
-import { hashOf } from "./input.ts";
+import { CHAINS } from "./chains.ts";
+import { exampleLinks as examples } from "./example-links.ts";
 import "./playground.css";
 
 const { entry } = Astro.locals.starlightRoute;
 const { title = entry.data.title, tagline } = entry.data.hero ?? {};
 
-const contracts = new Map(
-  report.protocols.flatMap((protocol) =>
-    protocol.contracts.map((contract) => [contractKey(contract.chainId, contract.address), contract] as const),
-  ),
-);
-
-/** What the report says of an example's contract, as its chip says it. */
-function kindOf(example: Example) {
-  const contract = contracts.get(contractKey(example.chainId, example.to));
-  if (!contract) throw new Error(`The playground's example ${example.id} calls a contract the coverage report does not list`);
-  if (contract.status !== "uncovered") return { formatted: true, tag: null };
-  return { formatted: false, tag: contract.draft ? "B3Pay draft" : contract.elsewhere ? "Near miss" : "No descriptor" };
-}
-
-const examples = EXAMPLES.map((example) => ({
-  ...example,
-  ...kindOf(example),
-  chain: chainById(example.chainId)?.name,
-  href: hashOf({ kind: "hash", chainId: example.chainId, hash: example.hash }),
-}));
 const groups = [
   { title: "The registry formats these", items: examples.filter((example) => example.formatted) },
   { title: "A wallet shows these as raw data", items: examples.filter((example) => !example.formatted) },
@@ -146,7 +124,7 @@ const groups = [
           <ul>
             {group.items.map((example) => (
               <li>
-                <a href={example.href}>
+                <a href={example.fragment}>
                   <span class="pg-example-title">{example.title}</span>
                   <span class="pg-example-meta">
                     {example.chain}

@@ -10,8 +10,9 @@ src/content/docs/   the site's own pages: home, Clear Signing with its coverage
                     tracker and playground, Toolkit, B3Forge, Internet Computer,
                     About, Contact, and /docs/
 src/components/     the header, footer, cards and form, Starlight overrides, the
-                    home page's hero and sections (home/), the coverage
-                    tracker's (coverage/) and the playground's (playground/)
+                    home page's hero and sections (home/), the Clear Signing
+                    page's hero (clear-signing/), the coverage tracker's
+                    (coverage/) and the playground's (playground/)
 src/data/           the coverage tracker's report
 src/pages/          the coverage tracker's page for each protocol,
                     /clear-signing/coverage.json, the report as published, and
@@ -66,7 +67,10 @@ deployment, though not for its own (`elsewhere` in the schema), is listed
 among the overview's near misses when that descriptor formats nearly all of
 its calls, and its card says so either way. Each of a contract's most-called
 functions names a real call of it from the tracker's sample (`exampleTx`),
-and its card links that call to the playground ("Try it").
+and its card links that call to the playground ("Try it"). The Clear Signing
+page opens with the tracker's headline and one of the playground's examples
+of each kind
+([`src/components/clear-signing/ClearSigningHero.astro`](src/components/clear-signing/ClearSigningHero.astro)).
 
 To update the tracker, replace the file and check it:
 

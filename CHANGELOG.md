@@ -35,6 +35,12 @@ The site is not versioned; changes are listed by the date they merged.
   report, from the tracker's run 42365364521). `scripts/playground.test.mjs`
   tests the parsing, the RPC fallback, the token reads and the library on
   real calls, and `scripts/playground-examples.mjs` writes the examples.
+- The Clear Signing page opens with the coverage tracker's headline beside
+  its offer: how much of the most-used contracts' recent traffic a wallet
+  could clear-sign, how many of them have a descriptor, and one of the
+  playground's examples of each kind (a call the registry formats, one it
+  does not describe, a near miss and a B3Pay draft), each opening in the
+  playground.
 - The Clear Signing coverage tracker, at `/clear-signing/coverage/`: how
   many of the most-used contracts on Ethereum, Base, Arbitrum One and OP
   Mainnet have an ERC-7730 descriptor in the registry, and how much of their

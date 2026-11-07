@@ -4,20 +4,23 @@
  * the home page, a signature request that decodes itself from calldata into
  * what a person reads (../home/HomeHero.astro); the Clear Signing
  * coverage tracker and each protocol's page under it, their headline numbers
- * worked out from the report (../coverage/CoverageHero.astro); and the Clear
- * Signing playground, whose hero is the playground itself
+ * worked out from the report (../coverage/CoverageHero.astro); the Clear
+ * Signing page, its offer beside the tracker's headline and calls to try
+ * (../clear-signing/ClearSigningHero.astro); and the Clear Signing
+ * playground, whose hero is the playground itself
  * (../playground/PlaygroundHero.astro). All of them read the page's `hero`
  * frontmatter for the title and tagline, and all but the playground its
  * actions.
  */
 import Default from "@astrojs/starlight/components/Hero.astro";
+import ClearSigningHero from "../clear-signing/ClearSigningHero.astro";
 import CoverageHero from "../coverage/CoverageHero.astro";
 import HomeHero from "../home/HomeHero.astro";
 import PlaygroundHero from "../playground/PlaygroundHero.astro";
 
 // Starlight gives a page the id of its path: the home page (src/content/docs/index.mdx)
-// "", the tracker "clear-signing/coverage", a protocol's page "clear-signing/coverage/<id>",
-// and the playground "clear-signing/playground".
+// "", the Clear Signing page "clear-signing", the tracker "clear-signing/coverage", a
+// protocol's page "clear-signing/coverage/<id>", and the playground "clear-signing/playground".
 const { id } = Astro.locals.starlightRoute;
 const coverage = id === "clear-signing/coverage" || id.startsWith("clear-signing/coverage/");
 ---
@@ -25,6 +28,8 @@ const coverage = id === "clear-signing/coverage" || id.startsWith("clear-signing
 {
   id === "" ? (
     <HomeHero />
+  ) : id === "clear-signing" ? (
+    <ClearSigningHero />
   ) : coverage ? (
     <CoverageHero />
   ) : id === "clear-signing/playground" ? (
