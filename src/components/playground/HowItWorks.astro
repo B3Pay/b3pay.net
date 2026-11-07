@@ -1,0 +1,61 @@
+---
+/**
+ * FIG. 01 of the playground's page: what it does with a transaction, step by
+ * step, in the order ./app.ts does it. The library's version and the
+ * registry's address are the ones the page uses (./clear.ts), and the
+ * report's date the coverage report's.
+ */
+import Section from "../home/Section.astro";
+import { day, report } from "../coverage/report.ts";
+import { LIBRARY_VERSION, REGISTRY_REPO } from "./clear.ts";
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+---
+
+<Section {id} fig="FIG. 01" eyebrow="How it works" title="Everything happens in your browser">
+  <Fragment slot="lead">
+    <p>
+      The playground does what a wallet that implements ERC-7730 does before it asks you to sign: it finds the contract's
+      descriptor in the Clear Signing registry and formats the call with it. This site only serves the page.
+    </p>
+  </Fragment>
+
+  <ol class="pg-steps rise">
+    <li>
+      <h3>The transaction</h3>
+      <p>
+        Your browser asks the chain's public RPC nodes for the transaction: the contract it calls, the value it sends and
+        its calldata. The examples carry their own transactions, so they need no RPC.
+      </p>
+    </li>
+    <li>
+      <h3>The descriptor</h3>
+      <p>
+        It looks the contract up by chain and address in the index of <a href={`https://github.com/${REGISTRY_REPO}`}
+          >the Clear Signing registry</a
+        >, read from GitHub as it is now, and reads the ERC-7730 descriptor the index names, with the files it includes.
+      </p>
+    </li>
+    <li>
+      <h3>The formatting</h3>
+      <p>
+        <a href="https://github.com/sourcifyeth/clear-signing">Sourcify's clear-signing library</a>,{" "}
+        {`version ${LIBRARY_VERSION}`}, decodes the calldata and writes each value the way the descriptor says. A token
+        amount needs the token's symbol and decimals, which your browser reads from the token's own contract.
+      </p>
+    </li>
+    <li>
+      <h3>The coverage</h3>
+      <p>
+        The page looks the contract up in the <a href="/clear-signing/coverage/">coverage tracker</a>'s report of {
+          day(report.generatedAt)
+        }: its status, the descriptor the registry has for another of its deployments, and B3Pay's draft for it, when
+        there is one.
+      </p>
+    </li>
+  </ol>
+</Section>

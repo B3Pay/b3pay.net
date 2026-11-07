@@ -1,0 +1,28 @@
+---
+title: Clear Signing playground
+description: Paste a transaction from Ethereum, Base, Arbitrum One or OP Mainnet and see what a wallet that reads the Clear Signing registry shows for it, beside the raw call it is asked to sign, with what the coverage tracker found for the contract.
+template: splash
+hero:
+  title: What would a wallet show you?
+  tagline: Paste a transaction from Ethereum, Base, Arbitrum One or OP Mainnet. Your browser formats it with the Clear Signing registry, the way a wallet that implements ERC-7730 does, beside the raw call the wallet is asked to sign.
+---
+
+import Closing from "../../../components/coverage/Closing.astro";
+import HowItWorks from "../../../components/playground/HowItWorks.astro";
+import Limits from "../../../components/playground/Limits.astro";
+
+{/* The hero is PlaygroundHero.astro, through the Hero override: the form, the examples and the result. */}
+
+<HowItWorks id="how-it-works" />
+
+<Limits id="limits" />
+
+<Closing
+  id="get-covered"
+  fig="FIG. 03"
+  title="Does your protocol's call show as raw data?"
+  back={{ href: "/clear-signing/coverage/", text: "See the coverage tracker" }}
+>
+  We write, test and submit descriptors. Tell us the chains, the addresses and the flows your users sign. The coverage
+  tracker shows where your contracts stand today.
+</Closing>

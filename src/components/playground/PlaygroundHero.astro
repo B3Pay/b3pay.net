@@ -1,0 +1,177 @@
+---
+/**
+ * The playground, through the Hero override (../starlight/Hero.astro): the
+ * page's title and tagline from its frontmatter, the form beside them, the
+ * examples under them, and under all of it the result, which ./app.ts draws.
+ *
+ * The examples are grouped by what the coverage report says of their
+ * contracts, so the page never says by hand which calls the registry formats.
+ * Each is a link to its own page address (#chain=…&tx=…), which the script
+ * reads; data-fragment-state tells scripts/check-links.mjs that such a
+ * fragment is state, not an element. Without scripts the form says it needs
+ * them; the parts that only work with them (the calldata tab and the button)
+ * start switched off. The status badges the result shows are rendered here,
+ * in templates the script copies, so they are the coverage pages' own.
+ */
+import StatusBadge from "../coverage/StatusBadge.astro";
+import { report } from "../coverage/report.ts";
+import { chainById, CHAINS } from "./chains.ts";
+import { contractKey } from "./contracts.ts";
+import { EXAMPLES, type Example } from "./examples.ts";
+import { hashOf } from "./input.ts";
+import "./playground.css";
+
+const { entry } = Astro.locals.starlightRoute;
+const { title = entry.data.title, tagline } = entry.data.hero ?? {};
+
+const contracts = new Map(
+  report.protocols.flatMap((protocol) =>
+    protocol.contracts.map((contract) => [contractKey(contract.chainId, contract.address), contract] as const),
+  ),
+);
+
+/** What the report says of an example's contract, as its chip says it. */
+function kindOf(example: Example) {
+  const contract = contracts.get(contractKey(example.chainId, example.to));
+  if (!contract) throw new Error(`The playground's example ${example.id} calls a contract the coverage report does not list`);
+  if (contract.status !== "uncovered") return { formatted: true, tag: null };
+  return { formatted: false, tag: contract.draft ? "B3Pay draft" : contract.elsewhere ? "Near miss" : "No descriptor" };
+}
+
+const examples = EXAMPLES.map((example) => ({
+  ...example,
+  ...kindOf(example),
+  chain: chainById(example.chainId)?.name,
+  href: hashOf({ kind: "hash", chainId: example.chainId, hash: example.hash }),
+}));
+const groups = [
+  { title: "The registry formats these", items: examples.filter((example) => example.formatted) },
+  { title: "A wallet shows these as raw data", items: examples.filter((example) => !example.formatted) },
+].filter((group) => group.items.length > 0);
+---
+
+<div class="pg" data-pg data-fragment-state>
+  <div class="pg-backdrop" aria-hidden="true"><div class="pg-glow"></div></div>
+
+  <div class="pg-copy">
+    <p class="pg-eyebrow-top">
+      <span class="pg-dot"></span>
+      <a href="/clear-signing/">Clear Signing</a>
+      <span aria-hidden="true">/</span> Playground
+    </p>
+    <h1 id="_top" data-page-title set:html={title} />
+    {tagline && <p class="pg-tagline" set:html={tagline} />}
+  </div>
+
+  <form class="pg-form" data-pg-form aria-label="Read a transaction">
+    <fieldset class="pg-kind">
+      <legend class="sr-only">What to read</legend>
+      <label><input type="radio" name="kind" value="hash" checked disabled /><span>Transaction hash</span></label>
+      <label><input type="radio" name="kind" value="call" disabled /><span>Calldata</span></label>
+    </fieldset>
+
+    <label class="pg-field">
+      <span class="pg-label">Chain</span>
+      <select name="chain">
+        {CHAINS.map((chain) => <option value={chain.id}>{chain.name}</option>)}
+      </select>
+    </label>
+
+    <div class="pg-group-fields" data-when="hash">
+      <label class="pg-field">
+        <span class="pg-label">Transaction hash</span>
+        <input
+          class="pg-mono"
+          name="tx"
+          type="text"
+          placeholder="0x…"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+        />
+      </label>
+    </div>
+
+    <div class="pg-group-fields" data-when="call" hidden>
+      <label class="pg-field">
+        <span class="pg-label">Contract address</span>
+        <input
+          class="pg-mono"
+          name="to"
+          type="text"
+          placeholder="0x…"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+          disabled
+        />
+      </label>
+      <label class="pg-field">
+        <span class="pg-label">Calldata</span>
+        <textarea
+          class="pg-mono"
+          name="data"
+          rows="4"
+          placeholder="0x…"
+          autocomplete="off"
+          autocapitalize="off"
+          spellcheck="false"
+          disabled></textarea>
+      </label>
+      <label class="pg-field">
+        <span class="pg-label">Value, in ETH</span>
+        <input name="eth" type="text" inputmode="decimal" placeholder="0" autocomplete="off" disabled />
+      </label>
+    </div>
+
+    <p class="pg-error" id="pg-error" data-pg-error role="alert" hidden></p>
+
+    <div class="pg-actions">
+      <button class="pg-submit" type="submit" disabled>Show what a wallet shows</button>
+      <p class="pg-status" data-pg-status role="status"></p>
+    </div>
+
+    <noscript><p class="pg-nojs">The playground runs in your browser, so it needs JavaScript.</p></noscript>
+    <p class="pg-privacy">
+      Your browser reads the transaction from the chain's public RPCs and the registry from GitHub. Nothing is signed or
+      sent, and what you look up stays out of this site's server.
+    </p>
+  </form>
+
+  <nav class="pg-examples" aria-label="Examples">
+    {
+      groups.map((group) => (
+        <div class="pg-example-group">
+          <p class="pg-examples-title">{group.title}</p>
+          <ul>
+            {group.items.map((example) => (
+              <li>
+                <a href={example.href}>
+                  <span class="pg-example-title">{example.title}</span>
+                  <span class="pg-example-meta">
+                    {example.chain}
+                    {example.tag && ` · ${example.tag}`}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      ))
+    }
+  </nav>
+
+  <section class="pg-result" data-pg-result aria-label="What a wallet shows" hidden></section>
+
+  {
+    (["covered", "partial", "uncovered", "draft"] as const).map((kind) => (
+      <template data-badge={kind}>
+        <StatusBadge {kind} />
+      </template>
+    ))
+  }
+</div>
+
+<script>
+  import "./app.ts";
+</script>

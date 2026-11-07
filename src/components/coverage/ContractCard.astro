@@ -6,7 +6,8 @@
  * another deployment that formats the same functions), what its recent calls
  * were and which of them the descriptor formats, whether Sourcify has its
  * source, and where its address came from. A B3Pay draft for it follows
- * (./DraftPreview.astro).
+ * (./DraftPreview.astro). Its id, contract-<chain id>-<address>, is where the
+ * playground links to it.
  */
 import DraftPreview from "./DraftPreview.astro";
 import Meter from "./Meter.astro";
@@ -25,6 +26,7 @@ import {
   short,
   sourcifyLabel,
 } from "./report.ts";
+import { contractAnchor } from "./format.ts";
 import { elsewhereReach } from "./totals.ts";
 import type { Contract } from "./types.ts";
 
@@ -42,7 +44,7 @@ const byTransactions = sample?.txShareCovered == null ? null : percent(sample.tx
 const bySenders = sample?.signerShareCovered == null ? null : percent(sample.signerShareCovered);
 ---
 
-<article class="contract">
+<article class="contract" id={contractAnchor(contract.chainId, contract.address)}>
   <header class="head">
     <div class="title">
       <p class="chain">{chainName(contract.chainId)}</p>
