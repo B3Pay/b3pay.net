@@ -1,0 +1,201 @@
+---
+/**
+ * FIG. 01: the four chains side by side, each measured the same way: how
+ * much of its tracked contracts' recent traffic a wallet could clear-sign,
+ * by transactions and then by senders, and its contracts by status. One
+ * hairline grid, four cells across, two on a tablet, one on a phone.
+ */
+import Section from "../home/Section.astro";
+import Meter from "./Meter.astro";
+import StatusIcon from "./StatusIcon.astro";
+import { chainTag, chains, count, perDay, percent, plural } from "./report.ts";
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+const STATUSES = ["covered", "partial", "uncovered"] as const;
+---
+
+<Section {id} fig="FIG. 01" eyebrow="By chain" title="Four chains, measured the same way">
+  <Fragment slot="lead">
+    <p>
+      Each chain's tracked contracts by status, and how much of their recent traffic a wallet could clear-sign. A busy
+      contract weighs more than a quiet one.
+    </p>
+  </Fragment>
+
+  <ul class="chains rise">
+    {
+      chains.map((chain) => (
+        <li class="chain">
+          <div class="head">
+            <h3>{chain.name}</h3>
+            <span class="tag" aria-hidden="true">
+              {chainTag(chain.id)}
+            </span>
+          </div>
+
+          {chain.txShareCovered === null ? (
+            <p class="share none">No recent transactions sampled</p>
+          ) : (
+            <>
+              <p class="share">
+                <strong>{percent(chain.txShareCovered)}</strong>
+                <span>of recent transactions</span>
+              </p>
+              <Meter share={chain.txShareCovered} />
+            </>
+          )}
+          <p class="senders">
+            {chain.signerShareCovered === null ? (
+              "Senders not known"
+            ) : (
+              <>
+                <strong>{percent(chain.signerShareCovered)}</strong> of recent senders
+              </>
+            )}
+          </p>
+
+          <ul class="counts">
+            {STATUSES.map((status) => (
+              <li>
+                <StatusIcon status={status} />
+                {count(chain[status])} {status}
+              </li>
+            ))}
+          </ul>
+          <p class="meta">
+            <span>{plural(chain.contracts, "contract")}</span>
+            <span>{perDay(chain.perDay)} transactions a day</span>
+            {chain.drafts > 0 && <span>{plural(chain.drafts, "draft")} ready</span>}
+          </p>
+        </li>
+      ))
+    }
+  </ul>
+</Section>
+
+<style>
+  /* One hairline between cells however they wrap: the grid's gap shows its background. */
+  .chains {
+    display: grid;
+    gap: 1px;
+    margin: 2.75rem 0 0;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background-color: var(--line);
+    list-style: none;
+  }
+
+  @media (min-width: 40rem) {
+    .chains {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .chains {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .chain {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1.25rem 1.25rem 1.35rem;
+    background-color: var(--surface-raised);
+  }
+
+  .chain p {
+    margin: 0;
+  }
+
+  .head {
+    display: flex;
+    gap: 0.75rem;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: 0.4rem;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    color: var(--sl-color-gray-4);
+  }
+
+  .share {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem 0.55rem;
+    align-items: baseline;
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-2);
+  }
+
+  .share strong {
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.035em;
+    color: var(--ink);
+  }
+
+  .share.none {
+    color: var(--ink-muted);
+  }
+
+  .chain :global(.meter) {
+    margin-top: 0.15rem;
+  }
+
+  .senders {
+    font-size: var(--sl-text-sm);
+    color: var(--ink-muted);
+  }
+
+  .senders strong {
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .counts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.9rem;
+    margin: 0.35rem 0 0;
+    padding: 0.75rem 0 0;
+    border-top: 1px solid var(--line);
+    list-style: none;
+    font-size: var(--sl-text-xs);
+    color: var(--ink-muted);
+  }
+
+  .counts li {
+    display: inline-flex;
+    gap: 0.35rem;
+    align-items: center;
+  }
+
+  /* Contracts, transactions a day, drafts: a line each, the same in every cell. */
+  .meta {
+    display: grid;
+    font-size: var(--sl-text-xs);
+    line-height: 1.5;
+    color: var(--sl-color-gray-3);
+  }
+</style>

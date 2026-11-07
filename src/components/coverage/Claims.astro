@@ -1,0 +1,114 @@
+---
+/**
+ * FIG. 05: what the page does not claim, in the words of the Clear Signing
+ * page's "What we don't claim". "Attested" appears only as the schema allows
+ * it: for a descriptor whose ERC-8176 attestation verified.
+ */
+import Section from "../home/Section.astro";
+import { attested, count, days, described, registryUrl, report, sampleSize } from "./report.ts";
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+const { registry, sources } = report;
+---
+
+<Section {id} fig="FIG. 05" eyebrow="Limits" title="What this page does not claim">
+  <ul class="claims rise">
+    <li>
+      <strong>Being in the registry is not an audit.</strong> The registry's maintainers screen submissions, and inclusion
+      is not an endorsement. A descriptor says what a call does, not whether the contract is safe to call.
+    </li>
+    <li>
+      <strong>A descriptor is not attested unless its attestation verifies.</strong> An attestation is a reviewer's signed
+      claim about one exact descriptor, under ERC-8176, which is still a draft. We call a descriptor attested only when its
+      attestation verified and has not been revoked: {count(attested.length)} of the {count(described.length)} contracts
+      here with a descriptor.
+    </li>
+    <li>
+      <strong>A descriptor for another deployment is not coverage.</strong> When the registry describes a contract on
+      another chain or at another address, we say only that it formats the same functions. It may hold that deployment's
+      addresses or constants, and the contract stays uncovered until the registry lists it.
+    </li>
+    <li>
+      <strong>Our drafts are drafts.</strong> A B3Pay draft is a descriptor we wrote and tested on real transactions. It is
+      not in the registry, so no wallet reads it yet, and its preview shows how one call would read, not how any wallet
+      shows it today.
+    </li>
+    <li>
+      <strong>A sample is not all traffic.</strong> The shares come from up to {count(sampleSize)} recent transactions for
+      each contract, read {days(sources.onchain.oldest, sources.onchain.newest)}. They describe those transactions, and
+      they move as traffic does.
+    </li>
+    <li>
+      <strong>Wallets decide.</strong> Each wallet chooses which registries and which reviewers it trusts. That a wallet
+      could clear-sign a call means the registry holds what it needs, not that every wallet shows it.
+    </li>
+  </ul>
+
+  <p class="sourced rise">
+    Sources: <a href={registryUrl}>the Clear Signing registry</a> at <code>{registry.commit.slice(0, 7)}</code>,{" "}
+    <a href="https://eips.ethereum.org/EIPS/eip-8176">ERC-8176</a>, <a href="https://www.blockscout.com/">Blockscout</a>,
+    the <a href="https://docs.sqd.dev/">SQD Network</a> and <a href="https://sourcify.dev/">Sourcify</a>. How a descriptor works is in{" "}
+    <a href="/docs/clear-signing/">the docs</a>.
+  </p>
+</Section>
+
+<style>
+  .claims {
+    display: grid;
+    gap: 0;
+    max-width: 50rem;
+    margin: 2.25rem 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .claims li {
+    position: relative;
+    padding: 1rem 0 1rem 1.75rem;
+    border-top: 1px solid var(--line);
+    font-size: var(--sl-text-base);
+    line-height: 1.6;
+    color: var(--sl-color-gray-2);
+  }
+
+  /* A short amber dash, the site's list mark on a quiet page. */
+  .claims li::before {
+    content: "";
+    position: absolute;
+    top: 1.85rem;
+    left: 0;
+    width: 0.75rem;
+    height: 1px;
+    background-color: var(--brand);
+  }
+
+  .claims strong {
+    color: var(--ink);
+  }
+
+  .sourced {
+    max-width: 50rem;
+    margin: 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+    font-size: var(--sl-text-sm);
+    color: var(--sl-color-gray-3);
+  }
+
+  .sourced a {
+    color: var(--sl-color-text-accent);
+  }
+
+  .sourced code {
+    padding: 0;
+    border: 0;
+    background: none;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: inherit;
+  }
+</style>

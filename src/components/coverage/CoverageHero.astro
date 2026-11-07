@@ -1,0 +1,530 @@
+---
+/**
+ * The coverage tracker's hero, through the Hero override, on the overview
+ * and on each protocol's page: the page's title, tagline and actions from
+ * its frontmatter, and beside them the two headline numbers, worked out from
+ * the report and never written by hand: how many of the contracts have a
+ * descriptor in the registry, and how much of their recent traffic a wallet
+ * could clear-sign, by transactions first and then by senders. Under them,
+ * what was measured and when. A protocol's page adds its status, category,
+ * website and, when DefiLlama has it, its TVL.
+ */
+import { LinkButton } from "@astrojs/starlight/components";
+import Meter from "./Meter.astro";
+import StatusBadge from "./StatusBadge.astro";
+import StatusIcon from "./StatusIcon.astro";
+import { count, day, days, host, percent, protocolById, registryUrl, report, usd } from "./report.ts";
+
+const { id, entry } = Astro.locals.starlightRoute;
+const { title = entry.data.title, tagline, actions = [] } = entry.data.hero ?? {};
+
+// A protocol's page is /clear-signing/coverage/<id>/; the overview is the page above them.
+const PROTOCOLS = "clear-signing/coverage/";
+const protocol = id.startsWith(PROTOCOLS) ? protocolById(id.slice(PROTOCOLS.length)) : null;
+
+const { registry, sources } = report;
+const totals = protocol ? protocol.totals : report.totals;
+const withDescriptor = totals.covered + totals.partial;
+const parts = [
+  { status: "covered", n: totals.covered },
+  { status: "partial", n: totals.partial },
+  { status: "uncovered", n: totals.uncovered },
+] as const;
+---
+
+<div class="cov-hero">
+  <div class="backdrop" aria-hidden="true"><div class="glow"></div></div>
+
+  <div class="copy">
+    {
+      protocol ? (
+        <p class="eyebrow">
+          <span class="dot" />
+          <a href="/clear-signing/coverage/">Clear Signing coverage tracker</a>
+          <span aria-hidden="true">/</span> {protocol.categoryLabel}
+        </p>
+      ) : (
+        <p class="eyebrow">
+          <span class="dot" />
+          Clear Signing coverage tracker
+        </p>
+      )
+    }
+    <h1 id="_top" data-page-title set:html={title} />
+    {tagline && <p class="tagline" set:html={tagline} />}
+    {
+      protocol && (
+        <dl class="facts">
+          <div>
+            <dt>Status</dt>
+            <dd>
+              <StatusBadge kind={protocol.status} />
+              {protocol.totals.drafts > 0 && (
+                <>
+                  {" "}
+                  <StatusBadge kind="draft" />
+                </>
+              )}
+            </dd>
+          </div>
+          <div>
+            <dt>Website</dt>
+            <dd>
+              <a href={protocol.website}>{host(protocol.website)}</a>
+            </dd>
+          </div>
+          {protocol.tvlUsd !== null && (
+            <div>
+              <dt>TVL</dt>
+              <dd>
+                {usd(protocol.tvlUsd)}{" "}
+                <span class="source">
+                  on the four chains, from DefiLlama{sources.defillama && `, ${day(sources.defillama)}`}
+                </span>
+              </dd>
+            </div>
+          )}
+        </dl>
+      )
+    }
+    {
+      report.mock && (
+        <p class="mock">
+          <strong>Mock data.</strong> Every protocol, address and number on this page is a placeholder for building it,
+          not a finding.
+        </p>
+      )
+    }
+    {
+      actions.length > 0 && (
+        <div class="actions">
+          {actions.map(({ attrs: { class: className, ...attrs } = {}, icon, link: href, text, variant }) => (
+            <LinkButton {href} {variant} icon={icon?.name} class:list={[className]} {...attrs}>
+              {text}
+              {icon?.html && <Fragment set:html={icon.html} />}
+            </LinkButton>
+          ))}
+        </div>
+      )
+    }
+  </div>
+
+  <figure class="readout">
+    <div class="figures">
+      <div class="figure">
+        <p class="kicker">Contracts</p>
+        <p class="value">
+          {count(withDescriptor)}<span class="of"> of {count(totals.contracts)}</span>
+        </p>
+        <p class="label">
+          {
+            protocol
+              ? `${totals.contracts === 1 ? "contract" : "contracts"} here ${withDescriptor === 1 || totals.contracts === 1 ? "has" : "have"} a descriptor in the registry`
+              : "most-used contracts have a descriptor in the registry"
+          }
+        </p>
+        <span class="segments" aria-hidden="true">
+          {parts.filter((part) => part.n > 0).map((part) => <span class:list={["segment", part.status]} style={`flex-grow: ${part.n}`} />)}
+        </span>
+        <ul class="legend">
+          {
+            parts.map((part) => (
+              <li>
+                <StatusIcon status={part.status} />
+                {count(part.n)} {part.status}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div class="figure">
+        <p class="kicker">Recent traffic</p>
+        {
+          totals.txShareCovered === null ? (
+            <p class="value none">No recent transactions</p>
+          ) : (
+            <>
+              <p class="value">{percent(totals.txShareCovered)}</p>
+              <p class="label">of recent transactions a wallet could clear-sign</p>
+              <Meter share={totals.txShareCovered} />
+            </>
+          )
+        }
+        <p class="senders">
+          {
+            totals.signerShareCovered === null ? (
+              "Senders not known"
+            ) : (
+              <>
+                <strong>{percent(totals.signerShareCovered)}</strong> of recent senders
+              </>
+            )
+          }
+        </p>
+        <p class="note">
+          Transactions count every call. Senders count each address once per function, so a relayer bot counts once
+          however many calls it sends.
+        </p>
+      </div>
+    </div>
+
+    <figcaption class="measured">
+      <span>
+        Registry at <a href={registryUrl}><code>{registry.commit.slice(0, 7)}</code></a>, committed {
+          day(registry.committedAt)
+        }
+      </span>
+      <span>On-chain reads {days(sources.onchain.oldest, sources.onchain.newest)}</span>
+      <span>
+        {count(Math.round(totals.perDay))} transactions a day across {count(totals.contracts)}{" "}
+        {totals.contracts === 1 ? "contract" : "contracts"}
+      </span>
+      <a href="/clear-signing/coverage.json">The data, as JSON</a>
+    </figcaption>
+  </figure>
+</div>
+
+<style>
+  .cov-hero {
+    position: relative;
+    isolation: isolate;
+    display: grid;
+    gap: 2.75rem;
+    align-items: center;
+    padding-block: clamp(1.5rem, 5vw, 4rem) clamp(2rem, 5vw, 4rem);
+  }
+
+  @media (min-width: 64rem) {
+    .cov-hero {
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 3.5rem;
+    }
+  }
+
+  /* ── The copy ─────────────────────────────────────────────────────── */
+
+  .eyebrow {
+    display: inline-flex;
+    gap: 0.6rem;
+    align-items: center;
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--sl-color-gray-2);
+  }
+
+  .eyebrow a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .eyebrow a:hover {
+    color: var(--sl-color-text-accent);
+    text-decoration: underline;
+  }
+
+  .dot {
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background-color: var(--accent);
+    box-shadow: 0 0 0 0.25rem color-mix(in srgb, var(--accent) 22%, transparent);
+  }
+
+  h1 {
+    margin: 1.4rem 0 0;
+    max-width: 15ch;
+    font-size: clamp(2.4rem, 1.3rem + 3.6vw, 4.25rem);
+    font-weight: 700;
+    line-height: 1.04;
+    letter-spacing: -0.035em;
+    color: var(--sl-color-white);
+    text-wrap: balance;
+  }
+
+  .tagline {
+    margin: 1.5rem 0 0;
+    max-width: 36rem;
+    font-size: clamp(1.05rem, 0.98rem + 0.3vw, 1.2rem);
+    line-height: 1.55;
+    color: var(--sl-color-gray-2);
+    text-wrap: pretty;
+  }
+
+  /* A protocol's status, website and TVL, under its name. */
+  .facts {
+    display: grid;
+    gap: 0.55rem;
+    max-width: 36rem;
+    margin: 1.6rem 0 0;
+  }
+
+  .facts div {
+    display: grid;
+    grid-template-columns: 5.5rem minmax(0, 1fr);
+    gap: 0.75rem;
+    align-items: baseline;
+  }
+
+  .facts dt {
+    font-family: var(--font-mono);
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .facts dd {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 0.5rem;
+    align-items: baseline;
+    margin: 0;
+    font-size: var(--sl-text-sm);
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .facts dd a {
+    color: var(--sl-color-text-accent);
+  }
+
+  .facts .source {
+    font-size: var(--sl-text-xs);
+    font-weight: 400;
+    color: var(--ink-muted);
+  }
+
+  /* Placeholder data says so where no one can miss it. */
+  .mock {
+    max-width: 36rem;
+    margin: 1.5rem 0 0;
+    padding: 0.75rem 1rem;
+    border: 1px dashed var(--brand);
+    border-radius: var(--radius-md);
+    background-color: color-mix(in srgb, var(--brand-soft) 50%, transparent);
+    font-size: var(--sl-text-sm);
+    line-height: 1.5;
+    color: var(--ink);
+  }
+
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 2rem;
+    align-items: center;
+    margin-top: 2.25rem;
+  }
+
+  /* ── The readout ──────────────────────────────────────────────────── */
+
+  .readout {
+    margin: 0;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background-color: var(--surface-raised);
+    box-shadow:
+      0 0 0 1px color-mix(in srgb, var(--brand) 6%, transparent),
+      0 30px 80px -40px color-mix(in srgb, var(--brand) 35%, transparent);
+  }
+
+  .figures {
+    display: grid;
+  }
+
+  @media (min-width: 36rem) {
+    .figures {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .figure + .figure {
+      border-inline-start: 1px solid var(--line);
+    }
+  }
+
+  @media (max-width: 35.99rem) {
+    .figure + .figure {
+      border-top: 1px solid var(--line);
+    }
+  }
+
+  .figure {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    padding: 1.4rem 1.4rem 1.5rem;
+  }
+
+  .figure p {
+    margin: 0;
+  }
+
+  .kicker {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--sl-color-text-accent);
+  }
+
+  .value {
+    font-size: clamp(3rem, 2.4rem + 2vw, 4rem);
+    font-weight: 700;
+    line-height: 1;
+    letter-spacing: -0.04em;
+    color: var(--ink);
+  }
+
+  .value .of {
+    font-size: 0.42em;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink-muted);
+  }
+
+  .value.none {
+    font-size: 1.5rem;
+    color: var(--ink-muted);
+  }
+
+  .label {
+    font-size: var(--sl-text-sm);
+    line-height: 1.45;
+    color: var(--sl-color-gray-2);
+  }
+
+  /* Contracts by status: one bar, a 2px gap between its parts. */
+  .segments {
+    display: flex;
+    gap: 2px;
+    height: 8px;
+    margin-top: 0.3rem;
+  }
+
+  .segment {
+    min-width: 4px;
+    border-radius: var(--radius-pill);
+  }
+
+  .segment.covered {
+    background-color: var(--coverage-covered);
+  }
+
+  .segment.partial {
+    background-color: var(--coverage-partial);
+  }
+
+  .segment.uncovered {
+    background-color: var(--coverage-empty);
+  }
+
+  @media (forced-colors: active) {
+    .segment {
+      forced-color-adjust: none;
+    }
+    .segment.covered {
+      background-color: CanvasText;
+    }
+    .segment.partial {
+      background-color: GrayText;
+    }
+    .segment.uncovered {
+      background-color: Canvas;
+      outline: 1px solid CanvasText;
+      outline-offset: -1px;
+    }
+  }
+
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 0.9rem;
+    margin: 0.1rem 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--sl-text-xs);
+    color: var(--ink-muted);
+  }
+
+  .legend li {
+    display: inline-flex;
+    gap: 0.35rem;
+    align-items: center;
+  }
+
+  .readout :global(.meter) {
+    margin-top: 0.3rem;
+    height: 8px;
+  }
+
+  .senders {
+    font-size: var(--sl-text-sm);
+    color: var(--ink-muted);
+  }
+
+  .senders strong {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .note {
+    font-size: var(--sl-text-xs);
+    line-height: 1.5;
+    color: var(--sl-color-gray-3);
+  }
+
+  .measured {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.25rem;
+    padding: 0.85rem 1.4rem 1rem;
+    border-top: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-stretch: 87.5%;
+    line-height: 1.6;
+    color: var(--ink-muted);
+  }
+
+  .measured code {
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+  }
+
+  .measured a {
+    color: var(--sl-color-text-accent);
+  }
+
+  /* ── The backdrop: the home page's hairline grid and glow, without the calldata ── */
+
+  .backdrop {
+    position: absolute;
+    z-index: -1;
+    inset-block: -1.5rem -2rem;
+    left: 50%;
+    width: 100vw;
+    overflow: hidden;
+    pointer-events: none;
+    translate: -50% 0;
+    background-image: linear-gradient(90deg, color-mix(in srgb, var(--ink) 4%, transparent) 1px, transparent 1px);
+    background-size: calc(100% / 12) 100%;
+    mask-image: linear-gradient(to bottom, #000 60%, transparent);
+  }
+
+  @media (max-width: 48rem) {
+    .backdrop {
+      background-size: calc(100% / 6) 100%;
+    }
+  }
+
+  .glow {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(40rem 26rem at 76% 42%, color-mix(in srgb, var(--brand) 12%, transparent), transparent 70%);
+  }
+</style>

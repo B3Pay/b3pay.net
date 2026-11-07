@@ -1,0 +1,306 @@
+---
+/**
+ * FIG. 02: the leaderboard, one row per protocol, busiest first. Each row is
+ * a summary that links to the protocol's own page, where its contracts are
+ * (src/pages/clear-signing/coverage/[protocol].astro).
+ *
+ * The rows are kept light, so a hundred protocols stay a small page: plain
+ * markup, styled by ./leaderboard.css rather than by scoped styles, which
+ * would mark every element, and status shapes drawn by that file, not
+ * inlined per row. Everything reads without scripts. With them, the filters,
+ * the search and the sortable headings appear; the inline script below shows
+ * them before the table is drawn, so nothing jumps, and hides them again if
+ * the board's script has not taken over within three seconds. Below 64rem
+ * each row is a card.
+ */
+import Section from "../home/Section.astro";
+import "./coverage.css";
+import "./leaderboard.css";
+import { chainName, chainTag, chains, chainsOf, count, perDay, percent, plural, report, statusLabel } from "./report.ts";
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+const { protocols, categories } = report;
+
+/** The words a search matches: the protocol's name and category, and its contracts' labels and names. */
+const searchOf = (protocol: (typeof protocols)[number]) => [
+  ...new Set(
+    [protocol.name, protocol.categoryLabel, ...protocol.contracts.flatMap((contract) => [contract.label, contract.name])]
+      .join(" ")
+      .toLowerCase()
+      .split(/\s+/),
+  ),
+];
+
+/** A share as a fill width, to a tenth of a percent. */
+const width = (share: number) => `width:${Math.round(share * 1000) / 10}%`;
+---
+
+<Section {id} fig="FIG. 02" eyebrow="Protocols" title="Every protocol we track, busiest first">
+  <Fragment slot="lead">
+    <p>
+      {plural(protocols.length, "protocol")}, by their contracts' recent transactions a day. Each has a page with its
+      contracts: what the registry formats, what people called, and where B3Pay has a draft, how one real call reads
+      with it.
+    </p>
+  </Fragment>
+
+  <div class="cov-board" data-board>
+    <script is:inline>
+      // Runs as the board is parsed: with scripts on, the filters show before
+      // anything is drawn. If the board's script has not taken over within
+      // three seconds, they go again.
+      (() => {
+        const board = document.currentScript.parentElement;
+        board.dataset.js = "";
+        setTimeout(() => board.hasAttribute("data-ready") || delete board.dataset.js, 3000);
+      })();
+    </script>
+
+    <form class="toolbar" role="search" aria-label="Filter the protocols">
+      <label class="field search">
+        <span class="field-label">Search</span>
+        <input type="search" name="q" placeholder="Protocol or contract" autocomplete="off" spellcheck="false" />
+      </label>
+      <label class="field">
+        <span class="field-label">Chain</span>
+        <select name="chain">
+          <option value="">All chains</option>
+          {chains.map((chain) => <option value={chain.id}>{chain.name}</option>)}
+        </select>
+      </label>
+      <label class="field">
+        <span class="field-label">Category</span>
+        <select name="category">
+          <option value="">All categories</option>
+          {
+            Object.entries(categories)
+              .sort(([, a], [, b]) => a.label.localeCompare(b.label))
+              .map(([key, category]) => <option value={key}>{category.label}</option>)
+          }
+        </select>
+      </label>
+      <label class="field">
+        <span class="field-label">Status</span>
+        <select name="status">
+          <option value="">All statuses</option>
+          <option value="covered">Covered</option>
+          <option value="partial">Partial</option>
+          <option value="uncovered">Uncovered</option>
+          <option value="draft">Draft ready</option>
+        </select>
+      </label>
+      <div class="tally">
+        <p class="shown" aria-live="polite" data-shown>All {plural(protocols.length, "protocol")}</p>
+        <button type="reset" class="reset">Clear filters</button>
+      </div>
+    </form>
+
+    <div class="frame">
+      <table>
+        <caption class="sr-only">
+          The protocols the tracker follows, with how many of their contracts have a descriptor and how much of their
+          recent traffic a wallet could clear-sign. Each protocol's name links to its page.
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col" class="rk">
+              <span aria-hidden="true">#</span>
+              <span class="sr-only">Rank by transactions a day</span>
+            </th>
+            <th scope="col" data-sort="name">
+              <button type="button" class="sort" disabled>Protocol<span class="arrow" aria-hidden="true"></span></button>
+            </th>
+            <th scope="col">Category</th>
+            <th scope="col">Chains</th>
+            <th scope="col">Status</th>
+            <th scope="col" data-sort="covered">
+              <button type="button" class="sort" disabled>
+                Contracts covered<span class="arrow" aria-hidden="true"></span>
+              </button>
+            </th>
+            <th scope="col" data-sort="share">
+              <button type="button" class="sort" disabled>
+                <span>Clear-signable <span class="sub">of recent transactions</span></span><span
+                  class="arrow"
+                  aria-hidden="true"></span>
+              </button>
+            </th>
+            <th scope="col" class="r" data-sort="day" aria-sort="descending">
+              <button type="button" class="sort" disabled>
+                <span>Transactions <span class="sub">a day</span></span><span class="arrow" aria-hidden="true"></span>
+              </button>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            protocols.map((protocol, i) => {
+              const { totals } = protocol;
+              return (
+                <tr
+                  id={`protocol-${protocol.id}`}
+                  data-chains={chainsOf(protocol).join(" ")}
+                  data-cat={protocol.category}
+                  data-status={protocol.status}
+                  data-draft={totals.drafts > 0 ? "" : undefined}
+                  data-covered={totals.contracts ? Math.round((totals.covered / totals.contracts) * 1e4) / 1e4 : 0}
+                  data-share={totals.txShareCovered ?? ""}
+                  data-day={totals.perDay}
+                  data-q={searchOf(protocol).join(" ")}
+                >
+                  <td class="rk">{String(i + 1).padStart(2, "0")}</td>
+                  <th scope="row">
+                    <a href={`/clear-signing/coverage/${protocol.id}/`}>{protocol.name}</a>
+                  </th>
+                  <td>{protocol.categoryLabel}</td>
+                  {/* Spaces between the parts of a cell, so a screen reader hears them apart. */}
+                  <td class="ch">
+                    {chainsOf(protocol).map((chainId) => (
+                      <>
+                        <span title={chainName(chainId)}>{chainTag(chainId)}</span>{" "}
+                      </>
+                    ))}
+                  </td>
+                  <td>
+                    <span class:list={["st", protocol.status]}>{statusLabel(protocol.status)}</span>
+                    {totals.drafts > 0 && (
+                      <>
+                        {" "}
+                        <span class="st draft">Draft ready</span>
+                      </>
+                    )}
+                  </td>
+                  <td>
+                    <b>{count(totals.covered)}</b> of {count(totals.contracts)}
+                    {totals.partial > 0 && <> <small>{count(totals.partial)} partial</small></>}
+                  </td>
+                  <td>
+                    {totals.txShareCovered === null ? (
+                      <small>No recent transactions</small>
+                    ) : (
+                      <>
+                        <b>{percent(totals.txShareCovered)}</b>{" "}
+                        <span class="mt" aria-hidden="true">
+                          <span style={width(totals.txShareCovered)} />
+                        </span>{" "}
+                        <small>
+                          {totals.signerShareCovered === null
+                            ? "Senders not known"
+                            : `${percent(totals.signerShareCovered)} of recent senders`}
+                        </small>
+                      </>
+                    )}
+                  </td>
+                  <td class="r">{perDay(totals.perDay)}</td>
+                </tr>
+              );
+            })
+          }
+          <tr class="empty" hidden>
+            <td colspan="8">No protocol matches these filters.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</Section>
+
+<script>
+  const board = document.querySelector<HTMLElement>("[data-board]");
+  if (board) setUp(board);
+
+  function setUp(board: HTMLElement) {
+    const form = board.querySelector<HTMLFormElement>(".toolbar");
+    const tbody = board.querySelector("tbody");
+    const empty = board.querySelector<HTMLElement>("tr.empty");
+    const shown = board.querySelector<HTMLElement>("[data-shown]");
+    if (!form || !tbody || !empty || !shown) return;
+    const rows = [...tbody.querySelectorAll<HTMLTableRowElement>("tr[data-q]")];
+    const rank = new Map(rows.map((row, i) => [row, i]));
+    const headers = [...board.querySelectorAll<HTMLElement>("th[data-sort]")];
+
+    // ── Filtering ────────────────────────────────────────────────────────
+    const filter = () => {
+      const data = new FormData(form);
+      const words = String(data.get("q") ?? "")
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(Boolean);
+      const chain = String(data.get("chain") ?? "");
+      const category = String(data.get("category") ?? "");
+      const status = String(data.get("status") ?? "");
+      let matches = 0;
+      for (const row of rows) {
+        const { q = "", chains = "" } = row.dataset;
+        const match =
+          words.every((word) => q.includes(word)) &&
+          (!chain || chains.split(" ").includes(chain)) &&
+          (!category || row.dataset.cat === category) &&
+          (!status || (status === "draft" ? "draft" in row.dataset : row.dataset.status === status));
+        row.hidden = !match;
+        if (match) matches += 1;
+      }
+      empty.hidden = matches > 0;
+      const noun = rows.length === 1 ? "protocol" : "protocols";
+      shown.textContent = matches === rows.length ? `All ${rows.length} ${noun}` : `${matches} of ${rows.length} ${noun}`;
+    };
+    form.addEventListener("input", filter);
+    form.addEventListener("submit", (event) => event.preventDefault());
+    // The fields take their first values only after the reset event.
+    form.addEventListener("reset", () => setTimeout(filter));
+
+    // ── Sorting ──────────────────────────────────────────────────────────
+    let key = "day";
+    let descending = true;
+    const valueOf = (row: HTMLElement): string | number => {
+      if (key === "name") return row.querySelector("a")?.textContent?.toLowerCase() ?? "";
+      const value = row.dataset[key];
+      return value ? Number(value) : Number.NaN;
+    };
+    const sort = () => {
+      const sign = descending ? -1 : 1;
+      rows.sort((a, b) => {
+        const [x, y] = [valueOf(a), valueOf(b)];
+        // A protocol with nothing to compare goes last, either way round.
+        if (typeof x === "number" && typeof y === "number" && Number.isNaN(x) !== Number.isNaN(y))
+          return Number.isNaN(x) ? 1 : -1;
+        const order = typeof x === "string" ? x.localeCompare(String(y)) : x - Number(y);
+        return sign * order || (rank.get(a) ?? 0) - (rank.get(b) ?? 0);
+      });
+      empty.before(...rows);
+      for (const header of headers)
+        if (header.dataset.sort === key) header.setAttribute("aria-sort", descending ? "descending" : "ascending");
+        else header.removeAttribute("aria-sort");
+    };
+    for (const header of headers) {
+      const button = header.querySelector("button");
+      if (!button) continue;
+      button.disabled = false;
+      button.addEventListener("click", () => {
+        const next = header.dataset.sort ?? "day";
+        // A new column starts from its most telling end: names from A, numbers from the most.
+        descending = next === key ? !descending : next !== "name";
+        key = next;
+        sort();
+      });
+    }
+
+    // ── A row is its protocol's link ─────────────────────────────────────
+    tbody.addEventListener("click", (event) => {
+      const target = event.target as Element;
+      const row = target.closest<HTMLElement>("tr[data-q]");
+      if (!row || target.closest("a, button") || String(getSelection() ?? "")) return;
+      row.querySelector("a")?.click();
+    });
+
+    // On a slow connection the inline fallback may have hidden the filters
+    // before this script arrived: they work now, so show them again.
+    board.dataset.js = "";
+    board.dataset.ready = "";
+    filter();
+  }
+</script>

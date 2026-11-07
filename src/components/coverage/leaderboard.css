@@ -1,0 +1,563 @@
+/*
+ * The coverage tracker's leaderboard (./Leaderboard.astro). These rules are
+ * global, under .cov-board, so the rows' plain markup carries no scoping
+ * marks, and the status shapes are drawn here, once, instead of an inline
+ * SVG in every row: a hundred protocols stay a small page. The shapes are
+ * those of ./StatusIcon.astro: a disc with a check, a half-filled ring, a
+ * dashed ring, and a ring around a dot.
+ */
+
+.cov-board {
+  margin-top: 2.75rem;
+}
+
+/* ── The filters: shown only when the board's script can run them ───── */
+
+.cov-board .toolbar {
+  display: none;
+}
+
+.cov-board[data-js] .toolbar {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem 1rem;
+  align-items: end;
+  margin-bottom: 1.25rem;
+}
+
+@media (min-width: 40rem) {
+  .cov-board[data-js] .toolbar {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  .cov-board .search,
+  .cov-board .tally {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (min-width: 64rem) {
+  .cov-board[data-js] .toolbar {
+    grid-template-columns: minmax(0, 1.6fr) repeat(3, minmax(0, 1fr));
+  }
+  .cov-board .search {
+    grid-column: auto;
+  }
+}
+
+.cov-board .field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.cov-board .field-label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--ink-muted);
+}
+
+.cov-board .field input,
+.cov-board .field select {
+  width: 100%;
+  height: 2.5rem;
+  padding: 0 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-raised);
+  font: inherit;
+  font-size: var(--sl-text-sm);
+  color: var(--ink);
+}
+
+.cov-board .field select {
+  appearance: none;
+  padding-inline-end: 2rem;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--ink-muted) 50%),
+    linear-gradient(135deg, var(--ink-muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 1.05rem) 55%,
+    calc(100% - 0.75rem) 55%;
+  background-size: 0.3rem 0.3rem;
+  background-repeat: no-repeat;
+}
+
+.cov-board .field input::placeholder {
+  color: var(--sl-color-gray-4);
+}
+
+.cov-board .field input:focus-visible,
+.cov-board .field select:focus-visible {
+  border-color: var(--brand);
+  outline: 2px solid color-mix(in srgb, var(--brand) 35%, transparent);
+  outline-offset: 1px;
+}
+
+.cov-board .tally {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cov-board .shown {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-stretch: 87.5%;
+  color: var(--ink-muted);
+}
+
+.cov-board .reset {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: var(--sl-text-sm);
+  font-weight: 600;
+  color: var(--sl-color-text-accent);
+  cursor: pointer;
+}
+
+.cov-board .reset:hover {
+  text-decoration: underline;
+}
+
+/* ── The table ──────────────────────────────────────────────────────── */
+
+.cov-board .frame {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-raised);
+}
+
+.cov-board table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--sl-text-sm);
+  color: var(--ink);
+}
+
+.cov-board thead th {
+  padding: 0.85rem 0.75rem;
+  border-bottom: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  font-weight: 400;
+  letter-spacing: 0.12em;
+  line-height: 1.5;
+  text-align: start;
+  text-transform: uppercase;
+  vertical-align: bottom;
+  color: var(--ink-muted);
+}
+
+.cov-board .sub {
+  display: block;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--sl-color-gray-4);
+}
+
+.cov-board .sort {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: flex-end;
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  letter-spacing: inherit;
+  text-align: inherit;
+  text-transform: inherit;
+  color: inherit;
+}
+
+.cov-board .sort:not(:disabled) {
+  cursor: pointer;
+}
+
+.cov-board .sort:not(:disabled):hover,
+.cov-board [aria-sort] .sort {
+  color: var(--ink);
+}
+
+.cov-board .sort:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* The arrow says which column the rows follow, and which way. */
+.cov-board .arrow {
+  flex-shrink: 0;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-bottom: 0.2rem;
+  border-inline-end: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  opacity: 0;
+  rotate: 45deg;
+}
+
+.cov-board [aria-sort] .arrow {
+  opacity: 1;
+  color: var(--sl-color-text-accent);
+}
+
+.cov-board [aria-sort="ascending"] .arrow {
+  margin-bottom: -0.05rem;
+  rotate: 225deg;
+}
+
+.cov-board thead .r .sort {
+  flex-direction: row-reverse;
+}
+
+.cov-board tbody tr + tr {
+  border-top: 1px solid var(--line);
+}
+
+.cov-board tbody tr > * {
+  padding: 0.95rem 0.75rem;
+  text-align: start;
+  vertical-align: top;
+}
+
+.cov-board tr > :first-child {
+  padding-inline-start: 1.1rem;
+}
+
+.cov-board tr > :last-child {
+  padding-inline-end: 1.1rem;
+}
+
+.cov-board .r,
+.cov-board tbody .r {
+  text-align: end;
+}
+
+.cov-board[data-ready] tbody tr:not(.empty) {
+  cursor: pointer;
+}
+
+.cov-board[data-ready] tbody tr:not(.empty):hover,
+.cov-board tbody tr:target {
+  background-color: color-mix(in srgb, var(--brand-soft) 28%, transparent);
+}
+
+.cov-board .rk {
+  width: 1%;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  color: var(--sl-color-gray-4);
+  white-space: nowrap;
+}
+
+.cov-board td.rk {
+  padding-top: 1.15rem;
+}
+
+.cov-board tbody th a {
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink);
+  text-decoration: none;
+}
+
+.cov-board tbody th a:hover {
+  color: var(--sl-color-text-accent);
+  text-decoration: underline;
+}
+
+.cov-board tbody th a:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 3px;
+  border-radius: var(--radius-sm);
+}
+
+/* Two chains to a line, so four make a block, not a ragged stack. */
+.cov-board .ch {
+  display: grid;
+  grid-template-columns: repeat(2, max-content);
+  gap: 0.3rem;
+  align-content: start;
+}
+
+.cov-board .ch span {
+  padding: 0.1rem 0.4rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  font-family: var(--font-mono);
+  font-size: 0.6rem;
+  letter-spacing: 0.08em;
+  line-height: 1.5;
+  text-align: center;
+  color: var(--ink-muted);
+}
+
+.cov-board b {
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink);
+}
+
+.cov-board small {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: var(--sl-text-xs);
+  color: var(--ink-muted);
+}
+
+/* "99% of recent senders" on one line, so rows keep one height. */
+@media (min-width: 64rem) {
+  .cov-board td small {
+    white-space: nowrap;
+  }
+}
+
+/* A share as a thin bar, as ./Meter.astro draws it. */
+.cov-board .mt {
+  display: block;
+  max-width: 9rem;
+  height: 6px;
+  margin-top: 0.4rem;
+  overflow: hidden;
+  border-radius: var(--radius-pill);
+  background-color: var(--coverage-empty);
+}
+
+.cov-board .mt > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background-color: var(--coverage-covered);
+}
+
+.cov-board td.r {
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.cov-board .empty td {
+  padding: 2.5rem 1.1rem;
+  color: var(--ink-muted);
+  text-align: center;
+}
+
+/* `hidden` hides a row however the layout below displays it. */
+.cov-board tr[hidden] {
+  display: none !important;
+}
+
+/* ── A status: its shape and its word, as ./StatusBadge.astro ───────── */
+
+.cov-board .st {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+  height: 1.5rem;
+  margin: 0 0.35rem 0.35rem 0;
+  padding: 0 0.6rem 0 0.45rem;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  font-weight: 600;
+  line-height: 1;
+  color: var(--ink);
+  white-space: nowrap;
+}
+
+.cov-board .st::before {
+  content: "";
+  box-sizing: border-box;
+  flex-shrink: 0;
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+}
+
+.cov-board .st.covered {
+  position: relative;
+  border-color: transparent;
+  background-color: var(--brand-soft);
+}
+
+/* A disc, and a check drawn over it: two borders of a turned box. */
+.cov-board .st.covered::before {
+  background-color: var(--coverage-covered);
+}
+
+.cov-board .st.covered::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: calc(0.45rem + 0.4rem - 0.1rem);
+  width: 0.2rem;
+  height: 0.38rem;
+  border: solid var(--on-brand);
+  border-width: 0 1.5px 1.5px 0;
+  translate: 0 -62%;
+  rotate: 45deg;
+}
+
+.cov-board .st.partial {
+  border-color: var(--ink-muted);
+}
+
+.cov-board .st.partial::before {
+  border: 1.5px solid var(--coverage-covered);
+  background: linear-gradient(90deg, var(--coverage-covered) 50%, transparent 50%);
+}
+
+.cov-board .st.uncovered {
+  border-style: dashed;
+  border-color: var(--ink-muted);
+}
+
+.cov-board .st.uncovered::before {
+  border: 1.5px dashed var(--ink-muted);
+}
+
+.cov-board .st.draft {
+  border-color: var(--brand);
+}
+
+.cov-board .st.draft::before {
+  border: 1.5px solid var(--coverage-covered);
+  background: var(--coverage-covered) content-box;
+  padding: 2px;
+}
+
+@media (forced-colors: active) {
+  .cov-board .st::before,
+  .cov-board .mt {
+    forced-color-adjust: none;
+  }
+  .cov-board .st.covered::before,
+  .cov-board .mt > span {
+    background: CanvasText;
+  }
+  .cov-board .st.covered::after {
+    forced-color-adjust: none;
+    border-color: Canvas;
+  }
+  .cov-board .st.partial::before {
+    border-color: CanvasText;
+    background: linear-gradient(90deg, CanvasText 50%, Canvas 50%);
+  }
+  .cov-board .st.uncovered::before,
+  .cov-board .st.draft::before {
+    border-color: CanvasText;
+  }
+  .cov-board .st.draft::before {
+    background: CanvasText content-box;
+  }
+  .cov-board .mt {
+    background: Canvas;
+    outline: 1px solid CanvasText;
+  }
+}
+
+/* ── Below 64rem: each protocol is a card ───────────────────────────── */
+
+@media (max-width: 63.99rem) {
+  .cov-board .frame {
+    border: 0;
+    background: none;
+  }
+
+  .cov-board table,
+  .cov-board tbody,
+  .cov-board tbody tr > *,
+  .cov-board caption {
+    display: block;
+  }
+
+  .cov-board thead {
+    display: none;
+  }
+
+  .cov-board tbody tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 0.9rem 1rem;
+    padding: 1rem 1.1rem 1.1rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+    background-color: var(--surface-raised);
+  }
+
+  .cov-board tbody tr + tr {
+    margin-top: 0.75rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .cov-board tbody tr > *,
+  .cov-board tr > :first-child,
+  .cov-board tr > :last-child {
+    padding: 0;
+  }
+
+  .cov-board tbody .r {
+    text-align: start;
+  }
+
+  .cov-board td.rk {
+    display: none;
+  }
+
+  .cov-board tbody th,
+  .cov-board tbody td:nth-child(5),
+  .cov-board .empty td {
+    grid-column: 1 / -1;
+  }
+
+  .cov-board tbody th a {
+    font-size: 1.1rem;
+  }
+
+  .cov-board .ch {
+    grid-template-columns: repeat(4, max-content);
+  }
+
+  /* Each cell's heading, from the table's columns. */
+  .cov-board tbody tr:not(.empty) > :is(:nth-child(3), :nth-child(4), :nth-child(6), :nth-child(7), :nth-child(8))::before {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-family: var(--font-mono);
+    font-size: 0.6rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    line-height: 1.4;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  .cov-board tbody tr > :nth-child(3)::before {
+    content: "Category";
+  }
+
+  .cov-board tbody tr > :nth-child(4)::before {
+    content: "Chains";
+    grid-column: 1 / -1;
+  }
+
+  .cov-board tbody tr > :nth-child(6)::before {
+    content: "Contracts covered";
+  }
+
+  .cov-board tbody tr > :nth-child(7)::before {
+    content: "Clear-signable, of recent transactions";
+  }
+
+  .cov-board tbody tr > :nth-child(8)::before {
+    content: "Transactions a day";
+  }
+}

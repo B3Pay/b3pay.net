@@ -1,0 +1,41 @@
+---
+/**
+ * /clear-signing/coverage/<protocol id>/: one page for each protocol in the
+ * coverage report, in the site's Starlight chrome (Starlight's StarlightPage),
+ * written to be shared with that protocol's team. Its hero is the tracker's
+ * (src/components/coverage/CoverageHero.astro, through the Hero override),
+ * which finds the protocol from the page's address; its title, description
+ * and line under the name say only what the report says (protocolCopy).
+ */
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import type { GetStaticPaths, InferGetStaticPropsType } from "astro";
+import ProtocolPage from "../../../components/coverage/ProtocolPage.astro";
+import { escapeHtml, protocolCopy, report } from "../../../components/coverage/report.ts";
+
+export const getStaticPaths = (() =>
+  report.protocols.map((protocol) => ({ params: { protocol: protocol.id }, props: { protocol } }))) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+
+const { protocol } = Astro.props as Props;
+const { title, description, tagline } = protocolCopy(protocol);
+---
+
+<StarlightPage
+  frontmatter={{
+    title,
+    description,
+    template: "splash",
+    // Starlight takes a hero's title and tagline as HTML; these are the report's text.
+    hero: {
+      title: escapeHtml(protocol.name),
+      tagline: escapeHtml(tagline),
+      actions: [
+        { text: "Start with your contracts", link: "/clear-signing/#start", icon: "right-arrow" },
+        { text: "All protocols", link: `/clear-signing/coverage/#protocol-${protocol.id}`, variant: "minimal" },
+      ],
+    },
+  }}
+>
+  <ProtocolPage protocol={protocol} />
+</StarlightPage>

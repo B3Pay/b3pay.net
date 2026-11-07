@@ -1,0 +1,58 @@
+---
+/**
+ * A status as a pill: its shape (./StatusIcon.astro) and its word, after the
+ * design system's StatusPill. Covered sits on brand-soft, partial in a solid
+ * outline, uncovered in a dashed one, and "Draft ready" in an amber outline,
+ * the design system's needs-you.
+ */
+import StatusIcon from "./StatusIcon.astro";
+import { statusLabel } from "./report.ts";
+import type { CoverageStatus } from "./types.ts";
+
+interface Props {
+  kind: CoverageStatus | "draft";
+}
+
+const { kind } = Astro.props;
+---
+
+<span class:list={["badge", kind]}>
+  <StatusIcon status={kind} />
+  {kind === "draft" ? "Draft ready" : statusLabel(kind)}
+</span>
+
+<style>
+  .badge {
+    display: inline-flex;
+    flex-shrink: 0;
+    gap: 0.4rem;
+    align-items: center;
+    height: 1.5rem;
+    padding: 0 0.6rem 0 0.45rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--ink);
+    white-space: nowrap;
+  }
+
+  .covered {
+    border-color: transparent;
+    background-color: var(--brand-soft);
+  }
+
+  .partial {
+    border-color: var(--ink-muted);
+  }
+
+  .uncovered {
+    border-style: dashed;
+    border-color: var(--ink-muted);
+  }
+
+  .draft {
+    border-color: var(--brand);
+  }
+</style>

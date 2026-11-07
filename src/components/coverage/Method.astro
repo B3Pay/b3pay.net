@@ -1,0 +1,184 @@
+---
+/**
+ * FIG. 04: how the numbers are made, in plain language. Every number and
+ * date in it comes from the report, and the status rule from the schema's
+ * own words (./types.ts), with its threshold from ./totals.ts.
+ */
+import Section from "../home/Section.astro";
+import { chains, count, day, days, percent, plural, registryUrl, report, sampleSize } from "./report.ts";
+import { COVERED_AT } from "./totals.ts";
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+const { registry, sources, totals } = report;
+const chainList = new Intl.ListFormat("en-GB", { type: "conjunction" }).format(chains.map((chain) => chain.name));
+---
+
+<Section {id} fig="FIG. 04" eyebrow="Method" title="How we measure">
+  <Fragment slot="lead">
+    <p>
+      Every number on this page is measured, the same way for every contract, from four sources read at the times it
+      states: the protocols' own address lists, the registry, the chains' recent transactions and Sourcify.
+    </p>
+  </Fragment>
+
+  <ol class="steps rise">
+    <li>
+      <h3>The contracts</h3>
+      <p>
+        {plural(totals.protocols, "protocol")} and {plural(totals.contracts, "contract")} on {chainList}. Every address
+        comes from the protocol's own documentation or repository, and each contract links to where we took it from.
+      </p>
+    </li>
+    <li>
+      <h3>The registry</h3>
+      <p>
+        We read <a href={registryUrl}>the Clear Signing registry</a> at commit <code>{registry.commit.slice(0, 7)}</code>,
+        from {day(registry.committedAt)}. Its calldata index lists{" "}
+        {plural(registry.deploymentsOnTrackedChains, "deployment")} on these chains, and a contract has a descriptor when its chain and address are in that index. Its verified ABI
+        gives the functions that change state, and the descriptor how many of them it formats.
+      </p>
+    </li>
+    <li>
+      <h3>Recent transactions</h3>
+      <p>
+        For each contract, up to its latest {count(sampleSize)} top-level transactions, read {
+          days(sources.onchain.oldest, sources.onchain.newest)
+        } from Blockscout's API or the <a href="https://docs.sqd.dev/">SQD Network</a> portal, which looks back at most 30
+        days. We count them by function selector, the first four bytes of the calldata. Plain transfers, with no
+        calldata, are left out.
+      </p>
+    </li>
+    <li>
+      <h3>Two shares</h3>
+      <p>
+        By transactions, every call counts. By senders, each address counts once for each function it called, so a
+        relayer bot counts once however many calls it sends. A protocol's, a chain's and the page's shares weigh each
+        contract by its transactions a day.
+      </p>
+    </li>
+    <li>
+      <h3>Status</h3>
+      <p>
+        <strong>Covered:</strong> the registry has a descriptor for the deployment, and it formats at least {
+          percent(COVERED_AT)
+        } of what recent senders called. Without senders we count transactions, and without recent calls, the
+        state-changing functions in the verified ABI. <strong>Partial:</strong> a descriptor that formats less, or whose reach
+        could not be measured. <strong>Uncovered:</strong> no descriptor for the deployment. A protocol is covered when all
+        its contracts are, uncovered when none of them has a descriptor, and partial in between.
+      </p>
+    </li>
+    <li>
+      <h3>Described elsewhere</h3>
+      <p>
+        For a deployment the registry does not list, we look at its descriptors for the same address on other chains
+        and for the protocol's other contracts. One counts only when every function it formats is in this contract's
+        verified ABI, and we give how much of this contract's recent calls those functions make up. The contract stays
+        uncovered.
+      </p>
+    </li>
+    <li>
+      <h3>Sourcify</h3>
+      <p>
+        Whether the contract's source is verified on <a href="https://sourcify.dev/">Sourcify</a>, exactly or partly. The
+        registry's linter needs it: a contract has to be verified there before a descriptor for it can go into the
+        registry.
+      </p>
+    </li>
+    <li>
+      <h3>Drafts</h3>
+      <p>
+        For {plural(totals.drafts, "contract")}, B3Pay has a draft descriptor, and every function it formats has a test
+        built from a real transaction. A preview shows one of those transactions as a wallet would with the draft.
+      </p>
+    </li>
+  </ol>
+
+  <p class="built rise">
+    Report built {day(report.generatedAt)}. <a href="/clear-signing/coverage.json">The data, as JSON</a>
+  </p>
+</Section>
+
+<style>
+  .steps {
+    display: grid;
+    gap: 0 3rem;
+    margin: 2.75rem 0 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: step;
+  }
+
+  @media (min-width: 48rem) {
+    .steps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .steps li {
+    display: grid;
+    grid-template-columns: 2.25rem minmax(0, 1fr);
+    gap: 0.4rem 0.75rem;
+    align-content: start;
+    padding: 1.25rem 0 1.4rem;
+    border-top: 1px solid var(--line);
+    counter-increment: step;
+  }
+
+  /* 01, 02…: the figure numbers' mono, small and quiet. */
+  .steps li::before {
+    content: counter(step, decimal-leading-zero);
+    grid-row: 1 / span 2;
+    padding-top: 0.3rem;
+    font-family: var(--font-mono);
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    color: var(--sl-color-text-accent);
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: var(--ink);
+  }
+
+  .steps p {
+    margin: 0;
+    font-size: var(--sl-text-sm);
+    line-height: 1.6;
+    color: var(--sl-color-gray-2);
+  }
+
+  .steps strong {
+    color: var(--ink);
+  }
+
+  .steps a,
+  .built a {
+    color: var(--sl-color-text-accent);
+  }
+
+  .steps code {
+    padding: 0 0.25rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background-color: var(--surface-raised);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+
+  .built {
+    margin: 1rem 0 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--line);
+    font-family: var(--font-mono);
+    font-size: 0.68rem;
+    font-stretch: 87.5%;
+    color: var(--ink-muted);
+  }
+</style>

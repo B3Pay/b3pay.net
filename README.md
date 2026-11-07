@@ -6,10 +6,15 @@ docs each repository publishes. Built with [Astro](https://astro.build) and
 [Starlight](https://starlight.astro.build), deployed on Vercel.
 
 ```
-src/content/docs/   the site's own pages: home, Clear Signing, Toolkit, B3Forge,
-                    Internet Computer, About, Contact, and /docs/
-src/components/     the header, footer, cards and form, Starlight overrides, and
-                    the home page's hero and sections (home/)
+src/content/docs/   the site's own pages: home, Clear Signing and its coverage
+                    tracker, Toolkit, B3Forge, Internet Computer, About, Contact,
+                    and /docs/
+src/components/     the header, footer, cards and form, Starlight overrides, the
+                    home page's hero and sections (home/), and the coverage
+                    tracker's (coverage/)
+src/data/           the coverage tracker's report
+src/pages/          the coverage tracker's page for each protocol, and
+                    /clear-signing/coverage.json, the report as published
 src/styles/         design tokens (from B3Pay/b3pay-design-system) and site CSS
 modules/            the docs modules: the registry, the modules written here,
                     and manifests for repositories built here (modules/README.md)
@@ -29,7 +34,8 @@ npm run dev              # sync the modules, then the dev server
 npm run build            # sync the modules, then build dist/
 npm run preview          # serve dist/ the way Vercel does, on localhost:4180
 npm test                 # module rules, archive safety, the checkers themselves,
-                         # and the home page's calldata against its sentences
+                         # the home page's calldata against its sentences, and
+                         # the coverage report against its schema and its counts
 npm run typecheck        # astro check, and the API function
 npm run check:links      # every link in dist/ reaches a page, a file or the API
 npm run check:redirects  # every old address ends where it should
@@ -39,6 +45,35 @@ npm run brand:images     # redraw the icons and the link preview card
 The first sync downloads the modules the registry pins from GitHub; later runs
 reuse `.modules/cache`. CI (`.github/workflows/ci.yml`) runs the tests, the type
 check, the build and both checks on every pull request.
+
+## The coverage tracker
+
+`/clear-signing/coverage/` and a page for each protocol under it,
+`/clear-signing/coverage/<protocol id>/`
+([`src/pages/clear-signing/coverage/[protocol].astro`](src/pages/clear-signing/coverage/[protocol].astro)),
+are built from one file,
+[`src/data/clear-signing-coverage.json`](src/data/clear-signing-coverage.json),
+the report the Clear Signing tracker writes (clear-signing-mcp, `cli.js
+report`). Its schema, with what each field means, is
+[`src/components/coverage/types.ts`](src/components/coverage/types.ts). The
+site publishes the file as it is at `/clear-signing/coverage.json`. The
+overview keeps one light row per protocol, so it stays small: with 96
+protocols and 564 contracts it is about 155 KB of HTML, and the contracts are
+on the protocols' pages. A contract the registry describes for another
+deployment, though not for its own (`elsewhere` in the schema), is listed
+among the overview's near misses when that descriptor formats nearly all of
+its calls, and its card says so either way.
+
+To update the tracker, replace the file and check it:
+
+```sh
+node scripts/coverage-totals.mjs          # the counts agree with the protocol list
+node scripts/coverage-totals.mjs --write  # or: work them out again and rewrite them
+npm test                                  # the report follows its schema
+```
+
+The build stops when a count disagrees with the protocol list, and `npm test`
+refuses a file marked `"mock": true`, the placeholder the page was built on.
 
 ## Docs modules
 
