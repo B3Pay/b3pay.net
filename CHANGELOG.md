@@ -20,8 +20,8 @@ The site is not versioned; changes are listed by the date they merged.
   `/clear-signing/pricing/`: three plans, Coverage priced per contract (one
   descriptor lists a contract on every chain it is deployed to), a Fix per
   descriptor, and Upkeep by the month; how paying works; and what no price
-  buys: a merge date, an attestation, a submission without the protocol's
-  sign-off, what every wallet shows, or an audit. Every price and term is in
+  buys: a merge date, an attestation, the protocol's own sign-off, what
+  every wallet shows, or an audit. Every price and term is in
   `src/data/clear-signing-pricing.ts`, and `scripts/pricing.test.mjs` fails
   when a page or component writes a dollar amount of its own. Linked from
   the Clear Signing page's hero and its "Before we start", and from the
