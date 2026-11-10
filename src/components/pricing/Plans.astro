@@ -1,0 +1,55 @@
+---
+/**
+ * FIG. 01 of the pricing page: the three plans, one card each, Coverage first
+ * and marked as the way in. Every price, and every number in a plan's terms,
+ * comes from src/data/clear-signing-pricing.ts; this component writes none.
+ */
+import Section from "../home/Section.astro";
+import { PLANS, dollars } from "../../data/clear-signing-pricing.ts";
+import "./pricing.css";
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+---
+
+<Section {id} fig="FIG. 01" eyebrow="Plans" title="Pick what your protocol needs">
+  <Fragment slot="lead">
+    <p>
+      Coverage for contracts the registry does not describe, a Fix for a descriptor that falls short, and Upkeep to keep
+      either current. A contract is one ABI: its descriptor lists every chain and address it is deployed to, so it is
+      priced once, however many chains you are on.
+    </p>
+  </Fragment>
+
+  <div class="pr-plans">
+    {
+      PLANS.map((plan, index) => (
+        <article
+          class:list={["pr-plan rise", { featured: index === 0 }]}
+          id={`plan-${plan.id}`}
+          aria-labelledby={`plan-${plan.id}-title`}
+        >
+          <p class="pr-kicker">{plan.name}</p>
+          <h3 id={`plan-${plan.id}-title`}>{plan.title}</h3>
+          <p class="pr-audience">{plan.audience}</p>
+          <div class="pr-prices">
+            {plan.prices.map((price, i) => (
+              <p class:list={["pr-price", { then: i > 0 }]}>
+                <span class="amount">{dollars(price.usd)}</span> <span class="unit">{price.unit}</span>
+              </p>
+            ))}
+          </div>
+          <ul class="pr-includes">
+            {plan.includes.map((line) => (
+              <li>{line}</li>
+            ))}
+          </ul>
+          <p class="pr-terms">{plan.terms}</p>
+        </article>
+      ))
+    }
+  </div>
+</Section>

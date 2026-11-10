@@ -1,0 +1,38 @@
+---
+title: Clear Signing pricing
+description: What B3Pay charges to write, test, submit and keep current the ERC-7730 descriptors for your protocol's contracts, how paying works, and what no price buys.
+template: splash
+hero:
+  title: What it costs to get clear-signed
+  tagline: A fixed price for each contract we describe, test on real transactions and submit to the Clear Signing registry, quoted before we start, and a monthly price to keep your descriptors current as your contracts change.
+  actions:
+    - text: Start with your contracts
+      link: /clear-signing/#start
+      icon: right-arrow
+    - text: What we do for a protocol
+      link: /clear-signing/
+      variant: minimal
+---
+
+import Closing from "../../../components/coverage/Closing.astro";
+import Limits from "../../../components/pricing/Limits.astro";
+import Paying from "../../../components/pricing/Paying.astro";
+import Plans from "../../../components/pricing/Plans.astro";
+
+{/* Every price on this page comes from src/data/clear-signing-pricing.ts; scripts/pricing.test.mjs fails on one written here. */}
+
+<Plans id="plans" />
+
+<Paying id="paying" />
+
+<Limits id="limits" />
+
+<Closing
+  id="get-covered"
+  fig="FIG. 04"
+  title="Not sure which one you need?"
+  back={{ href: "/clear-signing/coverage/", text: "Find your protocol in the tracker" }}
+>
+  Tell us the chains, the addresses and the flows your users sign, and we reply with a scope and a fixed quote. The
+  coverage tracker shows where your contracts stand today.
+</Closing>

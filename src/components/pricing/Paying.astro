@@ -1,0 +1,35 @@
+---
+/**
+ * FIG. 02 of the pricing page: how paying works. The share due at the start
+ * comes from src/data/clear-signing-pricing.ts, like every price.
+ */
+import Section from "../home/Section.astro";
+import { DEPOSIT } from "../../data/clear-signing-pricing.ts";
+import "./pricing.css";
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+const deposit = `${Math.round(DEPOSIT * 100)}%`;
+---
+
+<Section {id} fig="FIG. 02" eyebrow="Paying" title="Fixed before we start">
+  <ul class="pr-list rise">
+    <li>
+      <strong>A fixed quote, free.</strong> Before we start, you get the contracts and functions in scope, the price from this
+      page in US dollars, and the date the pull request opens. Scoping costs nothing.
+    </li>
+    <li>
+      <strong>{deposit} at the start, the rest at the pull request.</strong> Coverage and a Fix are paid in two
+      parts, {deposit} when we start and the rest when the registry pull request is open for review. The registry's
+      review is not in our hands, so the second payment does not wait for a merge, and we keep answering its reviewers
+      after it.
+    </li>
+    <li>
+      <strong>Upkeep by the quarter.</strong> Upkeep is billed at the start of each quarter, and stops at the end of any quarter
+      you choose.
+    </li>
+  </ul>
+</Section>
