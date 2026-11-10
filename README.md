@@ -7,13 +7,14 @@ docs each repository publishes. Built with [Astro](https://astro.build) and
 
 ```
 src/content/docs/   the site's own pages: home, Clear Signing with its coverage
-                    tracker and playground, Toolkit, B3Forge, Internet Computer,
-                    About, Contact, and /docs/
+                    tracker, playground and pricing, Toolkit, B3Forge, Internet
+                    Computer, About, Contact, and /docs/
 src/components/     the header, footer, cards and form, Starlight overrides, the
                     home page's hero and sections (home/), the Clear Signing
                     page's hero (clear-signing/), the coverage tracker's
-                    (coverage/) and the playground's (playground/)
-src/data/           the coverage tracker's report
+                    (coverage/), the playground's (playground/) and the
+                    pricing page's (pricing/)
+src/data/           the coverage tracker's report and the Clear Signing prices
 src/pages/          the coverage tracker's page for each protocol,
                     /clear-signing/coverage.json, the report as published, and
                     the contracts the playground looks up
@@ -112,6 +113,14 @@ with a clone of the registry and clear-signing-mcp's tracker:
 node scripts/playground-examples.mjs <registry clone> <clear-signing-mcp>/tracker
 npm test   # the examples against the report, and the library on real calls
 ```
+
+## Pricing
+
+`/clear-signing/pricing/` shows what the Clear Signing service costs: its
+plans, how paying works and what no price buys. Every price and term is in
+[`src/data/clear-signing-pricing.ts`](src/data/clear-signing-pricing.ts), so a
+price changes there and nowhere else; `npm test` fails when a page or
+component writes a dollar amount of its own.
 
 ## Docs modules
 

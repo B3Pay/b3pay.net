@@ -1,0 +1,47 @@
+---
+/**
+ * FIG. 03 of the pricing page: what no price buys, in the words of the Clear
+ * Signing page's "What we don't claim". "Attested" appears only to say that
+ * we don't sell it.
+ */
+import Section from "../home/Section.astro";
+import "./pricing.css";
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+---
+
+<Section {id} fig="FIG. 03" eyebrow="Limits" title="What no price buys">
+  <ul class="pr-list rise">
+    <li>
+      <strong>A merge date.</strong> The registry's maintainers review on their own schedule. We answer their reviewers until
+      the pull request merges, and we don't promise when that is.
+    </li>
+    <li>
+      <strong>An attestation.</strong> An attestation is a reviewer's signed claim about one exact descriptor, under ERC-8176,
+      which is still a draft. We don't sell attestations, and we call a descriptor attested only when an attestation exists
+      for its current content.
+    </li>
+    <li>
+      <strong>Your sign-off.</strong> The registry's guide for the reviewers who attest descriptors asks them to check that
+      whoever submits one is plausibly affiliated with the protocol. A plan's pull request goes out with your sign-off, and
+      we never present a descriptor as yours without it.
+    </li>
+    <li>
+      <strong>What every wallet shows.</strong> Each wallet chooses which registries and reviewers it trusts, and how it lays
+      out a request.
+    </li>
+    <li>
+      <strong>An audit.</strong> A descriptor says what a call does, not whether the contract is safe to call.
+    </li>
+  </ul>
+  <p class="pr-sourced rise">
+    Sources, checked 10 November 2026: <a
+      href="https://github.com/ethereum/clear-signing-erc7730-registry/blob/master/auditors/README.md"
+      >the registry's guide for auditors</a
+    > and <a href="https://eips.ethereum.org/EIPS/eip-8176">ERC-8176</a>.
+  </p>
+</Section>

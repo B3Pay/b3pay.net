@@ -1,0 +1,186 @@
+/*
+ * The pricing page (src/content/docs/clear-signing/pricing.mdx): the plans'
+ * cards, in the home page's offer card manner, and the lists of terms and
+ * limits, in the coverage tracker's (../coverage/Claims.astro). Inside a
+ * Section, so Starlight's content styles stay out.
+ */
+
+/* ── The plans ─────────────────────────────────────────────────────── */
+
+.pr-plans {
+  display: grid;
+  gap: 1.25rem;
+  margin-top: 3rem;
+}
+
+@media (min-width: 64rem) {
+  .pr-plans {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.pr-plan {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: clamp(1.5rem, 1rem + 1.5vw, 2rem);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background-color: var(--surface-raised);
+}
+
+/* Coverage, the way in: the brand's edge and glow, as on the home page's offer. */
+.pr-plan.featured {
+  border-color: color-mix(in srgb, var(--brand) 45%, var(--line));
+  background-image: radial-gradient(
+    28rem 16rem at 100% 0%,
+    color-mix(in srgb, var(--brand) 10%, transparent),
+    transparent 70%
+  );
+}
+
+.pr-plan p,
+.pr-plan ul {
+  margin: 0;
+}
+
+.pr-kicker {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sl-color-text-accent);
+}
+
+.pr-plan h3 {
+  margin: 0;
+  font-size: clamp(1.3rem, 1.15rem + 0.6vw, 1.6rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--sl-color-white);
+  text-wrap: balance;
+}
+
+.pr-audience {
+  line-height: 1.55;
+  color: var(--sl-color-gray-2);
+}
+
+.pr-prices {
+  display: grid;
+  gap: 0.35rem;
+  padding-block: 1rem;
+  border-block: 1px solid var(--line);
+}
+
+.pr-price {
+  line-height: 1.35;
+  color: var(--sl-color-gray-2);
+}
+
+/* The headline price on a line of its own, its words under it. No tabular
+   figures: the brand face sets a comma as wide as a digit in them, "$1 , 500". */
+.pr-price .amount {
+  display: block;
+  font-size: clamp(1.9rem, 1.6rem + 1vw, 2.4rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--sl-color-white);
+}
+
+/* The price after the headline one, on one line: "$500 for each contract after it". */
+.pr-price.then {
+  margin-top: 0.4rem;
+}
+
+.pr-price.then .amount {
+  display: inline;
+  font-size: var(--sl-text-lg);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.pr-includes {
+  display: grid;
+  gap: 0.6rem;
+  padding: 0;
+  list-style: none;
+  font-size: var(--sl-text-sm);
+  line-height: 1.55;
+  color: var(--sl-color-gray-2);
+}
+
+.pr-includes li {
+  position: relative;
+  padding-inline-start: 1.25rem;
+}
+
+/* The site's list mark: a short amber dash. */
+.pr-includes li::before {
+  content: "";
+  position: absolute;
+  top: 0.75em;
+  left: 0;
+  width: 0.6rem;
+  height: 1px;
+  background-color: var(--brand);
+}
+
+/* At the card's foot, whatever the length of the list above it. */
+.pr-plan .pr-terms {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  font-family: var(--font-mono);
+  font-size: var(--sl-text-xs);
+  line-height: 1.6;
+  color: var(--sl-color-gray-3);
+}
+
+/* ── Paying and limits ─────────────────────────────────────────────── */
+
+.pr-list {
+  display: grid;
+  max-width: 50rem;
+  margin: 2.25rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pr-list li {
+  position: relative;
+  padding: 1rem 0 1rem 1.75rem;
+  border-top: 1px solid var(--line);
+  font-size: var(--sl-text-base);
+  line-height: 1.6;
+  color: var(--sl-color-gray-2);
+}
+
+.pr-list li::before {
+  content: "";
+  position: absolute;
+  top: 1.85rem;
+  left: 0;
+  width: 0.75rem;
+  height: 1px;
+  background-color: var(--brand);
+}
+
+.pr-list strong {
+  color: var(--ink);
+}
+
+.pr-sourced {
+  max-width: 50rem;
+  margin: 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  font-size: var(--sl-text-sm);
+  color: var(--sl-color-gray-3);
+}
+
+.pr-sourced a {
+  color: var(--sl-color-text-accent);
+}
